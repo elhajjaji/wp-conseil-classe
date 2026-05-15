@@ -62,7 +62,7 @@ final class CC_Public {
         }
         if (!CC_Roles::user_can_parent_portal()) {
             wp_die(
-                wp_kses_post(__('Ce compte WordPress n’a pas le profil conseil de classe nécessaire (parent, admin conseil ou super admin conseil).', 'conseil-classe')),
+                wp_kses_post(__('Ce compte n’a pas le profil conseil de classe nécessaire (parent, admin conseil ou super admin conseil).', 'conseil-classe')),
                 esc_html__('Accès refusé', 'conseil-classe'),
                 ['response' => 403]
             );
@@ -232,7 +232,7 @@ final class CC_Public {
     public function shortcode_parent_login($atts): string {
         ob_start();
         echo '<div class="cc-parent-login">';
-        echo '<h3>' . esc_html__('Espace parents (compte WordPress)', 'conseil-classe') . '</h3>';
+        echo '<h3>' . esc_html__('Espace parents (compte du site)', 'conseil-classe') . '</h3>';
 
         if (is_user_logged_in()) {
             if (!CC_Roles::user_can_parent_portal()) {
@@ -245,12 +245,12 @@ final class CC_Public {
                 if ($row) {
                     echo '<p>' . esc_html__('Fiche parent :', 'conseil-classe') . ' <strong>' . esc_html($row['prenom'] . ' ' . $row['nom']) . '</strong></p>';
                 } else {
-                    echo '<div class="cc-notice cc-notice-warning">' . esc_html__('Aucune fiche parent n’est liée à ce compte (identifiant ou email). Un administrateur doit associer votre utilisateur WordPress à la liste des parents.', 'conseil-classe') . '</div>';
+                    echo '<div class="cc-notice cc-notice-warning">' . esc_html__('Aucune fiche parent n’est liée à ce compte (identifiant ou email). Un administrateur doit associer cet utilisateur à la liste des parents.', 'conseil-classe') . '</div>';
                 }
-                echo '<p><a class="cc-btn cc-btn-secondary" href="' . esc_url(wp_logout_url((string) wp_validate_redirect(self::current_page_url_or_home(), home_url('/')))) . '">' . esc_html__('Se déconnecter (WordPress)', 'conseil-classe') . '</a></p>';
+                echo '<p><a class="cc-btn cc-btn-secondary" href="' . esc_url(wp_logout_url((string) wp_validate_redirect(self::current_page_url_or_home(), home_url('/')))) . '">' . esc_html__('Se déconnecter', 'conseil-classe') . '</a></p>';
             }
         } else {
-            echo '<p class="cc-muted">' . esc_html__('Accédez au planning, à vos inscriptions et aux comptes rendus avec votre compte WordPress fourni par l’établissement ou l’association.', 'conseil-classe') . '</p>';
+            echo '<p class="cc-muted">' . esc_html__('Accédez au planning, à vos inscriptions et aux comptes rendus avec votre compte fourni par l’établissement ou l’association.', 'conseil-classe') . '</p>';
             echo '<p><a class="cc-btn cc-btn-primary" href="' . esc_url($this->wp_login_url_for_conseil()) . '">' . esc_html__('Se connecter', 'conseil-classe') . '</a></p>';
         }
 
@@ -556,7 +556,7 @@ final class CC_Public {
         echo '<p><strong>' . esc_html($council['classe_nom'] . ' (' . $council['classe_niveau'] . ')') . '</strong> — ' . esc_html(mysql2date('d/m/Y', $council['date_conseil'])) . ' ' . esc_html($heure) . '</p>';
 
         echo '<div class="cc-notice cc-notice-info">';
-        echo esc_html__('Une fois créé, vous ne pouvez plus modifier ce compte-rendu depuis cet espace ; l’équipe conseil peut le corriger depuis l’admin WordPress si besoin.', 'conseil-classe');
+        echo esc_html__('Une fois créé, vous ne pouvez plus modifier ce compte-rendu depuis cet espace ; l’équipe conseil peut le corriger depuis l’administration du site si besoin.', 'conseil-classe');
         echo '</div>';
 
         echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';

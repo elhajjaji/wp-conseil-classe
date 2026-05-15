@@ -516,6 +516,174 @@ final class CC_Repo {
         );
     }
 
+    public static function get_dashboard_stats(?int $yearId = null, ?int $termId = null): array {
+        global $wpdb;
+
+        $parents = CC_DB::table('parents');
+        $classes = CC_DB::table('classes');
+        $councils = CC_DB::table('councils');
+        $registrations = CC_DB::table('registrations');
+        $reports = CC_DB::table('reports');
+        $templates = CC_DB::table('pdf_templates');
+
+        $stats = [
+            'global' => [
+                'parents' => 0,
+                'classes' => 0,
+                'councils' => 0,
+                'registrations' => 0,
+                'reports' => 0,
+                'validated_reports' => 0,
+                'pdf_templates' => 0,
+                'active_pdf_templates' => 0,
+            ],
+            'active' => [
+                'classes' => 0,
+                'classes_without_council' => 0,
+                'councils' => 0,
+                'orphan_councils' => 0,
+                'registrations' => 0,
+                'registered_parents' => 0,
+                'reports' => 0,
+                'validated_reports' => 0,
+                'pending_reports' => 0,
+            ],
+        ];
+
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        $stats['global']['parents'] = (int) $wpdb->get_var("SELECT COUNT(*) FROM " . esc_sql($parents));
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        $stats['global']['classes'] = (int) $wpdb->get_var("SELECT COUNT(*) FROM " . esc_sql($classes));
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        $stats['global']['councils'] = (int) $wpdb->get_var("SELECT COUNT(*) FROM " . esc_sql($councils));
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        $stats['global']['registrations'] = (int) $wpdb->get_var("SELECT COUNT(*) FROM " . esc_sql($registrations));
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        $stats['global']['reports'] = (int) $wpdb->get_var("SELECT COUNT(*) FROM " . esc_sql($reports));
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        $stats['global']['validated_reports'] = (int) $wpdb->get_var("SELECT COUNT(*) FROM " . esc_sql($reports) . " WHERE valide = 1");
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        $stats['global']['pdf_templates'] = (int) $wpdb->get_var("SELECT COUNT(*) FROM " . esc_sql($templates));
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        $stats['global']['active_pdf_templates'] = (int) $wpdb->get_var("SELECT COUNT(*) FROM " . esc_sql($templates) . " WHERE actif = 1");
+
+        if (!$yearId || !$termId) {
+            return $stats;
+        }
+
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        $stats['active']['classes'] = (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM " . esc_sql($classes) . " WHERE year_id = %d", $yearId));
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        $stats['active']['councils'] = (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM " . esc_sql($councils) . " WHERE year_id = %d AND term_id = %d", $yearId, $termId));
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        $stats['active']['registrations'] = (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*)
+             FROM " . esc_sql($registrations) . " r
+             JOIN " . esc_sql($councils) . " c ON c.id = r.council_id
+             WHERE c.year_id = %d AND c.term_id = %d",
+            $yearId,
+            $termId
+        ));
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        $stats['active']['registered_parents'] = (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(DISTINCT r.parent_id)
+             FROM " . esc_sql($registrations) . " r
+             JOIN " . esc_sql($councils) . " c ON c.id = r.council_id
+             WHERE c.year_id = %d AND c.term_id = %d",
+            $yearId,
+            $termId
+        ));
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        $stats['active']['orphan_councils'] = (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*)
+             FROM " . esc_sql($councils) . " c
+             LEFT JOIN " . esc_sql($registrations) . " r ON r.council_id = c.id
+             WHERE c.year_id = %d AND c.term_id = %d AND r.id IS NULL",
+            $yearId,
+            $termId
+        ));
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        $stats['active']['reports'] = (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*)
+             FROM " . esc_sql($reports) . " r
+             JOIN " . esc_sql($councils) . " c ON c.id = r.council_id
+             WHERE c.year_id = %d AND c.term_id = %d",
+            $yearId,
+            $termId
+        ));
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        $stats['active']['validated_reports'] = (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*)
+             FROM " . esc_sql($reports) . " r
+             JOIN " . esc_sql($councils) . " c ON c.id = r.council_id
+             WHERE c.year_id = %d AND c.term_id = %d AND r.valide = 1",
+            $yearId,
+            $termId
+        ));
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        $stats['active']['classes_without_council'] = (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*)
+             FROM " . esc_sql($classes) . " cl
+             LEFT JOIN " . esc_sql($councils) . " c ON c.class_id = cl.id AND c.year_id = %d AND c.term_id = %d
+             WHERE cl.year_id = %d AND c.id IS NULL",
+            $yearId,
+            $termId,
+            $yearId
+        ));
+        $stats['active']['pending_reports'] = max(0, $stats['active']['councils'] - $stats['active']['reports']);
+
+        return $stats;
+    }
+
+    public static function list_dashboard_class_stats(?int $yearId = null, ?int $termId = null): array {
+        global $wpdb;
+
+        if (!$yearId || !$termId) {
+            return [];
+        }
+
+        $classes = CC_DB::table('classes');
+        $councils = CC_DB::table('councils');
+        $registrations = CC_DB::table('registrations');
+        $reports = CC_DB::table('reports');
+
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        return (array) $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT cl.id,
+                        cl.nom,
+                        cl.niveau,
+                        c.id AS council_id,
+                        c.date_conseil,
+                        c.heure_debut,
+                        c.heure_fin,
+                        c.salle_conseil,
+                        c.president_conseil,
+                        COALESCE(reg.registrations_count, 0) AS registrations_count,
+                        COALESCE(rep.report_id, 0) AS report_id,
+                        COALESCE(rep.report_validated, 0) AS report_validated
+                 FROM " . esc_sql($classes) . " cl
+                 LEFT JOIN " . esc_sql($councils) . " c
+                        ON c.class_id = cl.id AND c.year_id = %d AND c.term_id = %d
+                 LEFT JOIN (
+                        SELECT council_id, COUNT(*) AS registrations_count
+                        FROM " . esc_sql($registrations) . "
+                        GROUP BY council_id
+                 ) reg ON reg.council_id = c.id
+                 LEFT JOIN (
+                        SELECT id AS report_id, council_id, valide AS report_validated
+                        FROM " . esc_sql($reports) . "
+                 ) rep ON rep.council_id = c.id
+                 WHERE cl.year_id = %d
+                 ORDER BY cl.niveau ASC, cl.nom ASC",
+                $yearId,
+                $termId,
+                $yearId
+            ),
+            ARRAY_A
+        );
+    }
+
     public static function get_report(int $reportId): ?array {
         global $wpdb;
         $reports = CC_DB::table('reports');
@@ -627,6 +795,275 @@ final class CC_Repo {
         $table = CC_DB::table('pdf_templates');
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- intentional delete.
         $wpdb->delete($table, ['id' => $id], ['%d']);
+    }
+
+    // ── Statistiques : appréciations par classe (trimestre actif) ─────────────
+
+    public static function list_appreciations_by_class(int $yearId, int $termId): array {
+        global $wpdb;
+        $classes  = CC_DB::table('classes');
+        $councils = CC_DB::table('councils');
+        $reports  = CC_DB::table('reports');
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        return (array) $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT cl.nom,
+                        cl.niveau,
+                        COUNT(r.id)                                      AS nb_reports,
+                        COALESCE(SUM(r.nb_felicitations),0)              AS sum_fel,
+                        COALESCE(SUM(r.nb_encouragements),0)             AS sum_enc,
+                        COALESCE(SUM(r.nb_compliments),0)                AS sum_comp,
+                        COALESCE(SUM(r.nb_mise_en_garde_travail),0)      AS sum_mgt,
+                        COALESCE(SUM(r.nb_mise_en_garde_comportement),0) AS sum_mgc
+                 FROM " . esc_sql($classes) . " cl
+                 LEFT JOIN " . esc_sql($councils) . " co
+                        ON co.class_id = cl.id AND co.year_id = %d AND co.term_id = %d
+                 LEFT JOIN " . esc_sql($reports) . " r ON r.council_id = co.id
+                 WHERE cl.year_id = %d
+                 GROUP BY cl.id, cl.nom, cl.niveau
+                 ORDER BY cl.niveau ASC, cl.nom ASC",
+                $yearId, $termId, $yearId
+            ),
+            ARRAY_A
+        );
+    }
+
+    // ── Statistiques : appréciations par trimestre (toute l'année) ────────────
+
+    public static function list_appreciations_by_term(int $yearId): array {
+        global $wpdb;
+        $councils = CC_DB::table('councils');
+        $reports  = CC_DB::table('reports');
+        $terms    = CC_DB::table('terms');
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        return (array) $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT t.id AS term_id,
+                        t.nom AS term_nom,
+                        COUNT(r.id)                                      AS nb_reports,
+                        COALESCE(SUM(r.nb_felicitations),0)              AS sum_fel,
+                        COALESCE(SUM(r.nb_encouragements),0)             AS sum_enc,
+                        COALESCE(SUM(r.nb_compliments),0)                AS sum_comp,
+                        COALESCE(SUM(r.nb_mise_en_garde_travail),0)      AS sum_mgt,
+                        COALESCE(SUM(r.nb_mise_en_garde_comportement),0) AS sum_mgc
+                 FROM " . esc_sql($terms) . " t
+                 INNER JOIN " . esc_sql($councils) . " co
+                        ON co.term_id = t.id AND co.year_id = %d
+                 LEFT JOIN " . esc_sql($reports) . " r ON r.council_id = co.id
+                 GROUP BY t.id, t.nom
+                 ORDER BY t.id ASC",
+                $yearId
+            ),
+            ARRAY_A
+        );
+    }
+
+    // ── Statistiques : appréciations par classe × trimestre (évolution) ───────
+
+    public static function list_appreciations_all_classes_all_terms(int $yearId): array {
+        global $wpdb;
+        $classes  = CC_DB::table('classes');
+        $councils = CC_DB::table('councils');
+        $reports  = CC_DB::table('reports');
+        $terms    = CC_DB::table('terms');
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        return (array) $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT cl.id AS class_id,
+                        cl.nom AS class_nom,
+                        t.nom AS term_nom,
+                        COUNT(r.id)                                      AS nb_reports,
+                        COALESCE(SUM(r.nb_felicitations),0)              AS sum_fel,
+                        COALESCE(SUM(r.nb_encouragements),0)             AS sum_enc,
+                        COALESCE(SUM(r.nb_compliments),0)                AS sum_comp,
+                        COALESCE(SUM(r.nb_mise_en_garde_travail),0)      AS sum_mgt,
+                        COALESCE(SUM(r.nb_mise_en_garde_comportement),0) AS sum_mgc
+                 FROM " . esc_sql($classes) . " cl
+                 INNER JOIN " . esc_sql($councils) . " co
+                        ON co.class_id = cl.id AND co.year_id = %d
+                 INNER JOIN " . esc_sql($terms) . " t ON t.id = co.term_id
+                 LEFT JOIN " . esc_sql($reports) . " r ON r.council_id = co.id
+                 WHERE cl.year_id = %d
+                 GROUP BY cl.id, cl.nom, t.id, t.nom
+                 ORDER BY cl.niveau ASC, cl.nom ASC, t.id ASC",
+                $yearId, $yearId
+            ),
+            ARRAY_A
+        );
+    }
+
+    // ── Statistiques : top parents (nb inscriptions, trimestre actif) ─────────
+
+    public static function list_top_parents(int $yearId, int $termId, int $limit = 5): array {
+        global $wpdb;
+        $parents       = CC_DB::table('parents');
+        $registrations = CC_DB::table('registrations');
+        $councils      = CC_DB::table('councils');
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        return (array) $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT p.nom, p.prenom, COUNT(reg.id) AS nb_inscriptions
+                 FROM " . esc_sql($parents) . " p
+                 INNER JOIN " . esc_sql($registrations) . " reg ON reg.parent_id = p.id
+                 INNER JOIN " . esc_sql($councils) . " co
+                        ON co.id = reg.council_id AND co.year_id = %d AND co.term_id = %d
+                 GROUP BY p.id, p.nom, p.prenom
+                 ORDER BY nb_inscriptions DESC
+                 LIMIT %d",
+                $yearId, $termId, $limit
+            ),
+            ARRAY_A
+        );
+    }
+
+    // ── Statistiques : conseils sans CR (date passée) ─────────────────────────
+
+    public static function list_pending_councils(int $yearId, int $termId): array {
+        global $wpdb;
+        $classes  = CC_DB::table('classes');
+        $councils = CC_DB::table('councils');
+        $reports  = CC_DB::table('reports');
+        $today    = current_time('Y-m-d');
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        return (array) $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT cl.nom AS class_nom, cl.niveau, co.date_conseil, co.salle_conseil
+                 FROM " . esc_sql($councils) . " co
+                 INNER JOIN " . esc_sql($classes) . " cl ON cl.id = co.class_id
+                 LEFT JOIN " . esc_sql($reports) . " r ON r.council_id = co.id
+                 WHERE co.year_id = %d AND co.term_id = %d
+                   AND co.date_conseil < %s
+                   AND r.id IS NULL
+                 ORDER BY co.date_conseil ASC",
+                $yearId, $termId, $today
+            ),
+            ARRAY_A
+        );
+    }
+
+    // ── Statistiques : implication parents par trimestre (toute l'année) ──────
+
+    public static function list_parent_engagement_by_term(int $yearId, int $maxParentsPerCouncil): array {
+        global $wpdb;
+        $councils      = CC_DB::table('councils');
+        $registrations = CC_DB::table('registrations');
+        $reports       = CC_DB::table('reports');
+        $terms         = CC_DB::table('terms');
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        $rows = (array) $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT t.id AS term_id,
+                        t.nom AS term_nom,
+                        COUNT(DISTINCT co.id)  AS nb_councils,
+                        COUNT(DISTINCT reg.id) AS nb_inscriptions,
+                        COUNT(DISTINCT r.id)   AS nb_reports,
+                        SUM(CASE WHEN co.date_conseil < CURDATE() AND r.id IS NULL THEN 1 ELSE 0 END) AS nb_pending
+                 FROM " . esc_sql($terms) . " t
+                 INNER JOIN " . esc_sql($councils) . " co
+                        ON co.term_id = t.id AND co.year_id = %d
+                 LEFT JOIN " . esc_sql($registrations) . " reg ON reg.council_id = co.id
+                 LEFT JOIN " . esc_sql($reports) . " r ON r.council_id = co.id
+                 GROUP BY t.id, t.nom
+                 ORDER BY t.id ASC",
+                $yearId
+            ),
+            ARRAY_A
+        );
+        foreach ($rows as &$row) {
+            $row['capacity'] = (int) $row['nb_councils'] * $maxParentsPerCouncil;
+        }
+        unset($row);
+        return $rows;
+    }
+
+    /** Liste toutes les inscriptions d'une année + trimestre (pour export CSV). */
+    public static function list_registrations_for_year_term(int $yearId, int $termId): array {
+        global $wpdb;
+        $reg      = CC_DB::table('registrations');
+        $parents  = CC_DB::table('parents');
+        $councils = CC_DB::table('councils');
+        $classes  = CC_DB::table('classes');
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        return (array) $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT r.*, p.nom AS parent_nom, p.prenom AS parent_prenom, p.email AS parent_email,
+                        co.date_conseil, cl.nom AS classe_nom
+                 FROM " . esc_sql($reg) . " r
+                 JOIN " . esc_sql($parents) . " p ON p.id = r.parent_id
+                 JOIN " . esc_sql($councils) . " co ON co.id = r.council_id
+                 JOIN " . esc_sql($classes) . " cl ON cl.id = co.class_id
+                 WHERE co.year_id = %d AND co.term_id = %d
+                 ORDER BY cl.nom ASC, co.date_conseil ASC, p.nom ASC",
+                $yearId,
+                $termId
+            ),
+            ARRAY_A
+        );
+    }
+
+    /** Trouve un conseil par nom de classe et date (pour import). */
+    public static function get_council_by_class_date(int $yearId, int $termId, string $classeNom, string $dateConseil): ?array {
+        global $wpdb;
+        $councils = CC_DB::table('councils');
+        $classes  = CC_DB::table('classes');
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        $row = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT co.*
+                 FROM " . esc_sql($councils) . " co
+                 JOIN " . esc_sql($classes) . " cl ON cl.id = co.class_id
+                 WHERE co.year_id = %d AND co.term_id = %d
+                   AND cl.nom = %s AND co.date_conseil = %s
+                 LIMIT 1",
+                $yearId,
+                $termId,
+                $classeNom,
+                $dateConseil
+            ),
+            ARRAY_A
+        );
+        return is_array($row) ? $row : null;
+    }
+
+    /** Récupère le compte-rendu d'un conseil (un seul CR par conseil). */
+    public static function get_report_by_council(int $councilId): ?array {
+        global $wpdb;
+        $table = CC_DB::table('reports');
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name from safe source.
+        $row = $wpdb->get_row(
+            $wpdb->prepare("SELECT * FROM " . esc_sql($table) . " WHERE council_id = %d LIMIT 1", $councilId),
+            ARRAY_A
+        );
+        return is_array($row) ? $row : null;
+    }
+
+    /** Insère ou met à jour une inscription (pour import CSV). */
+    public static function upsert_registration(int $councilId, int $parentId, int $presente, string $commentaire): void {
+        global $wpdb;
+        $table = CC_DB::table('registrations');
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name from safe source.
+        $existing = $wpdb->get_var(
+            $wpdb->prepare("SELECT id FROM " . esc_sql($table) . " WHERE council_id = %d AND parent_id = %d LIMIT 1", $councilId, $parentId)
+        );
+        if ($existing) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- intentional update.
+            $wpdb->update(
+                $table,
+                ['presente' => $presente, 'commentaire' => $commentaire],
+                ['council_id' => $councilId, 'parent_id' => $parentId],
+                ['%d', '%s'],
+                ['%d', '%d']
+            );
+        } else {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- intentional insert.
+            $wpdb->insert($table, [
+                'parent_id'        => $parentId,
+                'council_id'       => $councilId,
+                'date_inscription' => CC_Utils::mysql_now(),
+                'presente'         => $presente,
+                'commentaire'      => $commentaire !== '' ? $commentaire : null,
+            ], ['%d', '%d', '%s', '%d', '%s']);
+        }
     }
 }
 
