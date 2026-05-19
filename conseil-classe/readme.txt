@@ -4,7 +4,7 @@ Tags: school, education, parents, csv, pdf
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 0.4.28
+Stable tag: 0.4.31
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,6 +50,8 @@ Le plugin peut générer un PDF via le navigateur (script intégré). Si la bibl
 2. Paramètres : établissement, association, règles et pages publiques (shortcodes).
 3. Planning des conseils dans l'administration.
 4. Espace public : planning et inscription ou désinscription d'un parent.
+5. Tableau de bord avec le bandeau de statistiques par année (chiffres clés : parents, classes, conseils, comptes-rendus).
+6. Page Statistiques : appréciations par classe, implication des parents, taux de couverture et évolution trimestrielle.
 
 == Changelog ==
 

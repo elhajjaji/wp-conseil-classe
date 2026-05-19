@@ -968,12 +968,27 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         echo '</div>';
         echo '</div>';
-        // ── Stat strip (chiffres globaux) ────────────────────────────────────
+        // ── Stat strip (année active, autres années en petit) ─────────────────
+        $activeYearNom = $year ? (string) $year['nom'] : null;
+        $heroParents   = $activeYearId ? (int) $dashboardStats['year']['parents']  : (int) $dashboardStats['global']['parents'];
+        $heroClasses   = $activeYearId ? (int) $dashboardStats['year']['classes']  : (int) $dashboardStats['global']['classes'];
+        $heroCouncils  = $activeYearId ? (int) $dashboardStats['year']['councils'] : (int) $dashboardStats['global']['councils'];
+        $heroCR        = $activeYearId ? (int) $dashboardStats['year']['reports']  : (int) $dashboardStats['global']['reports'];
+        $other_years_html = function (string $metric) use ($dashboardStats, $activeYearNom): string {
+            $out = '';
+            foreach ($dashboardStats['by_year'] as $nom => $data) {
+                if ($nom === $activeYearNom) {
+                    continue;
+                }
+                $out .= '<small class="cc-stat-other-year">' . esc_html($nom) . ' : ' . esc_html((string) ($data[$metric] ?? 0)) . '</small>';
+            }
+            return $out;
+        };
         echo '<div class="cc-admin-dash-hero-strip">';
-        echo '<div class="cc-admin-dash-hero-stat"><strong>' . esc_html((string) $dashboardStats['global']['parents']) . '</strong><span>' . esc_html__('Parents', 'conseil-classe') . '</span></div>';
-        echo '<div class="cc-admin-dash-hero-stat"><strong>' . esc_html((string) $dashboardStats['global']['classes']) . '</strong><span>' . esc_html__('Classes', 'conseil-classe') . '</span></div>';
-        echo '<div class="cc-admin-dash-hero-stat"><strong>' . esc_html((string) $dashboardStats['global']['councils']) . '</strong><span>' . esc_html__('Conseils', 'conseil-classe') . '</span></div>';
-        echo '<div class="cc-admin-dash-hero-stat"><strong>' . esc_html((string) $dashboardStats['global']['reports']) . '</strong><span>' . esc_html__('Comptes-rendus', 'conseil-classe') . '</span></div>';
+        echo '<div class="cc-admin-dash-hero-stat"><strong>' . esc_html((string) $heroParents) . '</strong><span>' . esc_html__('Parents', 'conseil-classe') . '</span>' . $other_years_html('parents') . '</div>';
+        echo '<div class="cc-admin-dash-hero-stat"><strong>' . esc_html((string) $heroClasses) . '</strong><span>' . esc_html__('Classes', 'conseil-classe') . '</span>' . $other_years_html('classes') . '</div>';
+        echo '<div class="cc-admin-dash-hero-stat"><strong>' . esc_html((string) $heroCouncils) . '</strong><span>' . esc_html__('Conseils', 'conseil-classe') . '</span>' . $other_years_html('councils') . '</div>';
+        echo '<div class="cc-admin-dash-hero-stat"><strong>' . esc_html((string) $heroCR) . '</strong><span>' . esc_html__('Comptes-rendus', 'conseil-classe') . '</span>' . $other_years_html('reports') . '</div>';
         echo '<div class="cc-admin-dash-hero-stat"><strong>' . esc_html((string) ($settings['max_parents_per_conseil'] ?? '2')) . '</strong><span>' . esc_html__('Quota/conseil', 'conseil-classe') . '</span></div>';
         echo '</div>';
         echo '</header>';
@@ -1648,6 +1663,9 @@ document.addEventListener("DOMContentLoaded", function () {
         echo '<h2>' . esc_html__('Export / Import trimestre (Excel)', 'conseil-classe') . '</h2>';
         echo '<p>' . esc_html__('Un seul fichier Excel multi-onglets avec les parents, classes, plannings, inscriptions et comptes-rendus du trimestre actif.', 'conseil-classe') . '</p>';
         echo '</div>';
+        if ($this->get_scalar('term_bundle_no_context') === '1') {
+            echo '<div class="notice notice-error"><p>' . esc_html__('Aucune année ou trimestre actif. Définissez-les dans « Années &amp; trimestres » avant d’importer.', 'conseil-classe') . '</p></div>';
+        }
         if ($this->get_scalar('term_bundle_context_error') === '1') {
             echo '<div class="notice notice-error"><p>' . esc_html__('Le fichier ne correspond pas à l’année/trimestre actifs. Activez le bon contexte avant l’import.', 'conseil-classe') . '</p></div>';
         }
@@ -2291,7 +2309,7 @@ document.addEventListener("DOMContentLoaded", function () {
         $year = CC_Repo::get_active_year();
         $term = CC_Repo::get_active_term();
         if (!$year || !$term) {
-            $this->redirect_admin('cc_settings');
+            $this->redirect_admin('cc_settings', ['term_bundle_no_context' => 1]);
         }
         $tmpPath = $this->uploaded_tmp_path('excel_file');
         if ($tmpPath === '') {

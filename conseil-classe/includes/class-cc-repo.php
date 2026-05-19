@@ -709,6 +709,36 @@ final class CC_Repo {
         // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
         $stats['global']['active_pdf_templates'] = (int) $wpdb->get_var("SELECT COUNT(*) FROM " . esc_sql($templates) . " WHERE actif = 1");
 
+        // ── Per-year breakdown (for dashboard header strip) ──────────────────
+        $stats['year']    = ['parents' => 0, 'classes' => 0, 'councils' => 0, 'reports' => 0];
+        $stats['by_year'] = []; // [ year_nom => ['parents'=>n, 'classes'=>n, 'councils'=>n, 'reports'=>n] ]
+        $years_table      = CC_DB::table('years');
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+        $pa_by_yr = (array) $wpdb->get_results("SELECT y.id, y.nom, COUNT(DISTINCT r.parent_id) AS cnt FROM " . esc_sql($registrations) . " r JOIN " . esc_sql($councils) . " c ON c.id = r.council_id JOIN " . esc_sql($years_table) . " y ON y.id = c.year_id GROUP BY y.id, y.nom ORDER BY y.nom DESC", ARRAY_A);
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+        $cl_by_yr = (array) $wpdb->get_results("SELECT y.id, y.nom, COUNT(*) AS cnt FROM " . esc_sql($classes) . " cl JOIN " . esc_sql($years_table) . " y ON y.id = cl.year_id GROUP BY y.id, y.nom ORDER BY y.nom DESC", ARRAY_A);
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+        $co_by_yr = (array) $wpdb->get_results("SELECT y.id, y.nom, COUNT(*) AS cnt FROM " . esc_sql($councils) . " c JOIN " . esc_sql($years_table) . " y ON y.id = c.year_id GROUP BY y.id, y.nom ORDER BY y.nom DESC", ARRAY_A);
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+        $re_by_yr = (array) $wpdb->get_results("SELECT y.id, y.nom, COUNT(*) AS cnt FROM " . esc_sql($reports) . " r JOIN " . esc_sql($councils) . " c ON c.id = r.council_id JOIN " . esc_sql($years_table) . " y ON y.id = c.year_id GROUP BY y.id, y.nom ORDER BY y.nom DESC", ARRAY_A);
+        $tmp = [];
+        foreach ($pa_by_yr as $row) { $tmp[(int) $row['id']]['nom'] = $row['nom']; $tmp[(int) $row['id']]['parents']  = (int) $row['cnt']; }
+        foreach ($cl_by_yr as $row) { $tmp[(int) $row['id']]['nom'] = $row['nom']; $tmp[(int) $row['id']]['classes']  = (int) $row['cnt']; }
+        foreach ($co_by_yr as $row) { $tmp[(int) $row['id']]['nom'] = $row['nom']; $tmp[(int) $row['id']]['councils'] = (int) $row['cnt']; }
+        foreach ($re_by_yr as $row) { $tmp[(int) $row['id']]['nom'] = $row['nom']; $tmp[(int) $row['id']]['reports']  = (int) $row['cnt']; }
+        foreach ($tmp as $yrId => $data) {
+            $nom                  = $data['nom'];
+            $stats['by_year'][$nom] = [
+                'parents'  => $data['parents']  ?? 0,
+                'classes'  => $data['classes']  ?? 0,
+                'councils' => $data['councils'] ?? 0,
+                'reports'  => $data['reports']  ?? 0,
+            ];
+            if ($yearId && $yrId === $yearId) {
+                $stats['year'] = $stats['by_year'][$nom];
+            }
+        }
+
         if (!$yearId || !$termId) {
             return $stats;
         }
