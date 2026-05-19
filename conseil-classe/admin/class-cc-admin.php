@@ -20,12 +20,15 @@ final class CC_Admin {
 
         add_action('admin_post_cc_class_create', [$this, 'handle_class_create']);
         add_action('admin_post_cc_class_delete', [$this, 'handle_class_delete']);
+        add_action('admin_post_cc_classes_bulk_delete', [$this, 'handle_classes_bulk_delete']);
 
         add_action('admin_post_cc_council_create', [$this, 'handle_council_create']);
         add_action('admin_post_cc_council_delete', [$this, 'handle_council_delete']);
+        add_action('admin_post_cc_councils_bulk_delete', [$this, 'handle_councils_bulk_delete']);
 
         add_action('admin_post_cc_parent_create', [$this, 'handle_parent_create']);
         add_action('admin_post_cc_parent_delete', [$this, 'handle_parent_delete']);
+        add_action('admin_post_cc_parents_bulk_delete', [$this, 'handle_parents_bulk_delete']);
         add_action('admin_post_cc_parent_regenerate_code', [$this, 'handle_parent_regenerate_code']);
         add_action('admin_post_cc_parents_export_csv', [$this, 'handle_parents_export_csv']);
         add_action('admin_post_cc_parents_import_csv', [$this, 'handle_parents_import_csv']);
@@ -37,6 +40,7 @@ final class CC_Admin {
         add_action('admin_post_cc_reports_download_template', [$this, 'handle_reports_download_template']);
 
         add_action('admin_post_cc_registration_unregister', [$this, 'handle_registration_unregister']);
+    add_action('admin_post_cc_registrations_bulk_delete', [$this, 'handle_registrations_bulk_delete']);
         add_action('admin_post_cc_registrations_export_csv', [$this, 'handle_registrations_export_csv']);
         add_action('admin_post_cc_registrations_import_csv', [$this, 'handle_registrations_import_csv']);
         add_action('admin_post_cc_registrations_download_template', [$this, 'handle_registrations_download_template']);
@@ -44,6 +48,7 @@ final class CC_Admin {
         add_action('admin_post_cc_report_toggle_validation', [$this, 'handle_report_toggle_validation']);
         add_action('admin_post_cc_report_update', [$this, 'handle_report_update']);
         add_action('admin_post_cc_report_export', [$this, 'handle_report_export']);
+        add_action('admin_post_cc_reports_bulk_delete', [$this, 'handle_reports_bulk_delete']);
 
         add_action('admin_post_cc_pdf_template_save', [$this, 'handle_pdf_template_save']);
         add_action('admin_post_cc_pdf_template_activate', [$this, 'handle_pdf_template_activate']);
@@ -61,6 +66,8 @@ final class CC_Admin {
         add_action('admin_post_cc_settings_export_csv', [$this, 'handle_settings_export_csv']);
         add_action('admin_post_cc_settings_import_csv', [$this, 'handle_settings_import_csv']);
         add_action('admin_post_cc_settings_download_template', [$this, 'handle_settings_download_template']);
+        add_action('admin_post_cc_term_export_excel', [$this, 'handle_term_export_excel']);
+        add_action('admin_post_cc_term_import_excel', [$this, 'handle_term_import_excel']);
         add_action('admin_post_cc_setup_front_pages', [$this, 'handle_setup_front_pages']);
     }
 
@@ -359,6 +366,11 @@ final class CC_Admin {
             return 'created';
         }
 
+        $year = CC_Repo::get_active_year();
+        if ($year && !CC_Repo::is_parent_assigned_to_year((int) $existing['id'], (int) $year['id'])) {
+            CC_Repo::assign_parent_to_year((int) $existing['id'], (int) $year['id']);
+        }
+
         $widRow = (int) ($existing['wp_user_id'] ?? 0);
         $upd = [
             'nom' => $nom,
@@ -639,6 +651,282 @@ final class CC_Admin {
         rewind($handle);
         return $handle;
     }
+
+    private function excel_send_headers(string $filename): void {
+        nocache_headers();
+        header('Content-Type: application/vnd.ms-excel; charset=utf-8');
+        header('Content-Disposition: attachment; filename=' . $filename);
+    }
+
+    private function excel_xml_escape(string $value): string {
+        return htmlspecialchars($value, ENT_XML1 | ENT_COMPAT, 'UTF-8');
+    }
+
+    /**
+     * @param array<int,string> $headers
+     * @param array<int,array<int,string|int|null>> $rows
+     */
+    private function excel_render_worksheet(string $sheetName, array $headers, array $rows): string {
+        $xml = '<Worksheet ss:Name="' . $this->excel_xml_escape($sheetName) . '"><Table>';
+        $xml .= '<Row>';
+        foreach ($headers as $header) {
+            $xml .= '<Cell><Data ss:Type="String">' . $this->excel_xml_escape((string) $header) . '</Data></Cell>';
+        }
+        $xml .= '</Row>';
+        foreach ($rows as $row) {
+            $xml .= '<Row>';
+            foreach ($row as $cell) {
+                $xml .= '<Cell><Data ss:Type="String">' . $this->excel_xml_escape((string) ($cell ?? '')) . '</Data></Cell>';
+            }
+            $xml .= '</Row>';
+        }
+        $xml .= '</Table></Worksheet>';
+
+        return $xml;
+    }
+
+    /**
+     * @param array<string,array{headers:array<int,string>,rows:array<int,array<int,string|int|null>>}> $worksheets
+     */
+    private function excel_render_workbook(array $worksheets): string {
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+        $xml .= '<?mso-application progid="Excel.Sheet"?>';
+        $xml .= '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"';
+        $xml .= ' xmlns:o="urn:schemas-microsoft-com:office:office"';
+        $xml .= ' xmlns:x="urn:schemas-microsoft-com:office:excel"';
+        $xml .= ' xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">';
+        $xml .= '<DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">';
+        $xml .= '<Author>Conseil de classe</Author>';
+        $xml .= '<Created>' . gmdate('Y-m-d\TH:i:s\Z') . '</Created>';
+        $xml .= '</DocumentProperties>';
+        $xml .= '<ExcelWorkbook xmlns="urn:schemas-microsoft-com:office:excel"><ProtectStructure>False</ProtectStructure><ProtectWindows>False</ProtectWindows></ExcelWorkbook>';
+        foreach ($worksheets as $sheetName => $sheet) {
+            $xml .= $this->excel_render_worksheet($sheetName, $sheet['headers'], $sheet['rows']);
+        }
+        $xml .= '</Workbook>';
+
+        return $xml;
+    }
+
+    /**
+     * @return array<string,array{headers:array<int,string>,rows:array<int,array<string,string>>}>|null
+     */
+    private function excel_parse_workbook(string $tmpPath): ?array {
+        if (!function_exists('simplexml_load_file')) {
+            return null;
+        }
+        libxml_use_internal_errors(true);
+        $xml = simplexml_load_file($tmpPath);
+        if (!$xml) {
+            libxml_clear_errors();
+            return null;
+        }
+        $ns = 'urn:schemas-microsoft-com:office:spreadsheet';
+        $sheets = [];
+        $workbookChildren = $xml->children($ns);
+        foreach ($workbookChildren->Worksheet as $worksheet) {
+            $attrs = $worksheet->attributes($ns);
+            $sheetName = isset($attrs['Name']) ? (string) $attrs['Name'] : '';
+            if ($sheetName === '') {
+                continue;
+            }
+            $rows = [];
+            $headers = [];
+            $table = $worksheet->children($ns)->Table;
+            if (!$table) {
+                continue;
+            }
+            foreach ($table->children($ns)->Row as $row) {
+                $values = [];
+                $index = 1;
+                foreach ($row->children($ns)->Cell as $cell) {
+                    $cellAttrs = $cell->attributes($ns);
+                    if (isset($cellAttrs['Index'])) {
+                        $index = (int) $cellAttrs['Index'];
+                    }
+                    $data = '';
+                    $dataNode = $cell->children($ns)->Data;
+                    if ($dataNode) {
+                        $data = (string) $dataNode;
+                    }
+                    $values[$index - 1] = $data;
+                    $index++;
+                }
+                if (!$headers) {
+                    ksort($values);
+                    $headers = array_values($values);
+                    continue;
+                }
+                $assoc = [];
+                foreach ($headers as $i => $header) {
+                    $assoc[(string) $header] = (string) ($values[$i] ?? '');
+                }
+                $rows[] = $assoc;
+            }
+            $sheets[$sheetName] = [
+                'headers' => $headers,
+                'rows' => $rows,
+            ];
+        }
+
+        return $sheets;
+    }
+
+    /**
+     * @param array<int,array<string,mixed>> $councils
+     * @param array<int,array<string,mixed>> $registrations
+     * @param array<int,array<string,mixed>> $reports
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    private function collect_term_parents(array $councils, array $registrations, array $reports): array {
+        $parentsByEmail = [];
+        $allParents = CC_Repo::list_parents('', 'parent');
+        foreach ($allParents as $parent) {
+            $email = CC_Utils::normalize_email((string) ($parent['email'] ?? ''));
+            if ($email === '') {
+                continue;
+            }
+            $wid = (int) ($parent['wp_user_id'] ?? 0);
+            $pwdOut = '';
+            if ($wid <= 0 || !$this->is_parent_wp_account_privileged($wid)) {
+                $pwdOut = (string) ($parent['code_acces'] ?? '');
+            }
+            $parentsByEmail[$email] = [
+                'nom' => (string) ($parent['nom'] ?? ''),
+                'prenom' => (string) ($parent['prenom'] ?? ''),
+                'email' => $email,
+                'telephone' => (string) ($parent['telephone'] ?? ''),
+                'code_acces' => $pwdOut,
+            ];
+        }
+        foreach ($registrations as $registration) {
+            $email = CC_Utils::normalize_email((string) ($registration['parent_email'] ?? ''));
+            if ($email === '') {
+                continue;
+            }
+            if (!isset($parentsByEmail[$email])) {
+                $parentsByEmail[$email] = [
+                    'nom' => (string) ($registration['parent_nom'] ?? ''),
+                    'prenom' => (string) ($registration['parent_prenom'] ?? ''),
+                    'email' => $email,
+                    'telephone' => '',
+                    'code_acces' => '',
+                ];
+            }
+            $parent = CC_Repo::get_parent_by_email($email);
+            if ($parent) {
+                $parentsByEmail[$email]['telephone'] = (string) ($parent['telephone'] ?? '');
+                $wid = (int) ($parent['wp_user_id'] ?? 0);
+                if ($wid <= 0 || !$this->is_parent_wp_account_privileged($wid)) {
+                    $parentsByEmail[$email]['code_acces'] = (string) ($parent['code_acces'] ?? '');
+                }
+            }
+        }
+        foreach ($reports as $report) {
+            $email = CC_Utils::normalize_email((string) ($report['email_parent'] ?? ''));
+            if ($email === '') {
+                continue;
+            }
+            if (!isset($parentsByEmail[$email])) {
+                $parentsByEmail[$email] = [
+                    'nom' => (string) ($report['nom_parent'] ?? ''),
+                    'prenom' => (string) ($report['prenom_parent'] ?? ''),
+                    'email' => $email,
+                    'telephone' => '',
+                    'code_acces' => '',
+                ];
+            }
+            $parent = CC_Repo::get_parent_by_email($email);
+            if ($parent) {
+                $parentsByEmail[$email]['telephone'] = (string) ($parent['telephone'] ?? '');
+                $parentsByEmail[$email]['code_acces'] = (string) ($parent['code_acces'] ?? '');
+            }
+        }
+        ksort($parentsByEmail);
+
+        return array_values($parentsByEmail);
+    }
+
+    /**
+     * @param array<int,array<string,mixed>> $councils
+     *
+     * @return array<int,array<string,string>>
+     */
+    private function collect_term_classes(array $councils): array {
+        $classes = [];
+        foreach ($councils as $council) {
+            $key = (string) ($council['classe_nom'] ?? '');
+            if ($key === '') {
+                continue;
+            }
+            $classes[$key] = [
+                'nom' => (string) ($council['classe_nom'] ?? ''),
+                'niveau' => (string) ($council['classe_niveau'] ?? ''),
+            ];
+        }
+        ksort($classes);
+
+        return array_values($classes);
+    }
+
+    /**
+     * @param array<int,array<string,string>> $rows
+     *
+     * @return array<string,string>
+     */
+    private function term_meta_to_assoc(array $rows): array {
+        $meta = [];
+        foreach ($rows as $row) {
+            $key = sanitize_key((string) ($row['key'] ?? ''));
+            if ($key === '') {
+                continue;
+            }
+            $meta[$key] = (string) ($row['value'] ?? '');
+        }
+
+        return $meta;
+    }
+
+    private function normalize_term_bundle_label(string $value): string {
+        $value = strtolower(trim($value));
+        $value = preg_replace('/[\s_\/\\\\]+/', '-', $value);
+        $value = preg_replace('/-+/', '-', (string) $value);
+
+        return trim((string) $value, '-');
+    }
+
+        /**
+         * @return array<int,int>
+         */
+        private function post_ids_array(string $key): array {
+                $raw = $_POST[$key] ?? [];
+                if (!is_array($raw)) {
+                        return [];
+                }
+
+                $ids = array_map('intval', $raw);
+                $ids = array_filter($ids, static function ($id): bool {
+                        return $id > 0;
+                });
+
+                return array_values(array_unique($ids));
+        }
+
+        private function render_bulk_toggle_script(string $scope): void {
+                echo '<script>
+document.addEventListener("DOMContentLoaded", function () {
+    var master = document.querySelector("[data-cc-toggle-all=\"' . esc_js($scope) . '\"]");
+    if (!master) return;
+    master.addEventListener("change", function () {
+        var items = document.querySelectorAll("input[data-cc-bulk-item=\"' . esc_js($scope) . '\"]");
+        items.forEach(function (item) {
+            item.checked = master.checked;
+        });
+    });
+});
+</script>';
+        }
 
     public function render_dashboard(): void {
         $this->require_manage();
@@ -1122,6 +1410,7 @@ final class CC_Admin {
     public function render_settings(): void {
         $this->require_manage();
         $s = CC_Repo::get_settings();
+        $year = CC_Repo::get_active_year();
         $nonce = wp_create_nonce('cc_save_settings');
         $dashboardUrl = admin_url('admin.php?page=cc_dashboard');
         $logsUrl = admin_url('admin.php?page=cc_logs');
@@ -1161,6 +1450,9 @@ final class CC_Admin {
         echo '<header class="cc-settings-hero">';
         echo '<h1><span class="dashicons dashicons-admin-generic" aria-hidden="true"></span> ' . esc_html__('Paramètres et Coordonnées', 'conseil-classe') . '</h1>';
         echo '<p class="cc-settings-hero-lede">' . esc_html__('Gestion des coordonnées de l’établissement et de l’association des parents d’élèves.', 'conseil-classe') . '</p>';
+        if ($year) {
+            echo '<p class="cc-settings-hero-lede"><strong>' . esc_html__('Année active :', 'conseil-classe') . '</strong> ' . esc_html($year['nom']) . '</p>';
+        }
         echo '<p class="cc-settings-breadcrumb"><a href="' . esc_url($dashboardUrl) . '">' . esc_html__('Accueil', 'conseil-classe') . '</a> <span>/</span> <span>' . esc_html__('Paramètres', 'conseil-classe') . '</span></p>';
         echo '</header>';
 
@@ -1351,6 +1643,34 @@ final class CC_Admin {
         echo '</p></form>';
         echo '</section>';
 
+        echo '<section id="cc-settings-term-workbook" class="cc-settings-panel cc-settings-panel--form cc-settings-panel--import">';
+        echo '<div class="cc-settings-panel-head">';
+        echo '<h2>' . esc_html__('Export / Import trimestre (Excel)', 'conseil-classe') . '</h2>';
+        echo '<p>' . esc_html__('Un seul fichier Excel multi-onglets avec les parents, classes, plannings, inscriptions et comptes-rendus du trimestre actif.', 'conseil-classe') . '</p>';
+        echo '</div>';
+        if ($this->get_scalar('term_bundle_context_error') === '1') {
+            echo '<div class="notice notice-error"><p>' . esc_html__('Le fichier ne correspond pas à l’année/trimestre actifs. Activez le bon contexte avant l’import.', 'conseil-classe') . '</p></div>';
+        }
+        if ($this->get_scalar('term_bundle_imported') !== '' || $this->get_scalar('term_bundle_ignored') !== '' || $this->get_scalar('term_bundle_errors') !== '') {
+            echo '<div class="notice notice-success"><p>' . esc_html(sprintf(
+                /* translators: 1: imported rows, 2: ignored rows, 3: error rows */
+                __('Import trimestre terminé : %1$d importé(s), %2$d ignoré(s), %3$d erreur(s).', 'conseil-classe'),
+                (int) $this->get_scalar('term_bundle_imported', '0'),
+                (int) $this->get_scalar('term_bundle_ignored', '0'),
+                (int) $this->get_scalar('term_bundle_errors', '0')
+            )) . '</p></div>';
+        }
+        echo '<div class="cc-settings-import-actions">';
+        echo '<a class="button button-primary" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_term_export_excel'), 'cc_term_export_excel')) . '">' . esc_html__('Export trimestre (Excel)', 'conseil-classe') . '</a>';
+        echo '</div>';
+        echo '<form class="cc-settings-import-form" method="post" action="' . esc_url(admin_url('admin-post.php')) . '" enctype="multipart/form-data">';
+        echo '<input type="hidden" name="action" value="cc_term_import_excel" />';
+        echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
+        echo '<p><input type="file" name="excel_file" accept=".xml,.xls,application/vnd.ms-excel,text/xml,application/xml" required /> ';
+        submit_button(__('Importer le trimestre', 'conseil-classe'), 'secondary', 'submit', false);
+        echo '</p></form>';
+        echo '</section>';
+
         echo '</div>';
         echo '</div>';
 
@@ -1406,6 +1726,10 @@ final class CC_Admin {
     public function handle_save_settings(): void {
         $this->require_manage();
         check_admin_referer('cc_save_settings');
+        $year = CC_Repo::get_active_year();
+        if (!$year) {
+            $this->redirect_admin('cc_settings');
+        }
 
         $data = [
             'nom_etablissement' => sanitize_text_field($this->post_scalar('nom_etablissement')),
@@ -1427,7 +1751,7 @@ final class CC_Admin {
             'max_parents_per_conseil' => max(1, (int) $this->post_scalar('max_parents_per_conseil', '2')),
         ];
 
-        CC_Repo::update_settings($data);
+        CC_Repo::update_settings($data, (int) $year['id']);
 
         update_option('cc_parent_login_page_id', (int) $this->post_scalar('cc_parent_login_page_id', '0'));
         update_option('cc_plannings_page_id', (int) $this->post_scalar('cc_plannings_page_id', '0'));
@@ -1588,6 +1912,13 @@ final class CC_Admin {
         }
 
         echo '<p><strong>' . esc_html__('Année active:', 'conseil-classe') . '</strong> ' . esc_html($year['nom']) . '</p>';
+        if ($this->get_scalar('bulk_deleted') !== '') {
+            echo '<div class="notice notice-success"><p>' . esc_html(sprintf(
+                /* translators: %d: number of deleted classes */
+                __('%d classe(s) supprimée(s) pour l’année active.', 'conseil-classe'),
+                (int) $this->get_scalar('bulk_deleted', '0')
+            )) . '</p></div>';
+        }
 
         echo '<h2>' . esc_html__('Import / Export (CSV)', 'conseil-classe') . '</h2>';
         echo '<p>';
@@ -1625,12 +1956,14 @@ final class CC_Admin {
         echo '<hr />';
         echo '<h2>' . esc_html__('Liste', 'conseil-classe') . '</h2>';
         echo '<table class="widefat striped"><thead><tr>';
+        echo '<th><input type="checkbox" data-cc-toggle-all="classes" /></th>';
         echo '<th>' . esc_html__('Nom', 'conseil-classe') . '</th>';
         echo '<th>' . esc_html__('Niveau', 'conseil-classe') . '</th>';
         echo '<th>' . esc_html__('Action', 'conseil-classe') . '</th>';
         echo '</tr></thead><tbody>';
         foreach ($classes as $c) {
             echo '<tr>';
+            echo '<td><input type="checkbox" name="ids[]" value="' . esc_attr((string) $c['id']) . '" data-cc-bulk-item="classes" form="cc-classes-bulk-form" /></td>';
             echo '<td>' . esc_html($c['nom']) . '</td>';
             echo '<td>' . esc_html($c['niveau']) . '</td>';
             echo '<td>';
@@ -1644,9 +1977,16 @@ final class CC_Admin {
             echo '</tr>';
         }
         if (!$classes) {
-            echo '<tr><td colspan="3">' . esc_html__('Aucune classe.', 'conseil-classe') . '</td></tr>';
+            echo '<tr><td colspan="4">' . esc_html__('Aucune classe.', 'conseil-classe') . '</td></tr>';
         }
         echo '</tbody></table>';
+        echo '<form id="cc-classes-bulk-form" method="post" action="' . esc_url(admin_url('admin-post.php')) . '" onsubmit="return confirm(\'Supprimer les classes sélectionnées ?\');">';
+        echo '<input type="hidden" name="action" value="cc_classes_bulk_delete" />';
+        echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
+        echo '<p>';
+        submit_button(__('Supprimer la sélection', 'conseil-classe'), 'delete', 'submit', false);
+        echo '</p></form>';
+        $this->render_bulk_toggle_script('classes');
         echo '</div>';
     }
 
@@ -1675,6 +2015,16 @@ final class CC_Admin {
         $this->redirect_admin('cc_classes');
     }
 
+    public function handle_classes_bulk_delete(): void {
+        $this->require_manage();
+        check_admin_referer('cc_classes');
+        $ids = $this->post_ids_array('ids');
+        foreach ($ids as $id) {
+            CC_Repo::delete_class($id);
+        }
+        $this->redirect_admin('cc_classes', ['bulk_deleted' => count($ids)]);
+    }
+
     public function render_councils(): void {
         $this->require_manage();
         $year = CC_Repo::get_active_year();
@@ -1691,6 +2041,13 @@ final class CC_Admin {
         }
 
         echo '<p><strong>' . esc_html__('Contexte:', 'conseil-classe') . '</strong> ' . esc_html($year['nom']) . ' - ' . esc_html($term['nom']) . '</p>';
+        if ($this->get_scalar('bulk_deleted') !== '') {
+            echo '<div class="notice notice-success"><p>' . esc_html(sprintf(
+                /* translators: %d: number of deleted councils */
+                __('%d conseil(s) supprimé(s) pour le trimestre actif.', 'conseil-classe'),
+                (int) $this->get_scalar('bulk_deleted', '0')
+            )) . '</p></div>';
+        }
 
         echo '<h2>' . esc_html__('Import / Export (CSV)', 'conseil-classe') . '</h2>';
         echo '<p>';
@@ -1754,6 +2111,7 @@ final class CC_Admin {
         echo '<hr />';
         echo '<h2>' . esc_html__('Liste', 'conseil-classe') . '</h2>';
         echo '<table class="widefat striped"><thead><tr>';
+        echo '<th><input type="checkbox" data-cc-toggle-all="councils" /></th>';
         echo '<th>' . esc_html__('Classe', 'conseil-classe') . '</th>';
         echo '<th>' . esc_html__('Date', 'conseil-classe') . '</th>';
         echo '<th>' . esc_html__('Heure', 'conseil-classe') . '</th>';
@@ -1769,6 +2127,7 @@ final class CC_Admin {
                 $heure .= ' - ' . substr((string) $co['heure_fin'], 0, 5);
             }
             echo '<tr>';
+            echo '<td><input type="checkbox" name="ids[]" value="' . esc_attr((string) $co['id']) . '" data-cc-bulk-item="councils" form="cc-councils-bulk-form" /></td>';
             echo '<td>' . esc_html($co['classe_nom'] . ' (' . $co['classe_niveau'] . ')') . '</td>';
             echo '<td>' . esc_html(mysql2date('d/m/Y', $co['date_conseil'])) . '</td>';
             echo '<td>' . esc_html($heure) . '</td>';
@@ -1787,9 +2146,16 @@ final class CC_Admin {
             echo '</tr>';
         }
         if (!$councils) {
-            echo '<tr><td colspan="7">' . esc_html__('Aucun conseil planifié.', 'conseil-classe') . '</td></tr>';
+            echo '<tr><td colspan="8">' . esc_html__('Aucun conseil planifié.', 'conseil-classe') . '</td></tr>';
         }
         echo '</tbody></table>';
+        echo '<form id="cc-councils-bulk-form" method="post" action="' . esc_url(admin_url('admin-post.php')) . '" onsubmit="return confirm(\'Supprimer les conseils sélectionnés ?\');">';
+        echo '<input type="hidden" name="action" value="cc_councils_bulk_delete" />';
+        echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
+        echo '<p>';
+        submit_button(__('Supprimer la sélection', 'conseil-classe'), 'delete', 'submit', false);
+        echo '</p></form>';
+        $this->render_bulk_toggle_script('councils');
 
         echo '</div>';
     }
@@ -1797,6 +2163,324 @@ final class CC_Admin {
     // =========================
     // CSV: settings (etablissement + association)
     // =========================
+    public function handle_term_export_excel(): void {
+        $this->require_manage();
+        check_admin_referer('cc_term_export_excel');
+        $year = CC_Repo::get_active_year();
+        $term = CC_Repo::get_active_term();
+        if (!$year || !$term) {
+            wp_die(esc_html__('Année/trimestre actif manquant.', 'conseil-classe'));
+        }
+
+        $yearId = (int) $year['id'];
+        $termId = (int) $term['id'];
+        $councils = CC_Repo::list_councils($yearId, $termId);
+        $registrations = CC_Repo::list_registrations_for_year_term($yearId, $termId);
+        $reports = CC_Repo::list_reports($yearId, $termId);
+        $parents = $this->collect_term_parents($councils, $registrations, $reports);
+        $classes = $this->collect_term_classes($councils);
+
+        $worksheets = [
+            'meta' => [
+                'headers' => ['key', 'value'],
+                'rows' => [
+                    ['format', 'cc_term_bundle_v1'],
+                    ['year_nom', (string) $year['nom']],
+                    ['term_nom', (string) $term['nom']],
+                    ['generated_at', gmdate('Y-m-d H:i:s')],
+                ],
+            ],
+            'parents' => [
+                'headers' => ['nom', 'prenom', 'email', 'telephone', 'code_acces'],
+                'rows' => array_map(static function (array $parent): array {
+                    return [
+                        $parent['nom'] ?? '',
+                        $parent['prenom'] ?? '',
+                        $parent['email'] ?? '',
+                        $parent['telephone'] ?? '',
+                        $parent['code_acces'] ?? '',
+                    ];
+                }, $parents),
+            ],
+            'classes' => [
+                'headers' => ['nom', 'niveau'],
+                'rows' => array_map(static function (array $class): array {
+                    return [
+                        $class['nom'] ?? '',
+                        $class['niveau'] ?? '',
+                    ];
+                }, $classes),
+            ],
+            'plannings' => [
+                'headers' => ['classe_nom', 'classe_niveau', 'date_conseil', 'heure_debut', 'heure_fin', 'salle_conseil', 'president_conseil'],
+                'rows' => array_map(static function (array $council): array {
+                    return [
+                        $council['classe_nom'] ?? '',
+                        $council['classe_niveau'] ?? '',
+                        $council['date_conseil'] ?? '',
+                        substr((string) ($council['heure_debut'] ?? ''), 0, 5),
+                        !empty($council['heure_fin']) ? substr((string) $council['heure_fin'], 0, 5) : '',
+                        $council['salle_conseil'] ?? '',
+                        $council['president_conseil'] ?? '',
+                    ];
+                }, $councils),
+            ],
+            'inscrits' => [
+                'headers' => ['parent_email', 'parent_nom', 'parent_prenom', 'classe_nom', 'date_conseil', 'presente', 'commentaire'],
+                'rows' => array_map(static function (array $registration): array {
+                    return [
+                        $registration['parent_email'] ?? '',
+                        $registration['parent_nom'] ?? '',
+                        $registration['parent_prenom'] ?? '',
+                        $registration['classe_nom'] ?? '',
+                        $registration['date_conseil'] ?? '',
+                        (string) (int) ($registration['presente'] ?? 0),
+                        $registration['commentaire'] ?? '',
+                    ];
+                }, $registrations),
+            ],
+            'cr' => [
+                'headers' => [
+                    'classe_nom', 'date_conseil', 'nom_parent', 'prenom_parent', 'email_parent',
+                    'profs_participants', 'delegue_eleve_1_nom', 'delegue_eleve_1_prenom', 'delegue_eleve_2_nom', 'delegue_eleve_2_prenom',
+                    'delegue_parent_1_nom', 'delegue_parent_1_prenom', 'delegue_parent_2_nom', 'delegue_parent_2_prenom',
+                    'remarque_principal', 'remarque_prof_principal', 'remarques_autres_profs', 'remarques_eleves_delegues', 'remarques_parents',
+                    'nb_felicitations', 'nb_encouragements', 'nb_compliments', 'nb_mise_en_garde_travail', 'nb_mise_en_garde_comportement', 'valide',
+                ],
+                'rows' => array_map(static function (array $report): array {
+                    return [
+                        $report['classe_nom'] ?? '',
+                        $report['date_conseil'] ?? '',
+                        $report['nom_parent'] ?? '',
+                        $report['prenom_parent'] ?? '',
+                        $report['email_parent'] ?? '',
+                        $report['profs_participants'] ?? '',
+                        $report['delegue_eleve_1_nom'] ?? '',
+                        $report['delegue_eleve_1_prenom'] ?? '',
+                        $report['delegue_eleve_2_nom'] ?? '',
+                        $report['delegue_eleve_2_prenom'] ?? '',
+                        $report['delegue_parent_1_nom'] ?? '',
+                        $report['delegue_parent_1_prenom'] ?? '',
+                        $report['delegue_parent_2_nom'] ?? '',
+                        $report['delegue_parent_2_prenom'] ?? '',
+                        $report['remarque_principal'] ?? '',
+                        $report['remarque_prof_principal'] ?? '',
+                        $report['remarques_autres_profs'] ?? '',
+                        $report['remarques_eleves_delegues'] ?? '',
+                        $report['remarques_parents'] ?? '',
+                        (string) (int) ($report['nb_felicitations'] ?? 0),
+                        (string) (int) ($report['nb_encouragements'] ?? 0),
+                        (string) (int) ($report['nb_compliments'] ?? 0),
+                        (string) (int) ($report['nb_mise_en_garde_travail'] ?? 0),
+                        (string) (int) ($report['nb_mise_en_garde_comportement'] ?? 0),
+                        (string) (int) ($report['valide'] ?? 0),
+                    ];
+                }, $reports),
+            ],
+        ];
+
+        $filename = 'trimestre_' . sanitize_file_name((string) $year['nom'] . '_' . (string) $term['nom']) . '_' . gmdate('Ymd') . '.xls';
+        $this->excel_send_headers($filename);
+        echo $this->excel_render_workbook($worksheets);
+        exit;
+    }
+
+    public function handle_term_import_excel(): void {
+        $this->require_manage();
+        check_admin_referer('cc_save_settings');
+        $year = CC_Repo::get_active_year();
+        $term = CC_Repo::get_active_term();
+        if (!$year || !$term) {
+            $this->redirect_admin('cc_settings');
+        }
+        $tmpPath = $this->uploaded_tmp_path('excel_file');
+        if ($tmpPath === '') {
+            $this->redirect_admin('cc_settings');
+        }
+
+        $workbook = $this->excel_parse_workbook($tmpPath);
+        if (!$workbook || empty($workbook['meta']['rows'])) {
+            $this->redirect_admin('cc_settings', ['term_bundle_errors' => 1]);
+        }
+
+        $meta = $this->term_meta_to_assoc($workbook['meta']['rows']);
+        $metaYear = $this->normalize_term_bundle_label((string) ($meta['year_nom'] ?? ''));
+        $activeYear = $this->normalize_term_bundle_label((string) $year['nom']);
+        $metaTerm = $this->normalize_term_bundle_label((string) ($meta['term_nom'] ?? ''));
+        $activeTerm = $this->normalize_term_bundle_label((string) $term['nom']);
+        if (($meta['format'] ?? '') !== 'cc_term_bundle_v1'
+            || $metaYear !== $activeYear
+            || $metaTerm !== $activeTerm) {
+            $this->redirect_admin('cc_settings', ['term_bundle_context_error' => 1]);
+        }
+
+        $yearId = (int) $year['id'];
+        $termId = (int) $term['id'];
+        $imported = 0;
+        $ignored = 0;
+        $errors = 0;
+
+        foreach (($workbook['parents']['rows'] ?? []) as $row) {
+            $email = CC_Utils::normalize_email((string) ($row['email'] ?? ''));
+            if ($email === '' || CC_Repo::get_parent_by_email($email)) {
+                $ignored++;
+                continue;
+            }
+            $nom = sanitize_text_field((string) ($row['nom'] ?? ''));
+            $prenom = sanitize_text_field((string) ($row['prenom'] ?? ''));
+            if ($nom === '' || $prenom === '') {
+                $errors++;
+                continue;
+            }
+            $plainPw = $this->resolve_parent_password_plain((string) ($row['code_acces'] ?? ''));
+            if (is_wp_error($plainPw)) {
+                $errors++;
+                continue;
+            }
+            if (CC_Repo::access_code_exists((string) $plainPw)) {
+                $errors++;
+                continue;
+            }
+            $wpAttached = $this->create_or_attach_wp_parent_user($email, $prenom, $nom, null, (string) $plainPw, false);
+            if (is_wp_error($wpAttached)) {
+                $errors++;
+                continue;
+            }
+            CC_Repo::create_parent([
+                'nom' => $nom,
+                'prenom' => $prenom,
+                'email' => $email,
+                'telephone' => sanitize_text_field((string) ($row['telephone'] ?? '')),
+                'code_acces' => (string) $plainPw,
+                'wp_user_id' => (int) $wpAttached,
+            ]);
+            $imported++;
+        }
+
+        foreach (($workbook['classes']['rows'] ?? []) as $row) {
+            $nom = sanitize_text_field((string) ($row['nom'] ?? ''));
+            $niveau = sanitize_text_field((string) ($row['niveau'] ?? ''));
+            if ($nom === '' || $niveau === '') {
+                $errors++;
+                continue;
+            }
+            if (CC_Repo::get_class_by_nom_for_year($yearId, $nom)) {
+                $ignored++;
+                continue;
+            }
+            CC_Repo::create_class($yearId, $nom, $niveau);
+            $imported++;
+        }
+
+        foreach (($workbook['plannings']['rows'] ?? []) as $row) {
+            $classeNom = sanitize_text_field((string) ($row['classe_nom'] ?? ''));
+            $classeNiveau = sanitize_text_field((string) ($row['classe_niveau'] ?? ''));
+            $date = sanitize_text_field((string) ($row['date_conseil'] ?? ''));
+            $heureDebut = sanitize_text_field((string) ($row['heure_debut'] ?? ''));
+            $heureFin = sanitize_text_field((string) ($row['heure_fin'] ?? ''));
+            if ($classeNom === '' || $classeNiveau === '' || $date === '' || $heureDebut === '') {
+                $errors++;
+                continue;
+            }
+            $classe = CC_Repo::get_class_by_nom_for_year($yearId, $classeNom);
+            $classId = $classe ? (int) $classe['id'] : CC_Repo::create_class($yearId, $classeNom, $classeNiveau);
+            if ($classe) {
+                $existingCouncil = CC_Repo::get_council_by_class_date($yearId, $termId, $classeNom, $date);
+                if ($existingCouncil) {
+                    $ignored++;
+                    continue;
+                }
+            }
+            CC_Repo::create_council([
+                'term_id' => $termId,
+                'year_id' => $yearId,
+                'class_id' => $classId,
+                'date_conseil' => $date,
+                'heure_debut' => strlen($heureDebut) === 5 ? $heureDebut . ':00' : $heureDebut,
+                'heure_fin' => $heureFin !== '' ? (strlen($heureFin) === 5 ? $heureFin . ':00' : $heureFin) : null,
+                'salle_conseil' => sanitize_text_field((string) ($row['salle_conseil'] ?? '')),
+                'president_conseil' => sanitize_text_field((string) ($row['president_conseil'] ?? '')),
+            ]);
+            $imported++;
+        }
+
+        foreach (($workbook['inscrits']['rows'] ?? []) as $row) {
+            $email = CC_Utils::normalize_email((string) ($row['parent_email'] ?? ''));
+            $classeNom = sanitize_text_field((string) ($row['classe_nom'] ?? ''));
+            $date = sanitize_text_field((string) ($row['date_conseil'] ?? ''));
+            if ($email === '' || $classeNom === '' || $date === '') {
+                $errors++;
+                continue;
+            }
+            $parent = CC_Repo::get_parent_by_email($email);
+            $council = CC_Repo::get_council_by_class_date($yearId, $termId, $classeNom, $date);
+            if (!$parent || !$council) {
+                $errors++;
+                continue;
+            }
+            CC_Repo::upsert_registration(
+                (int) $council['id'],
+                (int) $parent['id'],
+                max(0, (int) ($row['presente'] ?? 0)) > 0 ? 1 : 0,
+                sanitize_textarea_field((string) ($row['commentaire'] ?? ''))
+            );
+            $imported++;
+        }
+
+        foreach (($workbook['cr']['rows'] ?? []) as $row) {
+            $classeNom = sanitize_text_field((string) ($row['classe_nom'] ?? ''));
+            $date = sanitize_text_field((string) ($row['date_conseil'] ?? ''));
+            if ($classeNom === '' || $date === '') {
+                $errors++;
+                continue;
+            }
+            $council = CC_Repo::get_council_by_class_date($yearId, $termId, $classeNom, $date);
+            if (!$council) {
+                $errors++;
+                continue;
+            }
+            $data = [
+                'nom_parent' => sanitize_text_field((string) ($row['nom_parent'] ?? '')),
+                'prenom_parent' => sanitize_text_field((string) ($row['prenom_parent'] ?? '')),
+                'email_parent' => sanitize_email((string) ($row['email_parent'] ?? '')),
+                'profs_participants' => sanitize_textarea_field((string) ($row['profs_participants'] ?? '')),
+                'delegue_eleve_1_nom' => sanitize_text_field((string) ($row['delegue_eleve_1_nom'] ?? '')),
+                'delegue_eleve_1_prenom' => sanitize_text_field((string) ($row['delegue_eleve_1_prenom'] ?? '')),
+                'delegue_eleve_2_nom' => sanitize_text_field((string) ($row['delegue_eleve_2_nom'] ?? '')),
+                'delegue_eleve_2_prenom' => sanitize_text_field((string) ($row['delegue_eleve_2_prenom'] ?? '')),
+                'delegue_parent_1_nom' => sanitize_text_field((string) ($row['delegue_parent_1_nom'] ?? '')),
+                'delegue_parent_1_prenom' => sanitize_text_field((string) ($row['delegue_parent_1_prenom'] ?? '')),
+                'delegue_parent_2_nom' => sanitize_text_field((string) ($row['delegue_parent_2_nom'] ?? '')),
+                'delegue_parent_2_prenom' => sanitize_text_field((string) ($row['delegue_parent_2_prenom'] ?? '')),
+                'remarque_principal' => sanitize_textarea_field((string) ($row['remarque_principal'] ?? '')),
+                'remarque_prof_principal' => sanitize_textarea_field((string) ($row['remarque_prof_principal'] ?? '')),
+                'remarques_autres_profs' => sanitize_textarea_field((string) ($row['remarques_autres_profs'] ?? '')),
+                'remarques_eleves_delegues' => sanitize_textarea_field((string) ($row['remarques_eleves_delegues'] ?? '')),
+                'remarques_parents' => sanitize_textarea_field((string) ($row['remarques_parents'] ?? '')),
+                'nb_felicitations' => max(0, (int) ($row['nb_felicitations'] ?? 0)),
+                'nb_encouragements' => max(0, (int) ($row['nb_encouragements'] ?? 0)),
+                'nb_compliments' => max(0, (int) ($row['nb_compliments'] ?? 0)),
+                'nb_mise_en_garde_travail' => max(0, (int) ($row['nb_mise_en_garde_travail'] ?? 0)),
+                'nb_mise_en_garde_comportement' => max(0, (int) ($row['nb_mise_en_garde_comportement'] ?? 0)),
+            ];
+            $existing = CC_Repo::get_report_by_council((int) $council['id']);
+            if ($existing) {
+                CC_Repo::update_report_content((int) $existing['id'], $data);
+            } else {
+                $data['council_id'] = (int) $council['id'];
+                $data['valide'] = max(0, (int) ($row['valide'] ?? 0)) > 0 ? 1 : 0;
+                CC_Repo::create_report($data);
+            }
+            $imported++;
+        }
+
+        $this->redirect_admin('cc_settings', [
+            'term_bundle_imported' => $imported,
+            'term_bundle_ignored' => $ignored,
+            'term_bundle_errors' => $errors,
+        ]);
+    }
+
     public function handle_settings_export_csv(): void {
         $this->require_manage();
         check_admin_referer('cc_settings_export_csv');
@@ -2140,9 +2824,20 @@ final class CC_Admin {
         $this->redirect_admin('cc_councils');
     }
 
+    public function handle_councils_bulk_delete(): void {
+        $this->require_manage();
+        check_admin_referer('cc_councils');
+        $ids = $this->post_ids_array('ids');
+        foreach ($ids as $id) {
+            CC_Repo::delete_council($id);
+        }
+        $this->redirect_admin('cc_councils', ['bulk_deleted' => count($ids)]);
+    }
+
     public function render_parents(): void {
         $this->require_manage();
         $nonce = wp_create_nonce('cc_parents');
+        $year = CC_Repo::get_active_year();
         $search = sanitize_text_field($this->get_scalar('s'));
         $profile = sanitize_key($this->get_scalar('cc_profile', 'all'));
         if (!in_array($profile, ['all', 'parent', 'admin'], true)) {
@@ -2161,6 +2856,16 @@ final class CC_Admin {
 
         echo '<div class="wrap cc-admin-page">';
         echo '<h1>' . esc_html__('Parents', 'conseil-classe') . '</h1>';
+        if ($year) {
+            echo '<p><strong>' . esc_html__('Année active:', 'conseil-classe') . '</strong> ' . esc_html($year['nom']) . '</p>';
+        }
+        if ($this->get_scalar('bulk_deleted') !== '') {
+            echo '<div class="notice notice-success"><p>' . esc_html(sprintf(
+                /* translators: %d: number of removed parents */
+                __('%d parent(s) retiré(s) de l’année active.', 'conseil-classe'),
+                (int) $this->get_scalar('bulk_deleted', '0')
+            )) . '</p></div>';
+        }
 
         echo '<p>';
         echo '<a class="button button-primary" href="' . esc_url($exportParentsUrl) . '">' . esc_html__('Export (CSV)', 'conseil-classe') . '</a> ';
@@ -2254,6 +2959,7 @@ final class CC_Admin {
         echo '</p></form>';
 
         echo '<table class="widefat striped"><thead><tr>';
+        echo '<th><input type="checkbox" data-cc-toggle-all="parents" /></th>';
         echo '<th>' . esc_html__('Nom', 'conseil-classe') . '</th>';
         echo '<th>' . esc_html__('Email', 'conseil-classe') . '</th>';
         echo '<th>' . esc_html__('Téléphone', 'conseil-classe') . '</th>';
@@ -2264,6 +2970,7 @@ final class CC_Admin {
         echo '</tr></thead><tbody>';
         foreach ($parents as $p) {
             echo '<tr>';
+            echo '<td><input type="checkbox" name="ids[]" value="' . esc_attr((string) $p['id']) . '" data-cc-bulk-item="parents" form="cc-parents-bulk-form" /></td>';
             echo '<td>' . esc_html($p['prenom'] . ' ' . $p['nom']) . '</td>';
             echo '<td>' . esc_html($p['email']) . '</td>';
             echo '<td>' . esc_html($p['telephone'] ?? '') . '</td>';
@@ -2307,9 +3014,16 @@ final class CC_Admin {
             echo '</tr>';
         }
         if (!$parents) {
-            echo '<tr><td colspan="7">' . esc_html__('Aucun parent.', 'conseil-classe') . '</td></tr>';
+            echo '<tr><td colspan="8">' . esc_html__('Aucun parent.', 'conseil-classe') . '</td></tr>';
         }
         echo '</tbody></table>';
+        echo '<form id="cc-parents-bulk-form" method="post" action="' . esc_url(admin_url('admin-post.php')) . '" onsubmit="return confirm(\'Retirer les parents sélectionnés de l\'année active ?\');">';
+        echo '<input type="hidden" name="action" value="cc_parents_bulk_delete" />';
+        echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
+        echo '<p>';
+        submit_button(__('Retirer la sélection de l’année active', 'conseil-classe'), 'delete', 'submit', false);
+        echo '</p></form>';
+        $this->render_bulk_toggle_script('parents');
 
         echo '<script>
 function ccAskParentPassword(form) {
@@ -2329,6 +3043,10 @@ function ccAskParentPassword(form) {
     public function handle_parent_create(): void {
         $this->require_manage();
         check_admin_referer('cc_parents');
+        $year = CC_Repo::get_active_year();
+        if (!$year) {
+            $this->redirect_admin('cc_parents');
+        }
 
         $nom = sanitize_text_field($this->post_scalar('nom'));
         $prenom = sanitize_text_field($this->post_scalar('prenom'));
@@ -2350,13 +3068,16 @@ function ccAskParentPassword(form) {
             $this->redirect_admin('cc_parents', ['pw_err' => '1']);
         }
 
-        if (CC_Repo::access_code_exists((string) $plainPw)) {
+        $existing = CC_Repo::get_parent_by_email($email);
+        $existingId = $existing ? (int) $existing['id'] : null;
+
+        if (CC_Repo::access_code_exists((string) $plainPw, $existingId)) {
             $this->redirect_admin('cc_parents', ['code_dup' => '1']);
 
             return;
         }
 
-        if (CC_Repo::get_parent_by_email($email)) {
+        if ($existing && CC_Repo::is_parent_assigned_to_year((int) $existing['id'], (int) $year['id'])) {
             $this->redirect_admin('cc_parents', ['user_err' => '1']);
 
             return;
@@ -2369,14 +3090,25 @@ function ccAskParentPassword(form) {
             return;
         }
 
-        CC_Repo::create_parent([
-            'nom' => $nom,
-            'prenom' => $prenom,
-            'email' => $email,
-            'telephone' => $telephone !== '' ? $telephone : null,
-            'code_acces' => (string) $plainPw,
-            'wp_user_id' => (int) $wpAttached,
-        ]);
+        if ($existing) {
+            CC_Repo::update_parent((int) $existing['id'], [
+                'nom' => $nom,
+                'prenom' => $prenom,
+                'telephone' => $telephone !== '' ? $telephone : null,
+                'code_acces' => (string) $plainPw,
+                'wp_user_id' => (int) $wpAttached,
+            ]);
+            CC_Repo::assign_parent_to_year((int) $existing['id'], (int) $year['id']);
+        } else {
+            CC_Repo::create_parent([
+                'nom' => $nom,
+                'prenom' => $prenom,
+                'email' => $email,
+                'telephone' => $telephone !== '' ? $telephone : null,
+                'code_acces' => (string) $plainPw,
+                'wp_user_id' => (int) $wpAttached,
+            ]);
+        }
 
         $this->redirect_admin('cc_parents');
     }
@@ -2385,10 +3117,25 @@ function ccAskParentPassword(form) {
         $this->require_manage();
         check_admin_referer('cc_parents');
         $id = (int) $this->post_scalar('id', '0');
-        if ($id > 0) {
-            CC_Repo::delete_parent($id);
+        $year = CC_Repo::get_active_year();
+        if ($id > 0 && $year) {
+            CC_Repo::unassign_parent_from_year($id, (int) $year['id']);
         }
         $this->redirect_admin('cc_parents');
+    }
+
+    public function handle_parents_bulk_delete(): void {
+        $this->require_manage();
+        check_admin_referer('cc_parents');
+        $year = CC_Repo::get_active_year();
+        if (!$year) {
+            $this->redirect_admin('cc_parents');
+        }
+        $ids = $this->post_ids_array('ids');
+        foreach ($ids as $id) {
+            CC_Repo::unassign_parent_from_year($id, (int) $year['id']);
+        }
+        $this->redirect_admin('cc_parents', ['bulk_deleted' => count($ids)]);
     }
 
     public function handle_parent_regenerate_code(): void {
@@ -2621,7 +3368,16 @@ function ccAskParentPassword(form) {
                 echo '<p><strong>' . esc_html($council['classe_nom'] . ' (' . $council['classe_niveau'] . ')') . '</strong> — ' . esc_html(mysql2date('d/m/Y', $council['date_conseil'])) . ' ' . esc_html(substr((string) $council['heure_debut'], 0, 5)) . '</p>';
             }
 
+            if ($this->get_scalar('bulk_deleted') !== '') {
+                echo '<div class="notice notice-success"><p>' . esc_html(sprintf(
+                    /* translators: %d: number of removed registrations */
+                    __('%d inscription(s) supprimée(s) pour ce conseil.', 'conseil-classe'),
+                    (int) $this->get_scalar('bulk_deleted', '0')
+                )) . '</p></div>';
+            }
+
             echo '<table class="widefat striped"><thead><tr>';
+            echo '<th><input type="checkbox" data-cc-toggle-all="registrations" /></th>';
             echo '<th>' . esc_html__('Parent', 'conseil-classe') . '</th>';
             echo '<th>' . esc_html__('Email', 'conseil-classe') . '</th>';
             echo '<th>' . esc_html__('Téléphone', 'conseil-classe') . '</th>';
@@ -2633,6 +3389,7 @@ function ccAskParentPassword(form) {
 
             foreach ($regs as $r) {
                 echo '<tr>';
+                echo '<td><input type="checkbox" name="ids[]" value="' . esc_attr((string) $r['parent_id']) . '" data-cc-bulk-item="registrations" form="cc-registrations-bulk-form" /></td>';
                 echo '<td>' . esc_html($r['prenom'] . ' ' . $r['nom']) . '</td>';
                 echo '<td>' . esc_html($r['email']) . '</td>';
                 echo '<td>' . esc_html($r['telephone'] ?? '') . '</td>';
@@ -2652,10 +3409,18 @@ function ccAskParentPassword(form) {
             }
 
             if (!$regs) {
-                echo '<tr><td colspan="7">' . esc_html__('Aucune inscription.', 'conseil-classe') . '</td></tr>';
+                echo '<tr><td colspan="8">' . esc_html__('Aucune inscription.', 'conseil-classe') . '</td></tr>';
             }
 
             echo '</tbody></table>';
+            echo '<form id="cc-registrations-bulk-form" method="post" action="' . esc_url(admin_url('admin-post.php')) . '" onsubmit="return confirm(\'Désinscrire les parents sélectionnés ?\');">';
+            echo '<input type="hidden" name="action" value="cc_registrations_bulk_delete" />';
+            echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
+            echo '<input type="hidden" name="council_id" value="' . esc_attr((string) $councilId) . '" />';
+            echo '<p>';
+            submit_button(__('Désinscrire la sélection', 'conseil-classe'), 'delete', 'submit', false);
+            echo '</p></form>';
+            $this->render_bulk_toggle_script('registrations');
             echo '</section>';
         }
 
@@ -2671,6 +3436,17 @@ function ccAskParentPassword(form) {
             CC_Repo::unregister_parent($councilId, $parentId);
         }
         $this->redirect_admin('cc_registrations', ['council_id' => $councilId]);
+    }
+
+    public function handle_registrations_bulk_delete(): void {
+        $this->require_manage();
+        check_admin_referer('cc_registrations');
+        $councilId = (int) $this->post_scalar('council_id', '0');
+        $ids = $this->post_ids_array('ids');
+        foreach ($ids as $parentId) {
+            CC_Repo::unregister_parent($councilId, $parentId);
+        }
+        $this->redirect_admin('cc_registrations', ['council_id' => $councilId, 'bulk_deleted' => count($ids)]);
     }
 
     public function handle_registrations_export_csv(): void {
@@ -2775,6 +3551,7 @@ function ccAskParentPassword(form) {
         $this->require_manage();
         $year = CC_Repo::get_active_year();
         $term = CC_Repo::get_active_term();
+        $nonce = wp_create_nonce('cc_reports');
 
         echo '<div class="wrap cc-admin-page">';
         echo '<h1>' . esc_html__('Comptes-rendus', 'conseil-classe') . '</h1>';
@@ -2809,16 +3586,23 @@ function ccAskParentPassword(form) {
         echo '</section>';
 
         $reports = CC_Repo::list_reports((int) $year['id'], (int) $term['id']);
-        $nonce = wp_create_nonce('cc_reports');
         $updateNonceToken = wp_create_nonce('cc_report_update');
 
         if ($this->get_scalar('updated') !== '') {
             echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Compte-rendu enregistré.', 'conseil-classe') . '</p></div>';
         }
+        if ($this->get_scalar('bulk_deleted') !== '') {
+            echo '<div class="notice notice-success is-dismissible"><p>' . esc_html(sprintf(
+                /* translators: %d: number of deleted reports */
+                __('%d compte-rendu(s) supprimé(s) pour le trimestre actif.', 'conseil-classe'),
+                (int) $this->get_scalar('bulk_deleted', '0')
+            )) . '</p></div>';
+        }
 
         echo '<section class="cc-admin-section">';
         echo '<h2>' . esc_html__('Liste', 'conseil-classe') . '</h2>';
         echo '<table class="widefat striped"><thead><tr>';
+        echo '<th><input type="checkbox" data-cc-toggle-all="reports" /></th>';
         echo '<th>' . esc_html__('Classe', 'conseil-classe') . '</th>';
         echo '<th>' . esc_html__('Date conseil', 'conseil-classe') . '</th>';
         echo '<th>' . esc_html__('Président', 'conseil-classe') . '</th>';
@@ -2829,6 +3613,7 @@ function ccAskParentPassword(form) {
 
         foreach ($reports as $r) {
             echo '<tr>';
+            echo '<td><input type="checkbox" name="ids[]" value="' . esc_attr((string) $r['id']) . '" data-cc-bulk-item="reports" form="cc-reports-bulk-form" /></td>';
             echo '<td>' . esc_html($r['classe_nom'] . ' (' . $r['classe_niveau'] . ')') . '</td>';
             echo '<td>' . esc_html(mysql2date('d/m/Y', $r['date_conseil']) . ' ' . substr((string) $r['heure_debut'], 0, 5)) . '</td>';
             echo '<td>' . esc_html($r['president_conseil'] ?? '') . '</td>';
@@ -2860,10 +3645,17 @@ function ccAskParentPassword(form) {
         }
 
         if (!$reports) {
-            echo '<tr><td colspan="6">' . esc_html__('Aucun compte-rendu.', 'conseil-classe') . '</td></tr>';
+            echo '<tr><td colspan="7">' . esc_html__('Aucun compte-rendu.', 'conseil-classe') . '</td></tr>';
         }
 
         echo '</tbody></table>';
+        echo '<form id="cc-reports-bulk-form" method="post" action="' . esc_url(admin_url('admin-post.php')) . '" onsubmit="return confirm(\'Supprimer les comptes-rendus sélectionnés ?\');">';
+        echo '<input type="hidden" name="action" value="cc_reports_bulk_delete" />';
+        echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
+        echo '<p>';
+        submit_button(__('Supprimer la sélection', 'conseil-classe'), 'delete', 'submit', false);
+        echo '</p></form>';
+        $this->render_bulk_toggle_script('reports');
         echo '</section>';
 
         // Détail + édition (administrateur conseil).
@@ -2955,6 +3747,16 @@ function ccAskParentPassword(form) {
             CC_Repo::set_report_validation($id, $valide);
         }
         $this->redirect_admin('cc_reports');
+    }
+
+    public function handle_reports_bulk_delete(): void {
+        $this->require_manage();
+        check_admin_referer('cc_reports');
+        $ids = $this->post_ids_array('ids');
+        foreach ($ids as $reportId) {
+            CC_Repo::delete_report($reportId);
+        }
+        $this->redirect_admin('cc_reports', ['bulk_deleted' => count($ids)]);
     }
 
     public function handle_report_update(): void {

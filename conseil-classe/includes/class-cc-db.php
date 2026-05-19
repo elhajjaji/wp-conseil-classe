@@ -21,6 +21,7 @@ final class CC_DB {
 
         $tables[] = "CREATE TABLE " . self::table('settings') . " (
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            year_id BIGINT UNSIGNED NULL,
             nom_etablissement VARCHAR(200) NOT NULL DEFAULT '',
             adresse_etablissement TEXT NULL,
             telephone_etablissement VARCHAR(20) NULL,
@@ -40,7 +41,8 @@ final class CC_DB {
             max_parents_per_conseil INT NOT NULL DEFAULT 2,
             created_at DATETIME NOT NULL,
             updated_at DATETIME NOT NULL,
-            PRIMARY KEY  (id)
+            PRIMARY KEY  (id),
+            UNIQUE KEY year_id (year_id)
         ) $charsetCollate;";
 
         $tables[] = "CREATE TABLE " . self::table('logs') . " (
@@ -124,6 +126,17 @@ final class CC_DB {
             KEY wp_user_id (wp_user_id)
         ) $charsetCollate;";
 
+        $tables[] = "CREATE TABLE " . self::table('parent_years') . " (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            parent_id BIGINT UNSIGNED NOT NULL,
+            year_id BIGINT UNSIGNED NOT NULL,
+            created_at DATETIME NOT NULL,
+            PRIMARY KEY (id),
+            UNIQUE KEY unique_parent_year (parent_id, year_id),
+            KEY parent_id (parent_id),
+            KEY year_id (year_id)
+        ) $charsetCollate;";
+
         $tables[] = "CREATE TABLE " . self::table('registrations') . " (
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
             parent_id BIGINT UNSIGNED NOT NULL,
@@ -196,17 +209,19 @@ final class CC_DB {
         global $wpdb;
 
         $settingsTable = self::table('settings');
+        $yearsTable = self::table('years');
         // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name from safe source.
         $count = (int) $wpdb->get_var('SELECT COUNT(*) FROM ' . esc_sql($settingsTable));
         if ($count === 0) {
             $now = current_time('mysql');
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- intentional insert.
             $wpdb->insert($settingsTable, [
+                'year_id' => null,
                 'nom_etablissement' => __('Mon établissement', 'conseil-classe'),
                 'max_parents_per_conseil' => 2,
                 'created_at' => $now,
                 'updated_at' => $now,
-            ], ['%s', '%d', '%s', '%s']);
+            ], ['%d', '%s', '%d', '%s', '%s']);
         }
 
         $termsTable = self::table('terms');
@@ -219,6 +234,47 @@ final class CC_DB {
             $wpdb->insert($termsTable, ['nom' => 'T2', 'actif' => 0, 'year_id' => null]);
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- intentional insert.
             $wpdb->insert($termsTable, ['nom' => 'T3', 'actif' => 0, 'year_id' => null]);
+        }
+
+        // Migre l'ancienne configuration globale vers l'année active si nécessaire.
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        $activeYearId = (int) $wpdb->get_var('SELECT id FROM ' . esc_sql($yearsTable) . ' WHERE active = 1 ORDER BY id DESC LIMIT 1');
+        if ($activeYearId > 0) {
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name from safe source.
+            $settingsAssigned = (int) $wpdb->get_var($wpdb->prepare('SELECT COUNT(*) FROM ' . esc_sql($settingsTable) . ' WHERE year_id = %d', $activeYearId));
+            if ($settingsAssigned === 0) {
+                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name from safe source.
+                $legacySettingsId = (int) $wpdb->get_var('SELECT id FROM ' . esc_sql($settingsTable) . ' WHERE year_id IS NULL ORDER BY id ASC LIMIT 1');
+                if ($legacySettingsId > 0) {
+                    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- intentional update.
+                    $wpdb->update($settingsTable, ['year_id' => $activeYearId], ['id' => $legacySettingsId], ['%d'], ['%d']);
+                }
+            }
+        }
+
+        $parentYearsTable = self::table('parent_years');
+        // Associe les parents existants à l'année active pour préserver le comportement historique.
+        if ($activeYearId > 0) {
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+            $assignCount = (int) $wpdb->get_var('SELECT COUNT(*) FROM ' . esc_sql($parentYearsTable));
+            if ($assignCount === 0) {
+                $parentsTable = self::table('parents');
+                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name from safe source.
+                $parents = (array) $wpdb->get_results('SELECT id FROM ' . esc_sql($parentsTable), ARRAY_A);
+                $now = current_time('mysql');
+                foreach ($parents as $parent) {
+                    $parentId = (int) ($parent['id'] ?? 0);
+                    if ($parentId <= 0) {
+                        continue;
+                    }
+                    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- intentional insert.
+                    $wpdb->insert($parentYearsTable, [
+                        'parent_id' => $parentId,
+                        'year_id' => $activeYearId,
+                        'created_at' => $now,
+                    ], ['%d', '%d', '%s']);
+                }
+            }
         }
 
         $tplTable = self::table('pdf_templates');

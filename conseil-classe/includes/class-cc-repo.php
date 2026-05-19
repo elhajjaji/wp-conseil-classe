@@ -5,23 +5,74 @@ if (!defined('ABSPATH')) {
 }
 
 final class CC_Repo {
-    public static function get_settings(): array {
+    public static function get_settings(?int $yearId = null): array {
         global $wpdb;
         $table = CC_DB::table('settings');
-        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name from safe source.
-        $row = $wpdb->get_row("SELECT * FROM " . esc_sql($table) . " ORDER BY id ASC LIMIT 1", ARRAY_A);
+        if ($yearId === null || $yearId <= 0) {
+            $year = self::get_active_year();
+            $yearId = $year ? (int) $year['id'] : 0;
+        }
+        if ($yearId > 0) {
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name from safe source.
+            $row = $wpdb->get_row($wpdb->prepare("SELECT * FROM " . esc_sql($table) . " WHERE year_id = %d LIMIT 1", $yearId), ARRAY_A);
+            if (is_array($row)) {
+                return $row;
+            }
+        }
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- fallback legacy row.
+        $row = $wpdb->get_row("SELECT * FROM " . esc_sql($table) . " WHERE year_id IS NULL ORDER BY id ASC LIMIT 1", ARRAY_A);
         return is_array($row) ? $row : [];
     }
 
-    public static function update_settings(array $data): void {
+    public static function ensure_settings_for_year(int $yearId): array {
         global $wpdb;
         $table = CC_DB::table('settings');
-        $current = self::get_settings();
-        if (!$current) {
+        $current = self::get_settings($yearId);
+        if ($current && (int) ($current['year_id'] ?? 0) === $yearId) {
+            return $current;
+        }
+        $now = CC_Utils::mysql_now();
+        $defaults = [
+            'year_id' => $yearId,
+            'nom_etablissement' => '',
+            'adresse_etablissement' => '',
+            'telephone_etablissement' => '',
+            'email_etablissement' => '',
+            'site_web_etablissement' => '',
+            'nom_directeur' => '',
+            'nom_principal' => '',
+            'nom_association_parents' => '',
+            'adresse_association_parents' => '',
+            'telephone_association_parents' => '',
+            'email_association_parents' => '',
+            'site_web_association_parents' => '',
+            'president_association' => '',
+            'vice_president_association' => '',
+            'secretaire_association' => '',
+            'tresorier_association' => '',
+            'max_parents_per_conseil' => 2,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ];
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- intentional insert.
+        $wpdb->insert($table, $defaults, ['%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s']);
+        return self::get_settings($yearId);
+    }
+
+    public static function update_settings(array $data, ?int $yearId = null): void {
+        global $wpdb;
+        $table = CC_DB::table('settings');
+        if ($yearId === null || $yearId <= 0) {
+            $year = self::get_active_year();
+            $yearId = $year ? (int) $year['id'] : 0;
+        }
+        if ($yearId <= 0) {
             return;
         }
+        $current = self::ensure_settings_for_year($yearId);
 
         $update = $data;
+        $update['year_id'] = $yearId;
         $update['updated_at'] = CC_Utils::mysql_now();
 
         // Log champ par champ (à la manière de LogParametres)
@@ -73,6 +124,7 @@ final class CC_Repo {
         if ($active) {
             self::set_active_year($id);
         }
+        self::ensure_settings_for_year($id);
         return $id;
     }
 
@@ -232,24 +284,60 @@ final class CC_Repo {
         return is_array($row) ? $row : null;
     }
 
-    public static function list_parents(string $search = '', string $profile = 'all'): array {
+    public static function list_parents(string $search = '', string $profile = 'all', ?int $yearId = null): array {
         global $wpdb;
         $table = CC_DB::table('parents');
+        $parentYears = CC_DB::table('parent_years');
+        if ($yearId === null || $yearId <= 0) {
+            $year = self::get_active_year();
+            $yearId = $year ? (int) $year['id'] : 0;
+        }
         if ($search !== '') {
             $like = '%' . $wpdb->esc_like($search) . '%';
-            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name from safe source.
-            $rows = (array) $wpdb->get_results(
-                $wpdb->prepare(
-                    "SELECT * FROM " . esc_sql($table) . " WHERE nom LIKE %s OR prenom LIKE %s OR email LIKE %s ORDER BY nom ASC, prenom ASC",
-                    $like,
-                    $like,
-                    $like
-                ),
-                ARRAY_A
-            );
+            if ($yearId > 0) {
+                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+                $rows = (array) $wpdb->get_results(
+                    $wpdb->prepare(
+                        "SELECT p.* FROM " . esc_sql($table) . " p
+                         INNER JOIN " . esc_sql($parentYears) . " py ON py.parent_id = p.id
+                         WHERE py.year_id = %d AND (p.nom LIKE %s OR p.prenom LIKE %s OR p.email LIKE %s)
+                         ORDER BY p.nom ASC, p.prenom ASC",
+                        $yearId,
+                        $like,
+                        $like,
+                        $like
+                    ),
+                    ARRAY_A
+                );
+            } else {
+                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name from safe source.
+                $rows = (array) $wpdb->get_results(
+                    $wpdb->prepare(
+                        "SELECT * FROM " . esc_sql($table) . " WHERE nom LIKE %s OR prenom LIKE %s OR email LIKE %s ORDER BY nom ASC, prenom ASC",
+                        $like,
+                        $like,
+                        $like
+                    ),
+                    ARRAY_A
+                );
+            }
         } else {
-            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name from safe source.
-            $rows = (array) $wpdb->get_results("SELECT * FROM " . esc_sql($table) . " ORDER BY nom ASC, prenom ASC", ARRAY_A);
+            if ($yearId > 0) {
+                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+                $rows = (array) $wpdb->get_results(
+                    $wpdb->prepare(
+                        "SELECT p.* FROM " . esc_sql($table) . " p
+                         INNER JOIN " . esc_sql($parentYears) . " py ON py.parent_id = p.id
+                         WHERE py.year_id = %d
+                         ORDER BY p.nom ASC, p.prenom ASC",
+                        $yearId
+                    ),
+                    ARRAY_A
+                );
+            } else {
+                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name from safe source.
+                $rows = (array) $wpdb->get_results("SELECT * FROM " . esc_sql($table) . " ORDER BY nom ASC, prenom ASC", ARRAY_A);
+            }
         }
 
         return self::filter_parents_by_wp_profile($rows, $profile);
@@ -306,7 +394,12 @@ final class CC_Repo {
         }
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- intentional insert.
         $wpdb->insert($table, $data);
-        return (int) $wpdb->insert_id;
+        $parentId = (int) $wpdb->insert_id;
+        $year = self::get_active_year();
+        if ($parentId > 0 && $year) {
+            self::assign_parent_to_year($parentId, (int) $year['id']);
+        }
+        return $parentId;
     }
 
     public static function update_parent(int $id, array $data): void {
@@ -327,6 +420,48 @@ final class CC_Repo {
         $table = CC_DB::table('parents');
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- intentional delete.
         $wpdb->delete($table, ['id' => $id], ['%d']);
+    }
+
+    public static function assign_parent_to_year(int $parentId, int $yearId): void {
+        global $wpdb;
+        $table = CC_DB::table('parent_years');
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name from safe source.
+        $exists = (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM " . esc_sql($table) . " WHERE parent_id = %d AND year_id = %d", $parentId, $yearId));
+        if ($exists > 0) {
+            return;
+        }
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- intentional insert.
+        $wpdb->insert($table, [
+            'parent_id' => $parentId,
+            'year_id' => $yearId,
+            'created_at' => CC_Utils::mysql_now(),
+        ], ['%d', '%d', '%s']);
+    }
+
+    public static function unassign_parent_from_year(int $parentId, int $yearId): void {
+        global $wpdb;
+        $table = CC_DB::table('parent_years');
+        $reg = CC_DB::table('registrations');
+        $councils = CC_DB::table('councils');
+        // Supprime d'abord les inscriptions de cette année active, puis l'affectation.
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table names from safe source.
+        $wpdb->query($wpdb->prepare(
+            "DELETE r FROM " . esc_sql($reg) . " r
+             INNER JOIN " . esc_sql($councils) . " c ON c.id = r.council_id
+             WHERE r.parent_id = %d AND c.year_id = %d",
+            $parentId,
+            $yearId
+        ));
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- intentional delete.
+        $wpdb->delete($table, ['parent_id' => $parentId, 'year_id' => $yearId], ['%d', '%d']);
+    }
+
+    public static function is_parent_assigned_to_year(int $parentId, int $yearId): bool {
+        global $wpdb;
+        $table = CC_DB::table('parent_years');
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name from safe source.
+        $count = (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM " . esc_sql($table) . " WHERE parent_id = %d AND year_id = %d", $parentId, $yearId));
+        return $count > 0;
     }
 
     public static function count_registrations_for_council(int $councilId): int {
@@ -493,6 +628,13 @@ final class CC_Repo {
             'date_validation' => $valide ? CC_Utils::mysql_now() : null,
             'updated_at' => CC_Utils::mysql_now(),
         ], ['id' => $reportId], ['%d', '%s', '%s'], ['%d']);
+    }
+
+    public static function delete_report(int $reportId): void {
+        global $wpdb;
+        $table = CC_DB::table('reports');
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- intentional delete.
+        $wpdb->delete($table, ['id' => $reportId], ['%d']);
     }
 
     public static function list_reports(int $yearId, int $termId): array {
