@@ -1,10 +1,10 @@
-=== Aelhajjaji Conseil de classe ===
+=== Gestion Conseils de Classe ===
 Contributors: aelhajjaji
 Tags: school, education, parents, csv, pdf
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 0.4.32
+Stable tag: 0.4.33
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,7 +27,7 @@ The parent area is based on WordPress pages that contain shortcodes. These pages
 == Installation ==
 
 1. Upload the plugin folder to `wp-content/plugins/` (or install it from the Plugins screen in your WordPress admin).
-2. Activate **Aelhajjaji Conseil de classe** from the Plugins menu.
+2. Activate **Gestion Conseils de Classe** from the Plugins menu.
 3. Open the **Conseil de classe** menu and follow the setup order: settings, active school year, active term, classes, councils, parents.
 
 == Frequently Asked Questions ==
@@ -56,7 +56,7 @@ The plugin can generate a PDF via the browser (bundled script). If the **Dompdf*
 == Changelog ==
 
 = 0.4.32 =
-* WordPress.org review fixes: plugin renamed to Aelhajjaji Conseil de classe, readme translated to English, inline scripts replaced with wp_print_inline_script_tag(), pdfobject.min.js hosted locally (no CDN calls).
+* WordPress.org review fixes: plugin renamed to Gestion Conseils de Classe, readme translated to English, inline scripts replaced with wp_print_inline_script_tag(), pdfobject.min.js hosted locally (no CDN calls).
 
 = 0.4.31 =
 * Dashboard hero strip scoped to the active year: key stats (parents, classes, councils, reports) for the current year displayed prominently; other years shown in a compact secondary line.
