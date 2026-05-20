@@ -914,18 +914,16 @@ final class CC_Admin {
         }
 
         private function render_bulk_toggle_script(string $scope): void {
-                echo '<script>
-document.addEventListener("DOMContentLoaded", function () {
-    var master = document.querySelector("[data-cc-toggle-all=\"' . esc_js($scope) . '\"]");
-    if (!master) return;
-    master.addEventListener("change", function () {
-        var items = document.querySelectorAll("input[data-cc-bulk-item=\"' . esc_js($scope) . '\"]");
-        items.forEach(function (item) {
-            item.checked = master.checked;
-        });
-    });
-});
-</script>';
+                $s = esc_js($scope);
+                wp_print_inline_script_tag(
+                        'document.addEventListener("DOMContentLoaded",function(){' .
+                        'var m=document.querySelector("[data-cc-toggle-all=\\"' . $s . '\\"]");' .
+                        'if(!m)return;' .
+                        'm.addEventListener("change",function(){' .
+                        'var items=document.querySelectorAll("input[data-cc-bulk-item=\\"' . $s . '\\"]");' .
+                        'items.forEach(function(i){i.checked=m.checked;});' .
+                        '});});'
+                );
         }
 
     public function render_dashboard(): void {
@@ -1300,7 +1298,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     'legend'       => __('Inscrits', 'conseil-classe'),
                 ],
             ];
-            echo '<script id="cc-chart-data">var ccDashCharts = ' . wp_json_encode($chartData) . ';</script>';
+            wp_print_inline_script_tag( 'var ccDashCharts = ' . wp_json_encode( $chartData ) . ';', [ 'id' => 'cc-chart-data' ] );
 
             // ── Section graphiques (4 canvases) ─────────────────────────────
             echo '<section class="cc-admin-section cc-admin-section--dashboard">';
@@ -3043,17 +3041,17 @@ document.addEventListener("DOMContentLoaded", function () {
         echo '</p></form>';
         $this->render_bulk_toggle_script('parents');
 
-        echo '<script>
-function ccAskParentPassword(form) {
-  var msg = "Saisissez un nouveau mot de passe / code (min 6 caractères).\\n" +
-            "Laissez vide pour générer automatiquement.";
-  var val = window.prompt(msg, "");
-  if (val === null) return false;
-  var input = form.querySelector("input[name=\\"code_acces_custom\\"]");
-  if (input) input.value = (val || "").trim();
-  return true;
-}
-</script>';
+        wp_print_inline_script_tag(
+            'function ccAskParentPassword(form) {' .
+            '  var msg = "Saisissez un nouveau mot de passe / code (min 6 caract\u00e8res).\\n"' .
+            '            + "Laissez vide pour g\u00e9n\u00e9rer automatiquement.";' .
+            '  var val = window.prompt(msg, "");' .
+            '  if (val === null) return false;' .
+            '  var input = form.querySelector("input[name=\\"code_acces_custom\\"]");' .
+            '  if (input) input.value = (val || "").trim();' .
+            '  return true;' .
+            '}'
+        );
 
         echo '</div>';
     }
@@ -4070,6 +4068,8 @@ function ccAskParentPassword(form) {
         echo '<p class="cc-pdf-wait-msg">' . esc_html($msgWait) . '</p>';
         echo $fragment; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
         $scriptHref = add_query_arg('ver', CC_PLUGIN_VERSION, $scriptUrl);
+        $pdfObjectHref = esc_url(add_query_arg('ver', CC_PLUGIN_VERSION, CC_PLUGIN_URL . 'assets/pdfobject.min.js'));
+        echo '<script>window.ccPdfObjectUrl=' . wp_json_encode($pdfObjectHref) . ';</script>'; // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript
         echo '<script src="' . esc_url($scriptHref) . '"></script>'; // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript
         echo '<script>'; // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript
         echo '(function(){var el=document.getElementById("cc-pdf-root");var fn=' . wp_json_encode($fn) . ';';
@@ -4495,7 +4495,7 @@ function ccAskParentPassword(form) {
             ],
         ];
 
-        echo '<script id="cc-stat-data">var ccStatCharts = ' . wp_json_encode($statsJson) . ';</script>';
+        wp_print_inline_script_tag( 'var ccStatCharts = ' . wp_json_encode( $statsJson ) . ';', [ 'id' => 'cc-stat-data' ] );
 
         // ── Bandeau contexte ────────────────────────────────────────────────
         echo '<div class="cc-stat-context-bar">';

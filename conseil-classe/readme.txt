@@ -1,10 +1,10 @@
-=== Conseil de classe ===
+=== Aelhajjaji Conseil de classe ===
 Contributors: aelhajjaji
 Tags: school, education, parents, csv, pdf
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 0.4.31
+Stable tag: 0.4.32
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,64 +26,71 @@ The parent area is based on WordPress pages that contain shortcodes. These pages
 
 == Installation ==
 
-1. Téléversez le dossier du plugin dans `wp-content/plugins/` (ou installez-le depuis le répertoire des extensions).
-2. Activez **Conseil de classe** dans le menu Extensions.
-3. Ouvrez le menu **Conseil de classe** et suivez l'ordre de configuration : paramètres, année active, trimestre actif, classes, conseils, parents.
+1. Upload the plugin folder to `wp-content/plugins/` (or install it from the Plugins screen in your WordPress admin).
+2. Activate **Aelhajjaji Conseil de classe** from the Plugins menu.
+3. Open the **Conseil de classe** menu and follow the setup order: settings, active school year, active term, classes, councils, parents.
 
 == Frequently Asked Questions ==
 
-= Faut-il créer des pages sur le site ? =
+= Do I need to create pages on the site? =
 
-Oui. Créez des pages WordPress contenant les shortcodes indiqués dans **Conseil de classe → Paramètres → Pages (front)**, puis sélectionnez ces pages dans les listes déroulantes.
+Yes. Create WordPress pages containing the shortcodes listed under **Conseil de classe → Settings → Pages (front)**, then select those pages in the dropdown menus.
 
-= Quels rôles WordPress le plugin ajoute-t-il ? =
+= What WordPress roles does the plugin add? =
 
-Des rôles dédiés (parent, administrateur conseil, super administrateur conseil) avec les capacités adaptées. Les administrateurs WordPress du site conservent l'accès complet à la gestion du plugin.
+The plugin adds dedicated roles (parent, council administrator, council super-administrator) with appropriate capabilities. WordPress site administrators retain full access to plugin management.
 
-= Le PDF fonctionne-t-il sans extension supplémentaire ? =
+= Does PDF generation work without extra plugins? =
 
-Le plugin peut générer un PDF via le navigateur (script intégré). Si la bibliothèque **Dompdf** est disponible sur le site, un PDF peut aussi être généré côté serveur.
+The plugin can generate a PDF via the browser (bundled script). If the **Dompdf** library is available on the server, server-side PDF generation is also supported.
 
 == Screenshots ==
 
-1. Tableau de bord : raccourcis et contexte actif (établissement, année, trimestre).
-2. Paramètres : établissement, association, règles et pages publiques (shortcodes).
-3. Planning des conseils dans l'administration.
-4. Espace public : planning et inscription ou désinscription d'un parent.
-5. Tableau de bord avec le bandeau de statistiques par année (chiffres clés : parents, classes, conseils, comptes-rendus).
-6. Page Statistiques : appréciations par classe, implication des parents, taux de couverture et évolution trimestrielle.
+1. Dashboard: shortcuts and active context (school, year, term).
+2. Settings: school, association, rules and public pages (shortcodes).
+3. Council schedule in the admin area.
+4. Parent portal: schedule and registration or deregistration.
+5. Dashboard with the year-scoped statistics strip (key figures: parents, classes, councils, reports).
+6. Statistics page: assessments by class, parent involvement, coverage rate and term-over-term trends.
 
 == Changelog ==
 
+= 0.4.32 =
+* WordPress.org review fixes: plugin renamed to Aelhajjaji Conseil de classe, readme translated to English, inline scripts replaced with wp_print_inline_script_tag(), pdfobject.min.js hosted locally (no CDN calls).
+
+= 0.4.31 =
+* Dashboard hero strip scoped to the active year: key stats (parents, classes, councils, reports) for the current year displayed prominently; other years shown in a compact secondary line.
+* Added screenshots 5 and 6 (dashboard stats strip and Statistics page).
+
 = 0.4.1 =
-* Correctifs de conformité WordPress.org (Plugin Check) : validation/échappement des entrées, durcissement des requêtes SQL et ajustements readme.
+* WordPress.org compliance fixes (Plugin Check): input validation/escaping, SQL query hardening and readme adjustments.
 
 = 0.4.0 =
-* Structure conforme aux usages WordPress : dossier du plugin `conseil-classe/` et fichier principal `conseil-classe/conseil-classe.php` (anciens chemins `conseil-classe-plugin/conseil-classe-plugin.php` supprimés après désinstallation).
+* WordPress-compliant structure: plugin folder `conseil-classe/` with main file `conseil-classe/conseil-classe.php` (old paths removed after uninstall).
 
 = 0.3.2 =
-* Dépot : suppression du sous-dossier dupliqué `conseil-classe-plugin/` à l’intérieur du dossier du plugin. WordPress détectait parfois deux chemins d’extension (« fichier inexistant » après mise à jour si l’ancienne entrée était celle du doublon).
+* Repository: removed duplicated `conseil-classe-plugin/` subfolder inside the plugin folder. WordPress sometimes detected two plugin paths ("file not found" after update when the old entry pointed to the duplicate).
 
 = 0.3.1 =
-* En-tête du fichier principal : format conforme au Plugin Handbook (champs espacés, fins de ligne LF, licence « GPL v2 or later ») pour éviter les faux positifs de Plugin Check et assurer une lecture correcte par WordPress.
+* Main file header: compliant format per the Plugin Handbook (spaced fields, LF line endings, licence "GPL v2 or later") to avoid false positives from Plugin Check.
 
 = 0.3.0 =
-* Préparation au répertoire WordPress.org : fichier readme.txt et en-têtes du fichier principal (URI, licence, prérequis PHP et WordPress).
-* Visuels de fiche (bannières, icônes, captures) regroupés dans le dépôt Git sous `wordpress-org/assets/` avec les noms attendus par Subversion — ne pas les inclure dans le ZIP du plugin.
+* WordPress.org directory preparation: readme.txt and main file headers (URI, licence, PHP and WordPress requirements).
+* Artwork (banners, icons, screenshots) organised in the Git repository under `wordpress-org/assets/` with the names expected by Subversion — not included in the plugin ZIP.
 
 = 0.2.9 =
-* Version précédente (voir l'historique Git pour le détail des changements).
+* Previous version (see Git history for details).
 
 == Upgrade Notice ==
 
+= 0.4.32 =
+Recommended update: WordPress.org review fixes (plugin name, English readme, inline scripts, no CDN calls).
+
+= 0.4.31 =
+Recommended update: dashboard statistics scoped to active year, new screenshots.
+
 = 0.4.1 =
-Mise à jour recommandée pour les correctifs de conformité WordPress.org (Plugin Check) et de robustesse générale.
+Recommended update for WordPress.org compliance fixes (Plugin Check) and general robustness.
 
 = 0.4.0 =
-IMPORTANT : désinstallez / supprimez tout ancien dossier (`conseil-classe-plugin` ou doublons), puis installez ce ZIP — chemin attendu après installation : `wp-content/plugins/conseil-classe/conseil-classe.php`.
-
-= 0.3.2 =
-Correction du chemin d’installation du plugin et des métadonnées d’en-tête. Si nécessaire, supprimez l’ancien dossier puis réinstallez le ZIP.
-
-= 0.3.0 =
-Mise à jour recommandée si vous préparez une distribution sur WordPress.org ; aucun changement de schéma de base de données spécifique à cette version.
+IMPORTANT: uninstall/remove any old folder (`conseil-classe-plugin` or duplicates) before installing this ZIP. Expected path after install: `wp-content/plugins/conseil-classe/conseil-classe.php`.

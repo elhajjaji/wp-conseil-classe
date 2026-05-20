@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name:       Conseil de classe
+ * Plugin Name:       Aelhajjaji Conseil de classe
  * Plugin URI:        https://github.com/elhajjaji/wp-conseil-classe
- * Description:       Gestion conseils de classe : établissement, années, trimestres, classes, planning, parents, CR, CSV/PDF.
- * Version:           0.4.31
+ * Description:       Class council management: school settings, school years/terms, classes, planning, parent registrations, reports, CSV and PDF exports.
+ * Version:           0.4.32
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Tested up to:       6.9
@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('CC_PLUGIN_VERSION', '0.4.31');
+define('CC_PLUGIN_VERSION', '0.4.32');
 define('CC_PLUGIN_FILE', __FILE__);
 define('CC_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('CC_PLUGIN_URL', plugin_dir_url(__FILE__));
