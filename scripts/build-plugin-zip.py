@@ -15,45 +15,10 @@ def read_version(main_php: Path) -> str:
     return match.group(1).strip()
 
 
-def bump_patch_version(version: str) -> str:
-    match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", version)
-    if not match:
-        raise RuntimeError(
-            f"Version non supportée pour auto-incrément ({version}). Format attendu: x.y.z"
-        )
-
-    major, minor, patch = (int(match.group(1)), int(match.group(2)), int(match.group(3)))
-    return f"{major}.{minor}.{patch + 1}"
-
-
-def update_versions(main_php: Path, readme_txt: Path, old: str, new: str) -> None:
-    php_content = main_php.read_text(encoding="utf-8", errors="replace")
-
-    php_content = re.sub(
-        r"(^\s*\*\s*Version:\s*)(.+?)(\s*$)",
-        rf"\g<1>{new}\g<3>",
-        php_content,
-        count=1,
-        flags=re.MULTILINE,
-    )
-    php_content = re.sub(
-        r"(define\('CC_PLUGIN_VERSION',\s*')(.+?)('\);)",
-        rf"\g<1>{new}\g<3>",
-        php_content,
-        count=1,
-    )
-    main_php.write_text(php_content, encoding="utf-8")
-
-    if readme_txt.exists():
-        readme_content = readme_txt.read_text(encoding="utf-8", errors="replace")
-        readme_content = re.sub(
-            r"(^\s*Stable tag:\s*)(.+?)(\s*$)",
-            rf"\g<1>{new}\g<3>",
-            readme_content,
-            count=1,
-            flags=re.MULTILINE,
-        )
-        readme_txt.write_text(readme_content, encoding="utf-8")
+def validate_version(version: str) -> str:
+    if not re.fullmatch(r"\d+\.\d+\.\d+", version):
+        raise RuntimeError(f"Version non supportée ({version}). Format attendu: x.y.z")
+    return version
 
 
 def build_zip(source_dir: Path, destination: Path) -> None:
@@ -118,17 +83,14 @@ def main() -> int:
     repo_root = Path(__file__).resolve().parent.parent
     source_dir = repo_root / "conseil-classe"
     main_php = source_dir / "conseil-classe.php"
-    readme_txt = source_dir / "readme.txt"
 
     if not main_php.exists():
         raise RuntimeError(
             "Exécutez ce script depuis le dépôt (dossier conseil-classe attendu à la racine)."
         )
 
-    version_before = read_version(main_php)
-    version = bump_patch_version(version_before)
-    update_versions(main_php, readme_txt, version_before, version)
-    print(f"Version incrémentée : {version_before} -> {version}")
+    version = validate_version(read_version(main_php))
+    print(f"Version détectée : {version}")
 
     stable_zip = repo_root / "conseil-classe.zip"
     version_zip = repo_root / f"conseil-classe-{version}.zip"

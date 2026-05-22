@@ -132,8 +132,8 @@ final class CC_Admin {
 
     public function register_menu(): void {
         add_menu_page(
-            __('Conseil de classe', 'conseil-classe'),
-            __('Conseil de classe', 'conseil-classe'),
+            __('Conseil de classe', 'conseil-de-classe'),
+            __('Conseil de classe', 'conseil-de-classe'),
             CC_Roles::CAP_MANAGE,
             'cc_dashboard',
             [$this, 'render_dashboard'],
@@ -141,22 +141,22 @@ final class CC_Admin {
             26
         );
 
-        add_submenu_page('cc_dashboard', __('Paramètres', 'conseil-classe'), __('Paramètres', 'conseil-classe'), CC_Roles::CAP_MANAGE, 'cc_settings', [$this, 'render_settings']);
-        add_submenu_page('cc_dashboard', __('Années scolaires', 'conseil-classe'), __('Années scolaires', 'conseil-classe'), CC_Roles::CAP_MANAGE, 'cc_years', [$this, 'render_years']);
-        add_submenu_page('cc_dashboard', __('Trimestres', 'conseil-classe'), __('Trimestres', 'conseil-classe'), CC_Roles::CAP_MANAGE, 'cc_terms', [$this, 'render_terms']);
-        add_submenu_page('cc_dashboard', __('Classes', 'conseil-classe'), __('Classes', 'conseil-classe'), CC_Roles::CAP_MANAGE, 'cc_classes', [$this, 'render_classes']);
-        add_submenu_page('cc_dashboard', __('Conseils', 'conseil-classe'), __('Conseils', 'conseil-classe'), CC_Roles::CAP_MANAGE, 'cc_councils', [$this, 'render_councils']);
-        add_submenu_page('cc_dashboard', __('Parents', 'conseil-classe'), __('Parents', 'conseil-classe'), CC_Roles::CAP_MANAGE, 'cc_parents', [$this, 'render_parents']);
-        add_submenu_page('cc_dashboard', __('Inscriptions', 'conseil-classe'), __('Inscriptions', 'conseil-classe'), CC_Roles::CAP_MANAGE, 'cc_registrations', [$this, 'render_registrations']);
-        add_submenu_page('cc_dashboard', __('Comptes-rendus', 'conseil-classe'), __('Comptes-rendus', 'conseil-classe'), CC_Roles::CAP_MANAGE, 'cc_reports', [$this, 'render_reports']);
-        add_submenu_page('cc_dashboard', __('Statistiques', 'conseil-classe'), __('Statistiques', 'conseil-classe'), CC_Roles::CAP_MANAGE, 'cc_statistics', [$this, 'render_statistics']);
-        add_submenu_page('cc_dashboard', __('Templates PDF', 'conseil-classe'), __('Templates PDF', 'conseil-classe'), CC_Roles::CAP_MANAGE, 'cc_pdf_templates', [$this, 'render_pdf_templates']);
-        add_submenu_page('cc_dashboard', __('Logs', 'conseil-classe'), __('Logs', 'conseil-classe'), CC_Roles::CAP_MANAGE, 'cc_logs', [$this, 'render_logs']);
+        add_submenu_page('cc_dashboard', __('Paramètres', 'conseil-de-classe'), __('Paramètres', 'conseil-de-classe'), CC_Roles::CAP_MANAGE, 'cc_settings', [$this, 'render_settings']);
+        add_submenu_page('cc_dashboard', __('Années scolaires', 'conseil-de-classe'), __('Années scolaires', 'conseil-de-classe'), CC_Roles::CAP_MANAGE, 'cc_years', [$this, 'render_years']);
+        add_submenu_page('cc_dashboard', __('Trimestres', 'conseil-de-classe'), __('Trimestres', 'conseil-de-classe'), CC_Roles::CAP_MANAGE, 'cc_terms', [$this, 'render_terms']);
+        add_submenu_page('cc_dashboard', __('Classes', 'conseil-de-classe'), __('Classes', 'conseil-de-classe'), CC_Roles::CAP_MANAGE, 'cc_classes', [$this, 'render_classes']);
+        add_submenu_page('cc_dashboard', __('Conseils', 'conseil-de-classe'), __('Conseils', 'conseil-de-classe'), CC_Roles::CAP_MANAGE, 'cc_councils', [$this, 'render_councils']);
+        add_submenu_page('cc_dashboard', __('Parents', 'conseil-de-classe'), __('Parents', 'conseil-de-classe'), CC_Roles::CAP_MANAGE, 'cc_parents', [$this, 'render_parents']);
+        add_submenu_page('cc_dashboard', __('Inscriptions', 'conseil-de-classe'), __('Inscriptions', 'conseil-de-classe'), CC_Roles::CAP_MANAGE, 'cc_registrations', [$this, 'render_registrations']);
+        add_submenu_page('cc_dashboard', __('Comptes-rendus', 'conseil-de-classe'), __('Comptes-rendus', 'conseil-de-classe'), CC_Roles::CAP_MANAGE, 'cc_reports', [$this, 'render_reports']);
+        add_submenu_page('cc_dashboard', __('Statistiques', 'conseil-de-classe'), __('Statistiques', 'conseil-de-classe'), CC_Roles::CAP_MANAGE, 'cc_statistics', [$this, 'render_statistics']);
+        add_submenu_page('cc_dashboard', __('Templates PDF', 'conseil-de-classe'), __('Templates PDF', 'conseil-de-classe'), CC_Roles::CAP_MANAGE, 'cc_pdf_templates', [$this, 'render_pdf_templates']);
+        add_submenu_page('cc_dashboard', __('Logs', 'conseil-de-classe'), __('Logs', 'conseil-de-classe'), CC_Roles::CAP_MANAGE, 'cc_logs', [$this, 'render_logs']);
     }
 
     private function require_manage(): void {
         if (!CC_Roles::user_can_manage_plugin()) {
-            wp_die(esc_html__('Accès refusé.', 'conseil-classe'));
+            wp_die(esc_html__('Accès refusé.', 'conseil-de-classe'));
         }
     }
 
@@ -414,10 +414,10 @@ final class CC_Admin {
             return CC_Utils::generate_access_code([CC_Repo::class, 'access_code_exists']);
         }
         if (strlen($raw) < 6) {
-            return new WP_Error('cc_pw_short', __('Le mot de passe / code doit contenir au moins 6 caractères.', 'conseil-classe'));
+            return new WP_Error('cc_pw_short', __('Le mot de passe / code doit contenir au moins 6 caractères.', 'conseil-de-classe'));
         }
         if (strlen($raw) > 160) {
-            return new WP_Error('cc_pw_long', __('Mot de passe trop long.', 'conseil-classe'));
+            return new WP_Error('cc_pw_long', __('Mot de passe trop long.', 'conseil-de-classe'));
         }
 
         return $raw;
@@ -462,28 +462,28 @@ final class CC_Admin {
     private function get_front_page_definitions(): array {
         return [
             'cc_parent_login_page_id' => [
-                'title' => __('Connexion / compte parent', 'conseil-classe'),
+                'title' => __('Connexion / compte parent', 'conseil-de-classe'),
                 'slug' => 'connexion-compte-parent',
                 'shortcode' => '[cc_parent_login]',
-                'label' => __('Connexion / compte', 'conseil-classe'),
+                'label' => __('Connexion / compte', 'conseil-de-classe'),
             ],
             'cc_plannings_page_id' => [
-                'title' => __('Planning des conseils', 'conseil-classe'),
+                'title' => __('Planning des conseils', 'conseil-de-classe'),
                 'slug' => 'planning-conseils-classe',
                 'shortcode' => '[cc_plannings]',
-                'label' => __('Planning', 'conseil-classe'),
+                'label' => __('Planning', 'conseil-de-classe'),
             ],
             'cc_my_councils_page_id' => [
-                'title' => __('Mes conseils', 'conseil-classe'),
+                'title' => __('Mes conseils', 'conseil-de-classe'),
                 'slug' => 'mes-conseils',
                 'shortcode' => '[cc_my_councils]',
-                'label' => __('Mes conseils', 'conseil-classe'),
+                'label' => __('Mes conseils', 'conseil-de-classe'),
             ],
             'cc_report_form_page_id' => [
-                'title' => __('Formulaire compte-rendu', 'conseil-classe'),
+                'title' => __('Formulaire compte-rendu', 'conseil-de-classe'),
                 'slug' => 'formulaire-compte-rendu',
                 'shortcode' => '[cc_report_form]',
-                'label' => __('Formulaire compte-rendu', 'conseil-classe'),
+                'label' => __('Formulaire compte-rendu', 'conseil-de-classe'),
             ],
         ];
     }
@@ -528,7 +528,8 @@ final class CC_Admin {
 
         if ($setupDone) {
             echo '<div class="notice notice-success"><p>' . esc_html(sprintf(
-                __('Pages front configurées: %1$d créée(s), %2$d associée(s).', 'conseil-classe'),
+                /* translators: 1: number of pages created, 2: number of pages attached */
+                __('Pages front configurées: %1$d créée(s), %2$d associée(s).', 'conseil-de-classe'),
                 $created,
                 $attached
             )) . '</p></div>';
@@ -538,34 +539,34 @@ final class CC_Admin {
             return;
         }
 
-        echo '<div class="notice notice-warning"><p><strong>' . esc_html__('Pages front manquantes', 'conseil-classe') . '</strong><br />';
-        echo esc_html__('Certaines pages publiques ne sont pas encore créées ou associées. Le plugin peut proposer et rattacher automatiquement les 4 pages standard.', 'conseil-classe');
+        echo '<div class="notice notice-warning"><p><strong>' . esc_html__('Pages front manquantes', 'conseil-de-classe') . '</strong><br />';
+        echo esc_html__('Certaines pages publiques ne sont pas encore créées ou associées. Le plugin peut proposer et rattacher automatiquement les 4 pages standard.', 'conseil-de-classe');
         echo '</p><ul style="list-style:disc; padding-left:18px; margin-top:8px;">';
         foreach ($missing as $definition) {
             echo '<li>' . esc_html($definition['label'] . ' -> ' . $definition['title'] . ' (' . $definition['shortcode'] . ')') . '</li>';
         }
         echo '</ul><p>';
         if ($compact) {
-            echo '<a class="button button-primary" href="' . esc_url(admin_url('admin.php?page=cc_settings&front_pages_confirm=1#cc-settings-pages')) . '">' . esc_html__('Proposer la création des pages', 'conseil-classe') . '</a>';
-            echo ' <a class="button" href="' . esc_url(admin_url('admin.php?page=cc_settings#cc-settings-pages')) . '">' . esc_html__('Vérifier dans Paramètres', 'conseil-classe') . '</a>';
+            echo '<a class="button button-primary" href="' . esc_url(admin_url('admin.php?page=cc_settings&front_pages_confirm=1#cc-settings-pages')) . '">' . esc_html__('Proposer la création des pages', 'conseil-de-classe') . '</a>';
+            echo ' <a class="button" href="' . esc_url(admin_url('admin.php?page=cc_settings#cc-settings-pages')) . '">' . esc_html__('Vérifier dans Paramètres', 'conseil-de-classe') . '</a>';
             echo '</p></div>';
 
             return;
         }
 
         if ($confirmSetup) {
-            echo esc_html__('Confirmez la création automatique des pages ci-dessus. Les pages déjà existantes avec le bon slug seront simplement rattachées.', 'conseil-classe');
+            echo esc_html__('Confirmez la création automatique des pages ci-dessus. Les pages déjà existantes avec le bon slug seront simplement rattachées.', 'conseil-de-classe');
             echo '</p><form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" style="margin-top:12px;">';
             wp_nonce_field('cc_setup_front_pages');
             echo '<input type="hidden" name="action" value="cc_setup_front_pages" />';
-            submit_button(__('Oui, créer et associer ces pages', 'conseil-classe'), 'primary', 'submit', false);
-            echo ' <a class="button" href="' . esc_url(admin_url('admin.php?page=cc_settings#cc-settings-pages')) . '">' . esc_html__('Annuler', 'conseil-classe') . '</a>';
+            submit_button(__('Oui, créer et associer ces pages', 'conseil-de-classe'), 'primary', 'submit', false);
+            echo ' <a class="button" href="' . esc_url(admin_url('admin.php?page=cc_settings#cc-settings-pages')) . '">' . esc_html__('Annuler', 'conseil-de-classe') . '</a>';
             echo '</form></div>';
 
             return;
         }
 
-        echo '<a class="button button-primary" href="' . esc_url(admin_url('admin.php?page=cc_settings&front_pages_confirm=1#cc-settings-pages')) . '">' . esc_html__('Proposer la création de ces pages', 'conseil-classe') . '</a>';
+        echo '<a class="button button-primary" href="' . esc_url(admin_url('admin.php?page=cc_settings&front_pages_confirm=1#cc-settings-pages')) . '">' . esc_html__('Proposer la création de ces pages', 'conseil-de-classe') . '</a>';
         echo '</p></div>';
     }
 
@@ -900,17 +901,19 @@ final class CC_Admin {
          * @return array<int,int>
          */
         private function post_ids_array(string $key): array {
-                $raw = $_POST[$key] ?? [];
-                if (!is_array($raw)) {
-                        return [];
-                }
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Each caller verifies its nonce before invoking this helper.
+            $postData = wp_unslash($_POST);
+            $raw = $postData[$key] ?? [];
+            if (!is_array($raw)) {
+                return [];
+            }
 
-                $ids = array_map('intval', $raw);
+            $ids = array_map('absint', $raw);
                 $ids = array_filter($ids, static function ($id): bool {
-                        return $id > 0;
-                });
+                return $id > 0;
+            });
 
-                return array_values(array_unique($ids));
+            return array_values(array_unique($ids));
         }
 
         private function render_bulk_toggle_script(string $scope): void {
@@ -941,13 +944,13 @@ final class CC_Admin {
         // ── Hero header ──────────────────────────────────────────────────────
         echo '<header class="cc-admin-page-head cc-admin-page-head--dashboard">';
         echo '<div class="cc-admin-dash-hero-main">';
-        echo '<h1>' . esc_html__('Conseil de classe', 'conseil-classe') . '</h1>';
+        echo '<h1>' . esc_html__('Conseil de classe', 'conseil-de-classe') . '</h1>';
         if (!empty($settings['nom_etablissement'])) {
             echo '<p class="cc-admin-page-lede">' . esc_html($settings['nom_etablissement']) . '</p>';
         } else {
             echo '<p class="cc-admin-page-lede">';
             echo '<a class="cc-admin-dash-setup-link" href="' . esc_url(admin_url('admin.php?page=cc_settings')) . '">';
-            echo esc_html__('⚠ Configurer l\'établissement', 'conseil-classe');
+            echo esc_html__('⚠ Configurer l\'établissement', 'conseil-de-classe');
             echo '</a>';
             echo '</p>';
         }
@@ -957,12 +960,12 @@ final class CC_Admin {
         if ($year) {
             echo '<span class="cc-admin-dash-badge cc-admin-dash-badge--year">' . esc_html($year['nom']) . '</span>';
         } else {
-            echo '<a class="cc-admin-dash-badge cc-admin-dash-badge--missing" href="' . esc_url(admin_url('admin.php?page=cc_years')) . '">' . esc_html__('Définir une année', 'conseil-classe') . '</a>';
+            echo '<a class="cc-admin-dash-badge cc-admin-dash-badge--missing" href="' . esc_url(admin_url('admin.php?page=cc_years')) . '">' . esc_html__('Définir une année', 'conseil-de-classe') . '</a>';
         }
         if ($term) {
             echo '<span class="cc-admin-dash-badge cc-admin-dash-badge--term">' . esc_html($term['nom']) . '</span>';
         } else {
-            echo '<a class="cc-admin-dash-badge cc-admin-dash-badge--missing" href="' . esc_url(admin_url('admin.php?page=cc_years')) . '">' . esc_html__('Définir un trimestre', 'conseil-classe') . '</a>';
+            echo '<a class="cc-admin-dash-badge cc-admin-dash-badge--missing" href="' . esc_url(admin_url('admin.php?page=cc_years')) . '">' . esc_html__('Définir un trimestre', 'conseil-de-classe') . '</a>';
         }
         echo '</div>';
         echo '</div>';
@@ -972,6 +975,11 @@ final class CC_Admin {
         $heroClasses   = $activeYearId ? (int) $dashboardStats['year']['classes']  : (int) $dashboardStats['global']['classes'];
         $heroCouncils  = $activeYearId ? (int) $dashboardStats['year']['councils'] : (int) $dashboardStats['global']['councils'];
         $heroCR        = $activeYearId ? (int) $dashboardStats['year']['reports']  : (int) $dashboardStats['global']['reports'];
+        $otherYearsAllowedHtml = [
+            'small' => [
+                'class' => true,
+            ],
+        ];
         $other_years_html = function (string $metric) use ($dashboardStats, $activeYearNom): string {
             $out = '';
             foreach ($dashboardStats['by_year'] as $nom => $data) {
@@ -983,11 +991,11 @@ final class CC_Admin {
             return $out;
         };
         echo '<div class="cc-admin-dash-hero-strip">';
-        echo '<div class="cc-admin-dash-hero-stat"><strong>' . esc_html((string) $heroParents) . '</strong><span>' . esc_html__('Parents', 'conseil-classe') . '</span>' . $other_years_html('parents') . '</div>';
-        echo '<div class="cc-admin-dash-hero-stat"><strong>' . esc_html((string) $heroClasses) . '</strong><span>' . esc_html__('Classes', 'conseil-classe') . '</span>' . $other_years_html('classes') . '</div>';
-        echo '<div class="cc-admin-dash-hero-stat"><strong>' . esc_html((string) $heroCouncils) . '</strong><span>' . esc_html__('Conseils', 'conseil-classe') . '</span>' . $other_years_html('councils') . '</div>';
-        echo '<div class="cc-admin-dash-hero-stat"><strong>' . esc_html((string) $heroCR) . '</strong><span>' . esc_html__('Comptes-rendus', 'conseil-classe') . '</span>' . $other_years_html('reports') . '</div>';
-        echo '<div class="cc-admin-dash-hero-stat"><strong>' . esc_html((string) ($settings['max_parents_per_conseil'] ?? '2')) . '</strong><span>' . esc_html__('Quota/conseil', 'conseil-classe') . '</span></div>';
+        echo '<div class="cc-admin-dash-hero-stat"><strong>' . esc_html((string) $heroParents) . '</strong><span>' . esc_html__('Parents', 'conseil-de-classe') . '</span>' . wp_kses($other_years_html('parents'), $otherYearsAllowedHtml) . '</div>';
+        echo '<div class="cc-admin-dash-hero-stat"><strong>' . esc_html((string) $heroClasses) . '</strong><span>' . esc_html__('Classes', 'conseil-de-classe') . '</span>' . wp_kses($other_years_html('classes'), $otherYearsAllowedHtml) . '</div>';
+        echo '<div class="cc-admin-dash-hero-stat"><strong>' . esc_html((string) $heroCouncils) . '</strong><span>' . esc_html__('Conseils', 'conseil-de-classe') . '</span>' . wp_kses($other_years_html('councils'), $otherYearsAllowedHtml) . '</div>';
+        echo '<div class="cc-admin-dash-hero-stat"><strong>' . esc_html((string) $heroCR) . '</strong><span>' . esc_html__('Comptes-rendus', 'conseil-de-classe') . '</span>' . wp_kses($other_years_html('reports'), $otherYearsAllowedHtml) . '</div>';
+        echo '<div class="cc-admin-dash-hero-stat"><strong>' . esc_html((string) ($settings['max_parents_per_conseil'] ?? '2')) . '</strong><span>' . esc_html__('Quota/conseil', 'conseil-de-classe') . '</span></div>';
         echo '</div>';
         echo '</header>';
 
@@ -997,49 +1005,49 @@ final class CC_Admin {
         $tiles = [
             [
                 'url'   => admin_url('admin.php?page=cc_settings'),
-                'title' => __('Paramètres', 'conseil-classe'),
-                'desc'  => __('Établissement, association, quotas, pages publiques.', 'conseil-classe'),
+                'title' => __('Paramètres', 'conseil-de-classe'),
+                'desc'  => __('Établissement, association, quotas, pages publiques.', 'conseil-de-classe'),
                 'icon'  => 'dashicons-admin-settings',
                 'count' => null,
             ],
             [
                 'url'   => admin_url('admin.php?page=cc_years'),
-                'title' => __('Années & trimestres', 'conseil-classe'),
-                'desc'  => __('Cycles scolaires et périodes actives.', 'conseil-classe'),
+                'title' => __('Années & trimestres', 'conseil-de-classe'),
+                'desc'  => __('Cycles scolaires et périodes actives.', 'conseil-de-classe'),
                 'icon'  => 'dashicons-calendar-alt',
                 'count' => null,
             ],
             [
                 'url'   => admin_url('admin.php?page=cc_classes'),
-                'title' => __('Classes', 'conseil-classe'),
-                'desc'  => __('Classes pour l’année active.', 'conseil-classe'),
+                'title' => __('Classes', 'conseil-de-classe'),
+                'desc'  => __('Classes pour l’année active.', 'conseil-de-classe'),
                 'icon'  => 'dashicons-welcome-learn-more',
                 'count' => $year ? (int) $dashboardStats['active']['classes'] : null,
             ],
             [
                 'url'   => admin_url('admin.php?page=cc_councils'),
-                'title' => __('Planning des conseils', 'conseil-classe'),
-                'desc'  => __('Créneaux, lieux et présidences.', 'conseil-classe'),
+                'title' => __('Planning des conseils', 'conseil-de-classe'),
+                'desc'  => __('Créneaux, lieux et présidences.', 'conseil-de-classe'),
                 'icon'  => 'dashicons-list-view',
                 'count' => ($year && $term) ? (int) $dashboardStats['active']['councils'] : null,
             ],
             [
                 'url'   => admin_url('admin.php?page=cc_parents'),
-                'title' => __('Parents', 'conseil-classe'),
-                'desc'  => __('Fiches, import CSV et comptes utilisateurs.', 'conseil-classe'),
+                'title' => __('Parents', 'conseil-de-classe'),
+                'desc'  => __('Fiches, import CSV et comptes utilisateurs.', 'conseil-de-classe'),
                 'icon'  => 'dashicons-groups',
                 'count' => (int) $dashboardStats['global']['parents'],
             ],
             [
                 'url'   => admin_url('admin.php?page=cc_reports'),
-                'title' => __('Comptes-rendus', 'conseil-classe'),
-                'desc'  => __('Lecture, modification et export PDF.', 'conseil-classe'),
+                'title' => __('Comptes-rendus', 'conseil-de-classe'),
+                'desc'  => __('Lecture, modification et export PDF.', 'conseil-de-classe'),
                 'icon'  => 'dashicons-media-document',
                 'count' => ($year && $term) ? (int) $dashboardStats['active']['reports'] : null,
             ],
         ];
 
-        echo '<div class="cc-admin-dash-grid" role="navigation" aria-label="' . esc_attr__('Raccourcis Conseil de classe', 'conseil-classe') . '">';
+        echo '<div class="cc-admin-dash-grid" role="navigation" aria-label="' . esc_attr__('Raccourcis Conseil de classe', 'conseil-de-classe') . '">';
         foreach ($tiles as $t) {
             echo '<a class="cc-admin-dash-tile" href="' . esc_url($t['url']) . '">';
             echo '<span class="cc-admin-dash-tile-top">';
@@ -1059,32 +1067,32 @@ final class CC_Admin {
         $checkItems = [
             [
                 'ok'    => !empty($settings['nom_etablissement']),
-                'label' => __('Établissement', 'conseil-classe'),
+                'label' => __('Établissement', 'conseil-de-classe'),
                 'url'   => admin_url('admin.php?page=cc_settings'),
             ],
             [
                 'ok'    => $year !== null,
-                'label' => __('Année active', 'conseil-classe'),
+                'label' => __('Année active', 'conseil-de-classe'),
                 'url'   => admin_url('admin.php?page=cc_years'),
             ],
             [
                 'ok'    => $term !== null,
-                'label' => __('Trimestre actif', 'conseil-classe'),
+                'label' => __('Trimestre actif', 'conseil-de-classe'),
                 'url'   => admin_url('admin.php?page=cc_years'),
             ],
             [
                 'ok'    => empty($missingFrontPages),
-                'label' => __('Pages publiques', 'conseil-classe'),
+                'label' => __('Pages publiques', 'conseil-de-classe'),
                 'url'   => admin_url('admin.php?page=cc_settings'),
             ],
             [
                 'ok'    => $year && (int) $dashboardStats['active']['classes'] > 0,
-                'label' => __('Classes', 'conseil-classe'),
+                'label' => __('Classes', 'conseil-de-classe'),
                 'url'   => admin_url('admin.php?page=cc_classes'),
             ],
             [
                 'ok'    => $year && $term && (int) $dashboardStats['active']['councils'] > 0,
-                'label' => __('Conseils planifiés', 'conseil-classe'),
+                'label' => __('Conseils planifiés', 'conseil-de-classe'),
                 'url'   => admin_url('admin.php?page=cc_councils'),
             ],
         ];
@@ -1097,7 +1105,7 @@ final class CC_Admin {
         }
         if ($hasSetupIssues) {
             echo '<section class="cc-admin-section cc-admin-dash-checklist">';
-            echo '<h2>' . esc_html__('Mise en service', 'conseil-classe') . '</h2>';
+            echo '<h2>' . esc_html__('Mise en service', 'conseil-de-classe') . '</h2>';
             echo '<div class="cc-admin-checklist-items">';
             foreach ($checkItems as $chk) {
                 $cls = $chk['ok'] ? 'ok' : 'missing';
@@ -1115,13 +1123,13 @@ final class CC_Admin {
 
         // ── Actions rapides ──────────────────────────────────────────────────
         echo '<section class="cc-admin-section cc-admin-dash-quickactions">';
-        echo '<h2>' . esc_html__('Actions rapides', 'conseil-classe') . '</h2>';
+        echo '<h2>' . esc_html__('Actions rapides', 'conseil-de-classe') . '</h2>';
         echo '<div class="cc-admin-qa-grid">';
-        echo '<a class="cc-admin-qa-btn" href="' . esc_url(admin_url('admin.php?page=cc_classes')) . '"><span class="dashicons dashicons-plus-alt2"></span>' . esc_html__('Ajouter une classe', 'conseil-classe') . '</a>';
-        echo '<a class="cc-admin-qa-btn" href="' . esc_url(admin_url('admin.php?page=cc_councils')) . '"><span class="dashicons dashicons-plus-alt2"></span>' . esc_html__('Planifier un conseil', 'conseil-classe') . '</a>';
-        echo '<a class="cc-admin-qa-btn" href="' . esc_url(admin_url('admin.php?page=cc_parents')) . '"><span class="dashicons dashicons-plus-alt2"></span>' . esc_html__('Ajouter un parent', 'conseil-classe') . '</a>';
-        echo '<a class="cc-admin-qa-btn" href="' . esc_url(admin_url('admin.php?page=cc_reports')) . '"><span class="dashicons dashicons-media-document"></span>' . esc_html__('Comptes-rendus', 'conseil-classe') . '</a>';
-        echo '<a class="cc-admin-qa-btn" href="' . esc_url(admin_url('admin.php?page=cc_settings')) . '"><span class="dashicons dashicons-admin-settings"></span>' . esc_html__('Paramètres', 'conseil-classe') . '</a>';
+        echo '<a class="cc-admin-qa-btn" href="' . esc_url(admin_url('admin.php?page=cc_classes')) . '"><span class="dashicons dashicons-plus-alt2"></span>' . esc_html__('Ajouter une classe', 'conseil-de-classe') . '</a>';
+        echo '<a class="cc-admin-qa-btn" href="' . esc_url(admin_url('admin.php?page=cc_councils')) . '"><span class="dashicons dashicons-plus-alt2"></span>' . esc_html__('Planifier un conseil', 'conseil-de-classe') . '</a>';
+        echo '<a class="cc-admin-qa-btn" href="' . esc_url(admin_url('admin.php?page=cc_parents')) . '"><span class="dashicons dashicons-plus-alt2"></span>' . esc_html__('Ajouter un parent', 'conseil-de-classe') . '</a>';
+        echo '<a class="cc-admin-qa-btn" href="' . esc_url(admin_url('admin.php?page=cc_reports')) . '"><span class="dashicons dashicons-media-document"></span>' . esc_html__('Comptes-rendus', 'conseil-de-classe') . '</a>';
+        echo '<a class="cc-admin-qa-btn" href="' . esc_url(admin_url('admin.php?page=cc_settings')) . '"><span class="dashicons dashicons-admin-settings"></span>' . esc_html__('Paramètres', 'conseil-de-classe') . '</a>';
         echo '</div>';
         echo '</section>';
 
@@ -1135,47 +1143,47 @@ final class CC_Admin {
 
             $activeCards = [
                 [
-                    'label' => __('Parents inscrits', 'conseil-classe'),
+                    'label' => __('Parents inscrits', 'conseil-de-classe'),
                     'value' => (string) $dashboardStats['active']['registered_parents'],
-                    'meta' => __('Parents distincts inscrits sur le trimestre actif.', 'conseil-classe'),
+                    'meta' => __('Parents distincts inscrits sur le trimestre actif.', 'conseil-de-classe'),
                 ],
                 [
-                    'label' => __('Inscriptions', 'conseil-classe'),
+                    'label' => __('Inscriptions', 'conseil-de-classe'),
                     'value' => (string) $dashboardStats['active']['registrations'],
-                    'meta' => __('Total des inscriptions enregistrées sur les conseils actifs.', 'conseil-classe'),
+                    'meta' => __('Total des inscriptions enregistrées sur les conseils actifs.', 'conseil-de-classe'),
                 ],
                 [
-                    'label' => __('Conseils planifiés', 'conseil-classe'),
+                    'label' => __('Conseils planifiés', 'conseil-de-classe'),
                     'value' => (string) $dashboardStats['active']['councils'],
-                    'meta' => __('Conseils rattachés à l’année et au trimestre actifs.', 'conseil-classe'),
+                    'meta' => __('Conseils rattachés à l’année et au trimestre actifs.', 'conseil-de-classe'),
                 ],
                 [
-                    'label' => __('Conseils orphelins', 'conseil-classe'),
+                    'label' => __('Conseils orphelins', 'conseil-de-classe'),
                     'value' => (string) $dashboardStats['active']['orphan_councils'],
-                    'meta' => __('Conseils sans parent inscrit pour le moment.', 'conseil-classe'),
+                    'meta' => __('Conseils sans parent inscrit pour le moment.', 'conseil-de-classe'),
                     'tone' => ((int) $dashboardStats['active']['orphan_councils'] > 0) ? 'warning' : 'ok',
                 ],
                 [
-                    'label' => __('Comptes-rendus saisis', 'conseil-classe'),
+                    'label' => __('Comptes-rendus saisis', 'conseil-de-classe'),
                     'value' => (string) $dashboardStats['active']['reports'],
-                    'meta' => __('Comptes-rendus présents pour les conseils du trimestre actif.', 'conseil-classe'),
+                    'meta' => __('Comptes-rendus présents pour les conseils du trimestre actif.', 'conseil-de-classe'),
                 ],
                 [
-                    'label' => __('Comptes-rendus validés', 'conseil-classe'),
+                    'label' => __('Comptes-rendus validés', 'conseil-de-classe'),
                     'value' => (string) $dashboardStats['active']['validated_reports'],
-                    'meta' => __('Comptes-rendus validés administrativement.', 'conseil-classe'),
+                    'meta' => __('Comptes-rendus validés administrativement.', 'conseil-de-classe'),
                     'tone' => 'ok',
                 ],
                 [
-                    'label' => __('Comptes-rendus manquants', 'conseil-classe'),
+                    'label' => __('Comptes-rendus manquants', 'conseil-de-classe'),
                     'value' => (string) $dashboardStats['active']['pending_reports'],
-                    'meta' => __('Conseils planifiés sans compte-rendu saisi.', 'conseil-classe'),
+                    'meta' => __('Conseils planifiés sans compte-rendu saisi.', 'conseil-de-classe'),
                     'tone' => ((int) $dashboardStats['active']['pending_reports'] > 0) ? 'warning' : 'ok',
                 ],
                 [
-                    'label' => __('Classes sans conseil', 'conseil-classe'),
+                    'label' => __('Classes sans conseil', 'conseil-de-classe'),
                     'value' => (string) $dashboardStats['active']['classes_without_council'],
-                    'meta' => __('Classes de l’année active encore sans planification.', 'conseil-classe'),
+                    'meta' => __('Classes de l’année active encore sans planification.', 'conseil-de-classe'),
                     'tone' => ((int) $dashboardStats['active']['classes_without_council'] > 0) ? 'warning' : 'ok',
                 ],
             ];
@@ -1209,36 +1217,36 @@ final class CC_Admin {
 
             $generalCards = [
                 [
-                    'label' => __('Parents enregistrés', 'conseil-classe'),
+                    'label' => __('Parents enregistrés', 'conseil-de-classe'),
                     'value' => (string) $dashboardStats['global']['parents'],
-                    'meta' => __('Fiches parents présentes dans le plugin.', 'conseil-classe'),
+                    'meta' => __('Fiches parents présentes dans le plugin.', 'conseil-de-classe'),
                 ],
                 [
-                    'label' => __('Classes', 'conseil-classe'),
+                    'label' => __('Classes', 'conseil-de-classe'),
                     'value' => (string) $dashboardStats['global']['classes'],
-                    'meta' => __('Total cumulé des classes stockées.', 'conseil-classe'),
+                    'meta' => __('Total cumulé des classes stockées.', 'conseil-de-classe'),
                 ],
                 [
-                    'label' => __('Conseils', 'conseil-classe'),
+                    'label' => __('Conseils', 'conseil-de-classe'),
                     'value' => (string) $dashboardStats['global']['councils'],
-                    'meta' => __('Tous trimestres et années confondus.', 'conseil-classe'),
+                    'meta' => __('Tous trimestres et années confondus.', 'conseil-de-classe'),
                 ],
                 [
-                    'label' => __('Inscriptions cumulées', 'conseil-classe'),
+                    'label' => __('Inscriptions cumulées', 'conseil-de-classe'),
                     'value' => (string) $dashboardStats['global']['registrations'],
-                    'meta' => __('Historique complet des inscriptions.', 'conseil-classe'),
+                    'meta' => __('Historique complet des inscriptions.', 'conseil-de-classe'),
                 ],
                 [
-                    'label' => __('Comptes-rendus cumulés', 'conseil-classe'),
+                    'label' => __('Comptes-rendus cumulés', 'conseil-de-classe'),
                     'value' => (string) $dashboardStats['global']['reports'],
-                    'meta' => __('Tous les comptes-rendus enregistrés.', 'conseil-classe'),
+                    'meta' => __('Tous les comptes-rendus enregistrés.', 'conseil-de-classe'),
                 ],
                 [
-                    'label' => __('Templates PDF', 'conseil-classe'),
+                    'label' => __('Templates PDF', 'conseil-de-classe'),
                     'value' => (string) $dashboardStats['global']['pdf_templates'],
                     'meta' => sprintf(
                         /* translators: %d: active templates count */
-                        __('%d actif(s) actuellement.', 'conseil-classe'),
+                        __('%d actif(s) actuellement.', 'conseil-de-classe'),
                         (int) $dashboardStats['global']['active_pdf_templates']
                     ),
                 ],
@@ -1248,10 +1256,10 @@ final class CC_Admin {
             $chartData = [
                 'councilStatus' => [
                     'labels' => [
-                        __('CR validé', 'conseil-classe'),
-                        __('CR saisi (non validé)', 'conseil-classe'),
-                        __('Planifié sans CR', 'conseil-classe'),
-                        __('Orphelin (sans inscrit)', 'conseil-classe'),
+                        __('CR validé', 'conseil-de-classe'),
+                        __('CR saisi (non validé)', 'conseil-de-classe'),
+                        __('Planifié sans CR', 'conseil-de-classe'),
+                        __('Orphelin (sans inscrit)', 'conseil-de-classe'),
                     ],
                     'data' => [
                         (int) $dashboardStats['active']['validated_reports'],
@@ -1262,17 +1270,17 @@ final class CC_Admin {
                 ],
                 'occupation' => [
                     'labels' => [
-                        __('Places occupées', 'conseil-classe'),
-                        __('Places libres', 'conseil-classe'),
-                        __('Conseils orphelins', 'conseil-classe'),
+                        __('Places occupées', 'conseil-de-classe'),
+                        __('Places libres', 'conseil-de-classe'),
+                        __('Conseils orphelins', 'conseil-de-classe'),
                     ],
                     'data' => [$usedCapacity, $freeCapacity, (int) $dashboardStats['active']['orphan_councils']],
                 ],
                 'reports' => [
                     'labels' => [
-                        __('Validés', 'conseil-classe'),
-                        __('Saisis', 'conseil-classe'),
-                        __('Manquants', 'conseil-classe'),
+                        __('Validés', 'conseil-de-classe'),
+                        __('Saisis', 'conseil-de-classe'),
+                        __('Manquants', 'conseil-de-classe'),
                     ],
                     'data' => [
                         (int) $dashboardStats['active']['validated_reports'],
@@ -1282,8 +1290,8 @@ final class CC_Admin {
                 ],
                 'coverage' => [
                     'labels' => [
-                        __('Classes planifiées', 'conseil-classe'),
-                        __('Sans conseil', 'conseil-classe'),
+                        __('Classes planifiées', 'conseil-de-classe'),
+                        __('Sans conseil', 'conseil-de-classe'),
                     ],
                     'data' => [
                         $plannedClasses,
@@ -1295,28 +1303,28 @@ final class CC_Admin {
                     'data'         => $classData,
                     'colors'       => $classColors,
                     'borderColors' => $classBorderColors,
-                    'legend'       => __('Inscrits', 'conseil-classe'),
+                    'legend'       => __('Inscrits', 'conseil-de-classe'),
                 ],
             ];
             wp_print_inline_script_tag( 'var ccDashCharts = ' . wp_json_encode( $chartData ) . ';', [ 'id' => 'cc-chart-data' ] );
 
             // ── Section graphiques (4 canvases) ─────────────────────────────
             echo '<section class="cc-admin-section cc-admin-section--dashboard">';
-            echo '<h2>' . esc_html__('Graphiques de synthèse', 'conseil-classe') . '</h2>';
+            echo '<h2>' . esc_html__('Graphiques de synthèse', 'conseil-de-classe') . '</h2>';
             echo '<div class="cc-admin-canvas-grid">';
-            echo '<div class="cc-admin-canvas-card"><h3>' . esc_html__('État des conseils', 'conseil-classe') . '</h3>';
-            echo '<div class="cc-admin-canvas-wrap"><canvas id="cc-chart-councils" role="img" aria-label="' . esc_attr__('État des conseils', 'conseil-classe') . '"></canvas></div></div>';
-            echo '<div class="cc-admin-canvas-card"><h3>' . esc_html__('Occupation des places', 'conseil-classe') . '</h3>';
-            echo '<div class="cc-admin-canvas-wrap"><canvas id="cc-chart-occupation" role="img" aria-label="' . esc_attr__('Occupation des places', 'conseil-classe') . '"></canvas></div></div>';
-            echo '<div class="cc-admin-canvas-card"><h3>' . esc_html__('Comptes-rendus', 'conseil-classe') . '</h3>';
-            echo '<div class="cc-admin-canvas-wrap"><canvas id="cc-chart-reports" role="img" aria-label="' . esc_attr__('Comptes-rendus', 'conseil-classe') . '"></canvas></div></div>';
-            echo '<div class="cc-admin-canvas-card"><h3>' . esc_html__('Couverture des classes', 'conseil-classe') . '</h3>';
-            echo '<div class="cc-admin-canvas-wrap"><canvas id="cc-chart-coverage" role="img" aria-label="' . esc_attr__('Couverture des classes', 'conseil-classe') . '"></canvas></div></div>';
+            echo '<div class="cc-admin-canvas-card"><h3>' . esc_html__('État des conseils', 'conseil-de-classe') . '</h3>';
+            echo '<div class="cc-admin-canvas-wrap"><canvas id="cc-chart-councils" role="img" aria-label="' . esc_attr__('État des conseils', 'conseil-de-classe') . '"></canvas></div></div>';
+            echo '<div class="cc-admin-canvas-card"><h3>' . esc_html__('Occupation des places', 'conseil-de-classe') . '</h3>';
+            echo '<div class="cc-admin-canvas-wrap"><canvas id="cc-chart-occupation" role="img" aria-label="' . esc_attr__('Occupation des places', 'conseil-de-classe') . '"></canvas></div></div>';
+            echo '<div class="cc-admin-canvas-card"><h3>' . esc_html__('Comptes-rendus', 'conseil-de-classe') . '</h3>';
+            echo '<div class="cc-admin-canvas-wrap"><canvas id="cc-chart-reports" role="img" aria-label="' . esc_attr__('Comptes-rendus', 'conseil-de-classe') . '"></canvas></div></div>';
+            echo '<div class="cc-admin-canvas-card"><h3>' . esc_html__('Couverture des classes', 'conseil-de-classe') . '</h3>';
+            echo '<div class="cc-admin-canvas-wrap"><canvas id="cc-chart-coverage" role="img" aria-label="' . esc_attr__('Couverture des classes', 'conseil-de-classe') . '"></canvas></div></div>';
             echo '</div>';
             echo '</section>';
 
             echo '<section class="cc-admin-section cc-admin-section--dashboard">';
-            echo '<h2>' . esc_html__('Pilotage du trimestre actif', 'conseil-classe') . '</h2>';
+            echo '<h2>' . esc_html__('Pilotage du trimestre actif', 'conseil-de-classe') . '</h2>';
             echo '<div class="cc-admin-metric-grid">';
             foreach ($activeCards as $card) {
                 echo '<article class="cc-admin-metric-card' . (!empty($card['tone']) ? ' cc-admin-metric-card--' . esc_attr((string) $card['tone']) : '') . '">';
@@ -1329,7 +1337,7 @@ final class CC_Admin {
             echo '</section>';
 
             echo '<section class="cc-admin-section cc-admin-section--dashboard">';
-            echo '<h2>' . esc_html__('Vue générale', 'conseil-classe') . '</h2>';
+            echo '<h2>' . esc_html__('Vue générale', 'conseil-de-classe') . '</h2>';
             echo '<div class="cc-admin-metric-grid cc-admin-metric-grid--compact">';
             foreach ($generalCards as $card) {
                 echo '<article class="cc-admin-metric-card">';
@@ -1342,28 +1350,28 @@ final class CC_Admin {
             echo '</section>';
 
             echo '<section class="cc-admin-section cc-admin-section--dashboard">';
-            echo '<h2>' . esc_html__('Statistiques par classe', 'conseil-classe') . '</h2>';
+            echo '<h2>' . esc_html__('Statistiques par classe', 'conseil-de-classe') . '</h2>';
             if ($classStats) {
                 $canvasHeight = max(200, count($classStats) * 38) . 'px';
                 echo '<div class="cc-admin-canvas-wrap cc-admin-canvas-wrap--class" style="height:' . esc_attr($canvasHeight) . '">';
-                echo '<canvas id="cc-chart-classes" role="img" aria-label="' . esc_attr__('Inscriptions par classe', 'conseil-classe') . '"></canvas>';
+                echo '<canvas id="cc-chart-classes" role="img" aria-label="' . esc_attr__('Inscriptions par classe', 'conseil-de-classe') . '"></canvas>';
                 echo '</div>';
             } else {
-                echo '<p>' . esc_html__('Aucune classe à afficher pour le contexte actif.', 'conseil-classe') . '</p>';
+                echo '<p>' . esc_html__('Aucune classe à afficher pour le contexte actif.', 'conseil-de-classe') . '</p>';
             }
             echo '<table class="widefat striped cc-admin-dashboard-table"><thead><tr>';
-            echo '<th>' . esc_html__('Classe', 'conseil-classe') . '</th>';
-            echo '<th>' . esc_html__('Conseil', 'conseil-classe') . '</th>';
-            echo '<th>' . esc_html__('Inscrits', 'conseil-classe') . '</th>';
-            echo '<th>' . esc_html__('Compte-rendu', 'conseil-classe') . '</th>';
-            echo '<th>' . esc_html__('État', 'conseil-classe') . '</th>';
+            echo '<th>' . esc_html__('Classe', 'conseil-de-classe') . '</th>';
+            echo '<th>' . esc_html__('Conseil', 'conseil-de-classe') . '</th>';
+            echo '<th>' . esc_html__('Inscrits', 'conseil-de-classe') . '</th>';
+            echo '<th>' . esc_html__('Compte-rendu', 'conseil-de-classe') . '</th>';
+            echo '<th>' . esc_html__('État', 'conseil-de-classe') . '</th>';
             echo '</tr></thead><tbody>';
 
             foreach ($classStats as $row) {
                 $hasCouncil = !empty($row['council_id']);
                 $hasReport = !empty($row['report_id']);
                 $isValidated = (int) ($row['report_validated'] ?? 0) === 1;
-                $schedule = __('Non planifié', 'conseil-classe');
+                $schedule = __('Non planifié', 'conseil-de-classe');
                 if ($hasCouncil) {
                     $schedule = mysql2date('d/m/Y', (string) $row['date_conseil']);
                     if (!empty($row['heure_debut'])) {
@@ -1371,14 +1379,14 @@ final class CC_Admin {
                     }
                 }
 
-                $statusLabel = __('À planifier', 'conseil-classe');
+                $statusLabel = __('À planifier', 'conseil-de-classe');
                 $statusClass = 'pending';
                 if ($hasCouncil && !$hasReport) {
-                    $statusLabel = __('Conseil planifié', 'conseil-classe');
+                    $statusLabel = __('Conseil planifié', 'conseil-de-classe');
                     $statusClass = 'scheduled';
                 }
                 if ($hasReport) {
-                    $statusLabel = $isValidated ? __('Compte-rendu validé', 'conseil-classe') : __('Compte-rendu en attente', 'conseil-classe');
+                    $statusLabel = $isValidated ? __('Compte-rendu validé', 'conseil-de-classe') : __('Compte-rendu en attente', 'conseil-de-classe');
                     $statusClass = $isValidated ? 'ok' : 'warning';
                 }
 
@@ -1386,21 +1394,21 @@ final class CC_Admin {
                 echo '<td><strong>' . esc_html((string) $row['nom']) . '</strong><br /><span class="cc-admin-dashboard-muted">' . esc_html((string) $row['niveau']) . '</span></td>';
                 echo '<td>' . esc_html($schedule) . '</td>';
                 echo '<td>' . esc_html((string) ((int) ($row['registrations_count'] ?? 0))) . '</td>';
-                echo '<td>' . esc_html($hasReport ? ($isValidated ? __('Validé', 'conseil-classe') : __('Saisi', 'conseil-classe')) : __('Absent', 'conseil-classe')) . '</td>';
+                echo '<td>' . esc_html($hasReport ? ($isValidated ? __('Validé', 'conseil-de-classe') : __('Saisi', 'conseil-de-classe')) : __('Absent', 'conseil-de-classe')) . '</td>';
                 echo '<td><span class="cc-admin-status-badge cc-admin-status-badge--' . esc_attr($statusClass) . '">' . esc_html($statusLabel) . '</span></td>';
                 echo '</tr>';
             }
 
             if (!$classStats) {
-                echo '<tr><td colspan="5">' . esc_html__('Aucune classe à afficher pour le contexte actif.', 'conseil-classe') . '</td></tr>';
+                echo '<tr><td colspan="5">' . esc_html__('Aucune classe à afficher pour le contexte actif.', 'conseil-de-classe') . '</td></tr>';
             }
 
             echo '</tbody></table>';
             echo '</section>';
         } else {
             echo '<section class="cc-admin-section">';
-            echo '<h2>' . esc_html__('Tableau de bord', 'conseil-classe') . '</h2>';
-            echo '<p>' . esc_html__('Définissez une année scolaire active et un trimestre actif pour afficher les statistiques détaillées du tableau de bord.', 'conseil-classe') . '</p>';
+            echo '<h2>' . esc_html__('Tableau de bord', 'conseil-de-classe') . '</h2>';
+            echo '<p>' . esc_html__('Définissez une année scolaire active et un trimestre actif pour afficher les statistiques détaillées du tableau de bord.', 'conseil-de-classe') . '</p>';
             echo '</section>';
         }
 
@@ -1439,38 +1447,44 @@ final class CC_Admin {
 
         $schoolContactLines = [];
         if (($s['telephone_etablissement'] ?? '') !== '') {
-            $schoolContactLines[] = sprintf(__('Tél: %s', 'conseil-classe'), $s['telephone_etablissement']);
+            /* translators: %s: school phone number */
+            $schoolContactLines[] = sprintf(__('Tél: %s', 'conseil-de-classe'), $s['telephone_etablissement']);
         }
         if (($s['email_etablissement'] ?? '') !== '') {
-            $schoolContactLines[] = sprintf(__('Email: %s', 'conseil-classe'), $s['email_etablissement']);
+            /* translators: %s: school email address */
+            $schoolContactLines[] = sprintf(__('Email: %s', 'conseil-de-classe'), $s['email_etablissement']);
         }
         if (($s['site_web_etablissement'] ?? '') !== '') {
-            $schoolContactLines[] = sprintf(__('Web: %s', 'conseil-classe'), $s['site_web_etablissement']);
+            /* translators: %s: school website URL */
+            $schoolContactLines[] = sprintf(__('Web: %s', 'conseil-de-classe'), $s['site_web_etablissement']);
         }
 
         $associationContactLines = [];
         if (($s['telephone_association_parents'] ?? '') !== '') {
-            $associationContactLines[] = sprintf(__('Tél: %s', 'conseil-classe'), $s['telephone_association_parents']);
+            /* translators: %s: parent association phone number */
+            $associationContactLines[] = sprintf(__('Tél: %s', 'conseil-de-classe'), $s['telephone_association_parents']);
         }
         if (($s['email_association_parents'] ?? '') !== '') {
-            $associationContactLines[] = sprintf(__('Email: %s', 'conseil-classe'), $s['email_association_parents']);
+            /* translators: %s: parent association email address */
+            $associationContactLines[] = sprintf(__('Email: %s', 'conseil-de-classe'), $s['email_association_parents']);
         }
         if (($s['site_web_association_parents'] ?? '') !== '') {
-            $associationContactLines[] = sprintf(__('Web: %s', 'conseil-classe'), $s['site_web_association_parents']);
+            /* translators: %s: parent association website URL */
+            $associationContactLines[] = sprintf(__('Web: %s', 'conseil-de-classe'), $s['site_web_association_parents']);
         }
 
         echo '<div class="wrap cc-admin-page cc-settings-page">';
         echo '<header class="cc-settings-hero">';
-        echo '<h1><span class="dashicons dashicons-admin-generic" aria-hidden="true"></span> ' . esc_html__('Paramètres et Coordonnées', 'conseil-classe') . '</h1>';
-        echo '<p class="cc-settings-hero-lede">' . esc_html__('Gestion des coordonnées de l’établissement et de l’association des parents d’élèves.', 'conseil-classe') . '</p>';
+        echo '<h1><span class="dashicons dashicons-admin-generic" aria-hidden="true"></span> ' . esc_html__('Paramètres et Coordonnées', 'conseil-de-classe') . '</h1>';
+        echo '<p class="cc-settings-hero-lede">' . esc_html__('Gestion des coordonnées de l’établissement et de l’association des parents d’élèves.', 'conseil-de-classe') . '</p>';
         if ($year) {
-            echo '<p class="cc-settings-hero-lede"><strong>' . esc_html__('Année active :', 'conseil-classe') . '</strong> ' . esc_html($year['nom']) . '</p>';
+            echo '<p class="cc-settings-hero-lede"><strong>' . esc_html__('Année active :', 'conseil-de-classe') . '</strong> ' . esc_html($year['nom']) . '</p>';
         }
-        echo '<p class="cc-settings-breadcrumb"><a href="' . esc_url($dashboardUrl) . '">' . esc_html__('Accueil', 'conseil-classe') . '</a> <span>/</span> <span>' . esc_html__('Paramètres', 'conseil-classe') . '</span></p>';
+        echo '<p class="cc-settings-breadcrumb"><a href="' . esc_url($dashboardUrl) . '">' . esc_html__('Accueil', 'conseil-de-classe') . '</a> <span>/</span> <span>' . esc_html__('Paramètres', 'conseil-de-classe') . '</span></p>';
         echo '</header>';
 
         if ($this->get_scalar('updated') !== '') {
-            echo '<div class="notice notice-success"><p>' . esc_html__('Paramètres enregistrés.', 'conseil-classe') . '</p></div>';
+            echo '<div class="notice notice-success"><p>' . esc_html__('Paramètres enregistrés.', 'conseil-de-classe') . '</p></div>';
         }
 
         $this->render_front_pages_setup_notice();
@@ -1478,12 +1492,12 @@ final class CC_Admin {
         echo '<div class="cc-settings-layout">';
         echo '<aside class="cc-settings-sidebar">';
         echo '<section class="cc-settings-panel cc-settings-panel--actions">';
-        echo '<h2><span class="dashicons dashicons-admin-links" aria-hidden="true"></span> ' . esc_html__('Actions', 'conseil-classe') . '</h2>';
+        echo '<h2><span class="dashicons dashicons-admin-links" aria-hidden="true"></span> ' . esc_html__('Actions', 'conseil-de-classe') . '</h2>';
         echo '<div class="cc-settings-action-list">';
-        echo '<a class="cc-settings-action cc-settings-action--primary" href="#cc-settings-establishment"><span class="dashicons dashicons-building" aria-hidden="true"></span>' . esc_html__('Configurer l’établissement', 'conseil-classe') . '</a>';
-        echo '<a class="cc-settings-action cc-settings-action--success" href="#cc-settings-association"><span class="dashicons dashicons-groups" aria-hidden="true"></span>' . esc_html__('Configurer l’association', 'conseil-classe') . '</a>';
-        echo '<a class="cc-settings-action cc-settings-action--info" href="#cc-settings-pages"><span class="dashicons dashicons-visibility" aria-hidden="true"></span>' . esc_html__('Voir toutes les coordonnées', 'conseil-classe') . '</a>';
-        echo '<a class="cc-settings-action cc-settings-action--warning" href="' . esc_url($logsUrl) . '"><span class="dashicons dashicons-backup" aria-hidden="true"></span>' . esc_html__('Historique des modifications', 'conseil-classe') . '</a>';
+        echo '<a class="cc-settings-action cc-settings-action--primary" href="#cc-settings-establishment"><span class="dashicons dashicons-building" aria-hidden="true"></span>' . esc_html__('Configurer l’établissement', 'conseil-de-classe') . '</a>';
+        echo '<a class="cc-settings-action cc-settings-action--success" href="#cc-settings-association"><span class="dashicons dashicons-groups" aria-hidden="true"></span>' . esc_html__('Configurer l’association', 'conseil-de-classe') . '</a>';
+        echo '<a class="cc-settings-action cc-settings-action--info" href="#cc-settings-pages"><span class="dashicons dashicons-visibility" aria-hidden="true"></span>' . esc_html__('Voir toutes les coordonnées', 'conseil-de-classe') . '</a>';
+        echo '<a class="cc-settings-action cc-settings-action--warning" href="' . esc_url($logsUrl) . '"><span class="dashicons dashicons-backup" aria-hidden="true"></span>' . esc_html__('Historique des modifications', 'conseil-de-classe') . '</a>';
         echo '</div>';
         echo '</section>';
         echo '</aside>';
@@ -1491,52 +1505,52 @@ final class CC_Admin {
         echo '<div class="cc-settings-main">';
         echo '<div class="cc-settings-summary-grid">';
         $this->render_settings_summary_card(
-            (string) ($s['nom_etablissement'] ?? __('Établissement', 'conseil-classe')),
+            (string) ($s['nom_etablissement'] ?? __('Établissement', 'conseil-de-classe')),
             'dashicons-building',
             [
                 [
                     [
-                        'label' => __('Adresse', 'conseil-classe'),
+                        'label' => __('Adresse', 'conseil-de-classe'),
                         'lines' => $schoolAddressLines,
                     ],
                     [
-                        'label' => __('Contact', 'conseil-classe'),
+                        'label' => __('Contact', 'conseil-de-classe'),
                         'lines' => $schoolContactLines,
                     ],
                 ],
                 [
                     [
-                        'label' => __('Principal/Principale', 'conseil-classe'),
+                        'label' => __('Principal/Principale', 'conseil-de-classe'),
                         'lines' => array_values(array_filter([(string) ($s['nom_principal'] ?? '')])),
                     ],
                     [
-                        'label' => __('Direction', 'conseil-classe'),
+                        'label' => __('Direction', 'conseil-de-classe'),
                         'lines' => array_values(array_filter([(string) ($s['nom_directeur'] ?? '')])),
                     ],
                 ],
             ]
         );
         $this->render_settings_summary_card(
-            (string) ($s['nom_association_parents'] ?? __('Association des parents', 'conseil-classe')),
+            (string) ($s['nom_association_parents'] ?? __('Association des parents', 'conseil-de-classe')),
             'dashicons-groups',
             [
                 [
                     [
-                        'label' => __('Adresse', 'conseil-classe'),
+                        'label' => __('Adresse', 'conseil-de-classe'),
                         'lines' => $associationAddressLines,
                     ],
                     [
-                        'label' => __('Contact', 'conseil-classe'),
+                        'label' => __('Contact', 'conseil-de-classe'),
                         'lines' => $associationContactLines,
                     ],
                 ],
                 [
                     [
-                        'label' => __('Président(e)', 'conseil-classe'),
+                        'label' => __('Président(e)', 'conseil-de-classe'),
                         'lines' => array_values(array_filter([(string) ($s['president_association'] ?? '')])),
                     ],
                     [
-                        'label' => __('Bureau', 'conseil-classe'),
+                        'label' => __('Bureau', 'conseil-de-classe'),
                         'lines' => array_values(array_filter([
                             (string) ($s['vice_president_association'] ?? ''),
                             (string) ($s['secretaire_association'] ?? ''),
@@ -1554,79 +1568,79 @@ final class CC_Admin {
 
         echo '<section id="cc-settings-establishment" class="cc-settings-panel cc-settings-panel--form">';
         echo '<div class="cc-settings-panel-head">';
-        echo '<h2>' . esc_html__('Établissement', 'conseil-classe') . '</h2>';
-        echo '<p>' . esc_html__('Coordonnées et contacts principaux du collège.', 'conseil-classe') . '</p>';
+        echo '<h2>' . esc_html__('Établissement', 'conseil-de-classe') . '</h2>';
+        echo '<p>' . esc_html__('Coordonnées et contacts principaux du collège.', 'conseil-de-classe') . '</p>';
         echo '</div>';
         echo '<div class="cc-settings-fields">';
-        $this->text('nom_etablissement', __('Nom', 'conseil-classe'), $s['nom_etablissement'] ?? '');
-        $this->textarea('adresse_etablissement', __('Adresse', 'conseil-classe'), $s['adresse_etablissement'] ?? '');
-        $this->text('telephone_etablissement', __('Téléphone', 'conseil-classe'), $s['telephone_etablissement'] ?? '');
-        $this->text('email_etablissement', __('Email', 'conseil-classe'), $s['email_etablissement'] ?? '');
-        $this->text('site_web_etablissement', __('Site web', 'conseil-classe'), $s['site_web_etablissement'] ?? '');
-        $this->text('nom_directeur', __('Nom du directeur', 'conseil-classe'), $s['nom_directeur'] ?? '');
-        $this->text('nom_principal', __('Nom du principal', 'conseil-classe'), $s['nom_principal'] ?? '');
+        $this->text('nom_etablissement', __('Nom', 'conseil-de-classe'), $s['nom_etablissement'] ?? '');
+        $this->textarea('adresse_etablissement', __('Adresse', 'conseil-de-classe'), $s['adresse_etablissement'] ?? '');
+        $this->text('telephone_etablissement', __('Téléphone', 'conseil-de-classe'), $s['telephone_etablissement'] ?? '');
+        $this->text('email_etablissement', __('Email', 'conseil-de-classe'), $s['email_etablissement'] ?? '');
+        $this->text('site_web_etablissement', __('Site web', 'conseil-de-classe'), $s['site_web_etablissement'] ?? '');
+        $this->text('nom_directeur', __('Nom du directeur', 'conseil-de-classe'), $s['nom_directeur'] ?? '');
+        $this->text('nom_principal', __('Nom du principal', 'conseil-de-classe'), $s['nom_principal'] ?? '');
         echo '</div>';
         echo '</section>';
 
         echo '<section id="cc-settings-association" class="cc-settings-panel cc-settings-panel--form">';
         echo '<div class="cc-settings-panel-head">';
-        echo '<h2>' . esc_html__('Association des parents', 'conseil-classe') . '</h2>';
-        echo '<p>' . esc_html__('Informations de contact et composition du bureau.', 'conseil-classe') . '</p>';
+        echo '<h2>' . esc_html__('Association des parents', 'conseil-de-classe') . '</h2>';
+        echo '<p>' . esc_html__('Informations de contact et composition du bureau.', 'conseil-de-classe') . '</p>';
         echo '</div>';
         echo '<div class="cc-settings-fields">';
-        $this->text('nom_association_parents', __('Nom', 'conseil-classe'), $s['nom_association_parents'] ?? '');
-        $this->textarea('adresse_association_parents', __('Adresse', 'conseil-classe'), $s['adresse_association_parents'] ?? '');
-        $this->text('telephone_association_parents', __('Téléphone', 'conseil-classe'), $s['telephone_association_parents'] ?? '');
-        $this->text('email_association_parents', __('Email', 'conseil-classe'), $s['email_association_parents'] ?? '');
-        $this->text('site_web_association_parents', __('Site web', 'conseil-classe'), $s['site_web_association_parents'] ?? '');
-        $this->text('president_association', __('Président', 'conseil-classe'), $s['president_association'] ?? '');
-        $this->text('vice_president_association', __('Vice-président', 'conseil-classe'), $s['vice_president_association'] ?? '');
-        $this->text('secretaire_association', __('Secrétaire', 'conseil-classe'), $s['secretaire_association'] ?? '');
-        $this->text('tresorier_association', __('Trésorier', 'conseil-classe'), $s['tresorier_association'] ?? '');
+        $this->text('nom_association_parents', __('Nom', 'conseil-de-classe'), $s['nom_association_parents'] ?? '');
+        $this->textarea('adresse_association_parents', __('Adresse', 'conseil-de-classe'), $s['adresse_association_parents'] ?? '');
+        $this->text('telephone_association_parents', __('Téléphone', 'conseil-de-classe'), $s['telephone_association_parents'] ?? '');
+        $this->text('email_association_parents', __('Email', 'conseil-de-classe'), $s['email_association_parents'] ?? '');
+        $this->text('site_web_association_parents', __('Site web', 'conseil-de-classe'), $s['site_web_association_parents'] ?? '');
+        $this->text('president_association', __('Président', 'conseil-de-classe'), $s['president_association'] ?? '');
+        $this->text('vice_president_association', __('Vice-président', 'conseil-de-classe'), $s['vice_president_association'] ?? '');
+        $this->text('secretaire_association', __('Secrétaire', 'conseil-de-classe'), $s['secretaire_association'] ?? '');
+        $this->text('tresorier_association', __('Trésorier', 'conseil-de-classe'), $s['tresorier_association'] ?? '');
         echo '</div>';
         echo '</section>';
 
         echo '<section id="cc-settings-rules" class="cc-settings-panel cc-settings-panel--form">';
         echo '<div class="cc-settings-panel-head">';
-        echo '<h2>' . esc_html__('Règles', 'conseil-classe') . '</h2>';
-        echo '<p>' . esc_html__('Réglages de fonctionnement appliqués aux inscriptions.', 'conseil-classe') . '</p>';
+        echo '<h2>' . esc_html__('Règles', 'conseil-de-classe') . '</h2>';
+        echo '<p>' . esc_html__('Réglages de fonctionnement appliqués aux inscriptions.', 'conseil-de-classe') . '</p>';
         echo '</div>';
         echo '<div class="cc-settings-fields cc-settings-fields--compact">';
-        $this->number('max_parents_per_conseil', __('Nombre max d’inscriptions par conseil', 'conseil-classe'), (string) ($s['max_parents_per_conseil'] ?? 2), 1, 50);
+        $this->number('max_parents_per_conseil', __('Nombre max d’inscriptions par conseil', 'conseil-de-classe'), (string) ($s['max_parents_per_conseil'] ?? 2), 1, 50);
         echo '</div>';
         echo '</section>';
 
         echo '<section id="cc-settings-pages" class="cc-settings-panel cc-settings-panel--form">';
         echo '<div class="cc-settings-panel-head">';
-        echo '<h2>' . esc_html__('Pages (front)', 'conseil-classe') . '</h2>';
-        echo '<p>' . esc_html__('Associez les pages du site qui exposent les shortcodes publics.', 'conseil-classe') . '</p>';
+        echo '<h2>' . esc_html__('Pages (front)', 'conseil-de-classe') . '</h2>';
+        echo '<p>' . esc_html__('Associez les pages du site qui exposent les shortcodes publics.', 'conseil-de-classe') . '</p>';
         echo '</div>';
         echo '<div class="cc-settings-fields">';
         $loginPageId = (int) get_option('cc_parent_login_page_id', 0);
         $this->render_settings_page_selector(
             'cc_parent_login_page_id',
-            __('Page « Connexion / compte » (shortcode [cc_parent_login] — liens vers la connexion du site)', 'conseil-classe'),
+            __('Page « Connexion / compte » (shortcode [cc_parent_login] — liens vers la connexion du site)', 'conseil-de-classe'),
             absint($loginPageId)
         );
 
         $planningPageId = (int) get_option('cc_plannings_page_id', 0);
         $this->render_settings_page_selector(
             'cc_plannings_page_id',
-            __('Page “Planning” (doit contenir le shortcode [cc_plannings])', 'conseil-classe'),
+            __('Page “Planning” (doit contenir le shortcode [cc_plannings])', 'conseil-de-classe'),
             absint($planningPageId)
         );
 
         $myCouncilsPageId = (int) get_option('cc_my_councils_page_id', 0);
         $this->render_settings_page_selector(
             'cc_my_councils_page_id',
-            __('Page “Mes conseils” (doit contenir le shortcode [cc_my_councils])', 'conseil-classe'),
+            __('Page “Mes conseils” (doit contenir le shortcode [cc_my_councils])', 'conseil-de-classe'),
             absint($myCouncilsPageId)
         );
 
         $reportPageId = (int) get_option('cc_report_form_page_id', 0);
         $this->render_settings_page_selector(
             'cc_report_form_page_id',
-            __('Page “Formulaire compte-rendu” (doit contenir le shortcode [cc_report_form])', 'conseil-classe'),
+            __('Page “Formulaire compte-rendu” (doit contenir le shortcode [cc_report_form])', 'conseil-de-classe'),
             absint($reportPageId)
         );
 
@@ -1634,56 +1648,56 @@ final class CC_Admin {
         echo '</section>';
 
         echo '<div class="cc-settings-submit">';
-        submit_button(__('Enregistrer', 'conseil-classe'));
+        submit_button(__('Enregistrer', 'conseil-de-classe'));
         echo '</div>';
         echo '</form>';
 
         echo '<section id="cc-settings-import" class="cc-settings-panel cc-settings-panel--form cc-settings-panel--import">';
         echo '<div class="cc-settings-panel-head">';
-        echo '<h2>' . esc_html__('Import / Export (CSV)', 'conseil-classe') . '</h2>';
-        echo '<p>' . esc_html__('Exportez la configuration actuelle ou réinjectez un fichier CSV d’une seule ligne.', 'conseil-classe') . '</p>';
+        echo '<h2>' . esc_html__('Import / Export (CSV)', 'conseil-de-classe') . '</h2>';
+        echo '<p>' . esc_html__('Exportez la configuration actuelle ou réinjectez un fichier CSV d’une seule ligne.', 'conseil-de-classe') . '</p>';
         echo '</div>';
         echo '<div class="cc-settings-import-actions">';
-        echo '<a class="button button-primary" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_settings_export_csv'), 'cc_settings_export_csv')) . '">' . esc_html__('Export établissement + association (CSV)', 'conseil-classe') . '</a> ';
-        echo '<a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_settings_download_template'), 'cc_settings_download_template')) . '">' . esc_html__('Modèle import (CSV)', 'conseil-classe') . '</a>';
+        echo '<a class="button button-primary" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_settings_export_csv'), 'cc_settings_export_csv')) . '">' . esc_html__('Export établissement + association (CSV)', 'conseil-de-classe') . '</a> ';
+        echo '<a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_settings_download_template'), 'cc_settings_download_template')) . '">' . esc_html__('Modèle import (CSV)', 'conseil-de-classe') . '</a>';
         echo '</div>';
         echo '<form class="cc-settings-import-form" method="post" action="' . esc_url(admin_url('admin-post.php')) . '" enctype="multipart/form-data">';
         echo '<input type="hidden" name="action" value="cc_settings_import_csv" />';
         echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
         echo '<p><input type="file" name="csv_file" accept=".csv,text/csv" required /> ';
-        submit_button(__('Import (1 ligne)', 'conseil-classe'), 'secondary', 'submit', false);
-        echo ' <a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_settings_download_template'), 'cc_settings_download_template')) . '">' . esc_html__('Télécharger le modèle', 'conseil-classe') . '</a>';
+        submit_button(__('Import (1 ligne)', 'conseil-de-classe'), 'secondary', 'submit', false);
+        echo ' <a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_settings_download_template'), 'cc_settings_download_template')) . '">' . esc_html__('Télécharger le modèle', 'conseil-de-classe') . '</a>';
         echo '</p></form>';
         echo '</section>';
 
         echo '<section id="cc-settings-term-workbook" class="cc-settings-panel cc-settings-panel--form cc-settings-panel--import">';
         echo '<div class="cc-settings-panel-head">';
-        echo '<h2>' . esc_html__('Export / Import trimestre (Excel)', 'conseil-classe') . '</h2>';
-        echo '<p>' . esc_html__('Un seul fichier Excel multi-onglets avec les parents, classes, plannings, inscriptions et comptes-rendus du trimestre actif.', 'conseil-classe') . '</p>';
+        echo '<h2>' . esc_html__('Export / Import trimestre (Excel)', 'conseil-de-classe') . '</h2>';
+        echo '<p>' . esc_html__('Un seul fichier Excel multi-onglets avec les parents, classes, plannings, inscriptions et comptes-rendus du trimestre actif.', 'conseil-de-classe') . '</p>';
         echo '</div>';
         if ($this->get_scalar('term_bundle_no_context') === '1') {
-            echo '<div class="notice notice-error"><p>' . esc_html__('Aucune année ou trimestre actif. Définissez-les dans « Années &amp; trimestres » avant d’importer.', 'conseil-classe') . '</p></div>';
+            echo '<div class="notice notice-error"><p>' . esc_html__('Aucune année ou trimestre actif. Définissez-les dans « Années &amp; trimestres » avant d’importer.', 'conseil-de-classe') . '</p></div>';
         }
         if ($this->get_scalar('term_bundle_context_error') === '1') {
-            echo '<div class="notice notice-error"><p>' . esc_html__('Le fichier ne correspond pas à l’année/trimestre actifs. Activez le bon contexte avant l’import.', 'conseil-classe') . '</p></div>';
+            echo '<div class="notice notice-error"><p>' . esc_html__('Le fichier ne correspond pas à l’année/trimestre actifs. Activez le bon contexte avant l’import.', 'conseil-de-classe') . '</p></div>';
         }
         if ($this->get_scalar('term_bundle_imported') !== '' || $this->get_scalar('term_bundle_ignored') !== '' || $this->get_scalar('term_bundle_errors') !== '') {
             echo '<div class="notice notice-success"><p>' . esc_html(sprintf(
                 /* translators: 1: imported rows, 2: ignored rows, 3: error rows */
-                __('Import trimestre terminé : %1$d importé(s), %2$d ignoré(s), %3$d erreur(s).', 'conseil-classe'),
+                __('Import trimestre terminé : %1$d importé(s), %2$d ignoré(s), %3$d erreur(s).', 'conseil-de-classe'),
                 (int) $this->get_scalar('term_bundle_imported', '0'),
                 (int) $this->get_scalar('term_bundle_ignored', '0'),
                 (int) $this->get_scalar('term_bundle_errors', '0')
             )) . '</p></div>';
         }
         echo '<div class="cc-settings-import-actions">';
-        echo '<a class="button button-primary" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_term_export_excel'), 'cc_term_export_excel')) . '">' . esc_html__('Export trimestre (Excel)', 'conseil-classe') . '</a>';
+        echo '<a class="button button-primary" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_term_export_excel'), 'cc_term_export_excel')) . '">' . esc_html__('Export trimestre (Excel)', 'conseil-de-classe') . '</a>';
         echo '</div>';
         echo '<form class="cc-settings-import-form" method="post" action="' . esc_url(admin_url('admin-post.php')) . '" enctype="multipart/form-data">';
         echo '<input type="hidden" name="action" value="cc_term_import_excel" />';
         echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
         echo '<p><input type="file" name="excel_file" accept=".xml,.xls,application/vnd.ms-excel,text/xml,application/xml" required /> ';
-        submit_button(__('Importer le trimestre', 'conseil-classe'), 'secondary', 'submit', false);
+        submit_button(__('Importer le trimestre', 'conseil-de-classe'), 'secondary', 'submit', false);
         echo '</p></form>';
         echo '</section>';
 
@@ -1719,7 +1733,7 @@ final class CC_Admin {
                 if ($lines) {
                     echo '<p>' . implode('<br />', array_map('esc_html', $lines)) . '</p>';
                 } else {
-                    echo '<p class="cc-settings-summary-empty">' . esc_html__('Non renseigné', 'conseil-classe') . '</p>';
+                    echo '<p class="cc-settings-summary-empty">' . esc_html__('Non renseigné', 'conseil-de-classe') . '</p>';
                 }
                 echo '</div>';
             }
@@ -1730,12 +1744,18 @@ final class CC_Admin {
     }
 
     private function render_settings_page_selector(string $name, string $label, int $selected): void {
+        $fieldName = sanitize_key($name);
+        $selectedPageId = absint($selected);
         echo '<p class="cc-settings-field cc-settings-field--wide"><label for="' . esc_attr($name) . '">' . esc_html($label) . '</label><br />';
-        wp_dropdown_pages([
-            'name' => $name,
-            'selected' => $selected,
-            'show_option_none' => esc_html__('— Non défini —', 'conseil-classe'),
+        // phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_dropdown_pages escapes attributes and returns controlled select markup.
+        $dropdown = wp_dropdown_pages([
+            'name' => $fieldName,
+            'selected' => $selectedPageId,
+            'show_option_none' => esc_html__('— Non défini —', 'conseil-de-classe'),
+            'echo' => 0,
         ]);
+        // phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo wp_kses_post((string) $dropdown);
         echo '</p>';
     }
 
@@ -1782,45 +1802,45 @@ final class CC_Admin {
         $nonce = wp_create_nonce('cc_years');
 
         echo '<div class="wrap cc-admin-page">';
-        echo '<h1>' . esc_html__('Années scolaires', 'conseil-classe') . '</h1>';
+        echo '<h1>' . esc_html__('Années scolaires', 'conseil-de-classe') . '</h1>';
 
-        echo '<h2>' . esc_html__('Ajouter', 'conseil-classe') . '</h2>';
+        echo '<h2>' . esc_html__('Ajouter', 'conseil-de-classe') . '</h2>';
         echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
         echo '<input type="hidden" name="action" value="cc_year_create" />';
         echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
-        $this->text('nom', __('Nom (ex: 2025-2026)', 'conseil-classe'), '');
-        echo '<label><input type="checkbox" name="active" value="1" /> ' . esc_html__('Définir active', 'conseil-classe') . '</label>';
-        submit_button(__('Créer', 'conseil-classe'), 'primary', 'submit', false);
+        $this->text('nom', __('Nom (ex: 2025-2026)', 'conseil-de-classe'), '');
+        echo '<label><input type="checkbox" name="active" value="1" /> ' . esc_html__('Définir active', 'conseil-de-classe') . '</label>';
+        submit_button(__('Créer', 'conseil-de-classe'), 'primary', 'submit', false);
         echo '</form>';
 
         echo '<hr />';
-        echo '<h2>' . esc_html__('Liste', 'conseil-classe') . '</h2>';
+        echo '<h2>' . esc_html__('Liste', 'conseil-de-classe') . '</h2>';
 
         echo '<table class="widefat striped"><thead><tr>';
-        echo '<th>' . esc_html__('Nom', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Active', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Actions', 'conseil-classe') . '</th>';
+        echo '<th>' . esc_html__('Nom', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Active', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Actions', 'conseil-de-classe') . '</th>';
         echo '</tr></thead><tbody>';
 
         foreach ($years as $y) {
             $active = ((int) $y['active'] === 1);
             echo '<tr>';
             echo '<td>' . esc_html($y['nom']) . '</td>';
-            echo '<td>' . ($active ? '<strong>' . esc_html__('Oui', 'conseil-classe') . '</strong>' : esc_html__('Non', 'conseil-classe')) . '</td>';
+            echo '<td>' . ($active ? '<strong>' . esc_html__('Oui', 'conseil-de-classe') . '</strong>' : esc_html__('Non', 'conseil-de-classe')) . '</td>';
             echo '<td>';
 
             echo '<form style="display:inline" method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
             echo '<input type="hidden" name="action" value="cc_year_set_active" />';
             echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
             echo '<input type="hidden" name="id" value="' . esc_attr((string) $y['id']) . '" />';
-            submit_button(__('Activer', 'conseil-classe'), 'secondary', 'submit', false);
+            submit_button(__('Activer', 'conseil-de-classe'), 'secondary', 'submit', false);
             echo '</form> ';
 
             echo '<form style="display:inline" method="post" action="' . esc_url(admin_url('admin-post.php')) . '" onsubmit="return confirm(\'Supprimer cette année ?\');">';
             echo '<input type="hidden" name="action" value="cc_year_delete" />';
             echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
             echo '<input type="hidden" name="id" value="' . esc_attr((string) $y['id']) . '" />';
-            submit_button(__('Supprimer', 'conseil-classe'), 'delete', 'submit', false);
+            submit_button(__('Supprimer', 'conseil-de-classe'), 'delete', 'submit', false);
             echo '</form>';
 
             echo '</td>';
@@ -1828,7 +1848,7 @@ final class CC_Admin {
         }
 
         if (!$years) {
-            echo '<tr><td colspan="3">' . esc_html__('Aucune année.', 'conseil-classe') . '</td></tr>';
+            echo '<tr><td colspan="3">' . esc_html__('Aucune année.', 'conseil-de-classe') . '</td></tr>';
         }
 
         echo '</tbody></table>';
@@ -1872,28 +1892,28 @@ final class CC_Admin {
         $nonce = wp_create_nonce('cc_terms');
 
         echo '<div class="wrap cc-admin-page">';
-        echo '<h1>' . esc_html__('Trimestres', 'conseil-classe') . '</h1>';
+        echo '<h1>' . esc_html__('Trimestres', 'conseil-de-classe') . '</h1>';
         echo '<section class="cc-admin-section">';
-        echo '<h2>' . esc_html__('Trimestre actif', 'conseil-classe') . '</h2>';
-        echo '<p>' . esc_html__('Le plugin crée par défaut T1/T2/T3. Ici, vous choisissez le trimestre actif.', 'conseil-classe') . '</p>';
+        echo '<h2>' . esc_html__('Trimestre actif', 'conseil-de-classe') . '</h2>';
+        echo '<p>' . esc_html__('Le plugin crée par défaut T1/T2/T3. Ici, vous choisissez le trimestre actif.', 'conseil-de-classe') . '</p>';
 
         echo '<table class="widefat striped"><thead><tr>';
-        echo '<th>' . esc_html__('Nom', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Actif', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Action', 'conseil-classe') . '</th>';
+        echo '<th>' . esc_html__('Nom', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Actif', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Action', 'conseil-de-classe') . '</th>';
         echo '</tr></thead><tbody>';
 
         foreach ($terms as $t) {
             $isActive = $active && (int) $active['id'] === (int) $t['id'];
             echo '<tr>';
             echo '<td>' . esc_html($t['nom']) . '</td>';
-            echo '<td>' . ($isActive ? '<strong>' . esc_html__('Oui', 'conseil-classe') . '</strong>' : esc_html__('Non', 'conseil-classe')) . '</td>';
+            echo '<td>' . ($isActive ? '<strong>' . esc_html__('Oui', 'conseil-de-classe') . '</strong>' : esc_html__('Non', 'conseil-de-classe')) . '</td>';
             echo '<td>';
             echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
             echo '<input type="hidden" name="action" value="cc_term_set_active" />';
             echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
             echo '<input type="hidden" name="id" value="' . esc_attr((string) $t['id']) . '" />';
-            submit_button(__('Activer', 'conseil-classe'), 'secondary', 'submit', false);
+            submit_button(__('Activer', 'conseil-de-classe'), 'secondary', 'submit', false);
             echo '</form>';
             echo '</td>';
             echo '</tr>';
@@ -1919,32 +1939,32 @@ final class CC_Admin {
         $nonce = wp_create_nonce('cc_classes');
 
         echo '<div class="wrap cc-admin-page">';
-        echo '<h1>' . esc_html__('Classes', 'conseil-classe') . '</h1>';
+        echo '<h1>' . esc_html__('Classes', 'conseil-de-classe') . '</h1>';
 
         if (!$year) {
-            echo '<div class="notice notice-warning"><p>' . esc_html__('Définissez d’abord une année active.', 'conseil-classe') . '</p></div>';
+            echo '<div class="notice notice-warning"><p>' . esc_html__('Définissez d’abord une année active.', 'conseil-de-classe') . '</p></div>';
             echo '</div>';
             return;
         }
 
-        echo '<p><strong>' . esc_html__('Année active:', 'conseil-classe') . '</strong> ' . esc_html($year['nom']) . '</p>';
+        echo '<p><strong>' . esc_html__('Année active:', 'conseil-de-classe') . '</strong> ' . esc_html($year['nom']) . '</p>';
         if ($this->get_scalar('bulk_deleted') !== '') {
             echo '<div class="notice notice-success"><p>' . esc_html(sprintf(
                 /* translators: %d: number of deleted classes */
-                __('%d classe(s) supprimée(s) pour l’année active.', 'conseil-classe'),
+                __('%d classe(s) supprimée(s) pour l’année active.', 'conseil-de-classe'),
                 (int) $this->get_scalar('bulk_deleted', '0')
             )) . '</p></div>';
         }
 
-        echo '<h2>' . esc_html__('Import / Export (CSV)', 'conseil-classe') . '</h2>';
+        echo '<h2>' . esc_html__('Import / Export (CSV)', 'conseil-de-classe') . '</h2>';
         echo '<p>';
-        echo '<a class="button button-primary" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_classes_export_csv'), 'cc_classes_export_csv')) . '">' . esc_html__('Export classes (CSV)', 'conseil-classe') . '</a> ';
-        echo '<a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_classes_download_template'), 'cc_classes_download_template')) . '">' . esc_html__('Modèle import (CSV)', 'conseil-classe') . '</a>';
+        echo '<a class="button button-primary" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_classes_export_csv'), 'cc_classes_export_csv')) . '">' . esc_html__('Export classes (CSV)', 'conseil-de-classe') . '</a> ';
+        echo '<a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_classes_download_template'), 'cc_classes_download_template')) . '">' . esc_html__('Modèle import (CSV)', 'conseil-de-classe') . '</a>';
         echo '</p>';
         if ($this->get_scalar('imported') !== '' || $this->get_scalar('updated') !== '' || $this->get_scalar('import_errors') !== '') {
             echo '<div class="notice notice-success"><p>' . esc_html(sprintf(
                 /* translators: 1: created classes, 2: updated classes, 3: import errors */
-                __('Import classes terminé: %1$d créé(s), %2$d mis à jour, %3$d erreur(s).', 'conseil-classe'),
+                __('Import classes terminé: %1$d créé(s), %2$d mis à jour, %3$d erreur(s).', 'conseil-de-classe'),
                 (int) $this->get_scalar('imported', '0'),
                 (int) $this->get_scalar('updated', '0'),
                 (int) $this->get_scalar('import_errors', '0')
@@ -1954,28 +1974,28 @@ final class CC_Admin {
         echo '<input type="hidden" name="action" value="cc_classes_import_csv" />';
         echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
         echo '<p><input type="file" name="csv_file" accept=".csv,text/csv" required /> ';
-        submit_button(__('Import', 'conseil-classe'), 'secondary', 'submit', false);
-        echo ' <a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_classes_download_template'), 'cc_classes_download_template')) . '">' . esc_html__('Télécharger le modèle', 'conseil-classe') . '</a>';
+        submit_button(__('Import', 'conseil-de-classe'), 'secondary', 'submit', false);
+        echo ' <a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_classes_download_template'), 'cc_classes_download_template')) . '">' . esc_html__('Télécharger le modèle', 'conseil-de-classe') . '</a>';
         echo '</p></form>';
 
-        echo '<h2>' . esc_html__('Ajouter une classe', 'conseil-classe') . '</h2>';
+        echo '<h2>' . esc_html__('Ajouter une classe', 'conseil-de-classe') . '</h2>';
         echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
         echo '<input type="hidden" name="action" value="cc_class_create" />';
         echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
-        $this->text('nom', __('Nom (ex: 6A)', 'conseil-classe'), '');
-        $this->text('niveau', __('Niveau (ex: 6eme)', 'conseil-classe'), '');
-        submit_button(__('Créer', 'conseil-classe'), 'primary', 'submit', false);
+        $this->text('nom', __('Nom (ex: 6A)', 'conseil-de-classe'), '');
+        $this->text('niveau', __('Niveau (ex: 6eme)', 'conseil-de-classe'), '');
+        submit_button(__('Créer', 'conseil-de-classe'), 'primary', 'submit', false);
         echo '</form>';
 
         $classes = CC_Repo::list_classes_for_year((int) $year['id']);
 
         echo '<hr />';
-        echo '<h2>' . esc_html__('Liste', 'conseil-classe') . '</h2>';
+        echo '<h2>' . esc_html__('Liste', 'conseil-de-classe') . '</h2>';
         echo '<table class="widefat striped"><thead><tr>';
         echo '<th><input type="checkbox" data-cc-toggle-all="classes" /></th>';
-        echo '<th>' . esc_html__('Nom', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Niveau', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Action', 'conseil-classe') . '</th>';
+        echo '<th>' . esc_html__('Nom', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Niveau', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Action', 'conseil-de-classe') . '</th>';
         echo '</tr></thead><tbody>';
         foreach ($classes as $c) {
             echo '<tr>';
@@ -1987,20 +2007,20 @@ final class CC_Admin {
             echo '<input type="hidden" name="action" value="cc_class_delete" />';
             echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
             echo '<input type="hidden" name="id" value="' . esc_attr((string) $c['id']) . '" />';
-            submit_button(__('Supprimer', 'conseil-classe'), 'delete', 'submit', false);
+            submit_button(__('Supprimer', 'conseil-de-classe'), 'delete', 'submit', false);
             echo '</form>';
             echo '</td>';
             echo '</tr>';
         }
         if (!$classes) {
-            echo '<tr><td colspan="4">' . esc_html__('Aucune classe.', 'conseil-classe') . '</td></tr>';
+            echo '<tr><td colspan="4">' . esc_html__('Aucune classe.', 'conseil-de-classe') . '</td></tr>';
         }
         echo '</tbody></table>';
         echo '<form id="cc-classes-bulk-form" method="post" action="' . esc_url(admin_url('admin-post.php')) . '" onsubmit="return confirm(\'Supprimer les classes sélectionnées ?\');">';
         echo '<input type="hidden" name="action" value="cc_classes_bulk_delete" />';
         echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
         echo '<p>';
-        submit_button(__('Supprimer la sélection', 'conseil-classe'), 'delete', 'submit', false);
+        submit_button(__('Supprimer la sélection', 'conseil-de-classe'), 'delete', 'submit', false);
         echo '</p></form>';
         $this->render_bulk_toggle_script('classes');
         echo '</div>';
@@ -2048,32 +2068,32 @@ final class CC_Admin {
         $nonce = wp_create_nonce('cc_councils');
 
         echo '<div class="wrap cc-admin-page">';
-        echo '<h1>' . esc_html__('Conseils', 'conseil-classe') . '</h1>';
+        echo '<h1>' . esc_html__('Conseils', 'conseil-de-classe') . '</h1>';
 
         if (!$year || !$term) {
-            echo '<div class="notice notice-warning"><p>' . esc_html__('Définissez une année active et un trimestre actif.', 'conseil-classe') . '</p></div>';
+            echo '<div class="notice notice-warning"><p>' . esc_html__('Définissez une année active et un trimestre actif.', 'conseil-de-classe') . '</p></div>';
             echo '</div>';
             return;
         }
 
-        echo '<p><strong>' . esc_html__('Contexte:', 'conseil-classe') . '</strong> ' . esc_html($year['nom']) . ' - ' . esc_html($term['nom']) . '</p>';
+        echo '<p><strong>' . esc_html__('Contexte:', 'conseil-de-classe') . '</strong> ' . esc_html($year['nom']) . ' - ' . esc_html($term['nom']) . '</p>';
         if ($this->get_scalar('bulk_deleted') !== '') {
             echo '<div class="notice notice-success"><p>' . esc_html(sprintf(
                 /* translators: %d: number of deleted councils */
-                __('%d conseil(s) supprimé(s) pour le trimestre actif.', 'conseil-classe'),
+                __('%d conseil(s) supprimé(s) pour le trimestre actif.', 'conseil-de-classe'),
                 (int) $this->get_scalar('bulk_deleted', '0')
             )) . '</p></div>';
         }
 
-        echo '<h2>' . esc_html__('Import / Export (CSV)', 'conseil-classe') . '</h2>';
+        echo '<h2>' . esc_html__('Import / Export (CSV)', 'conseil-de-classe') . '</h2>';
         echo '<p>';
-        echo '<a class="button button-primary" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_councils_export_csv'), 'cc_councils_export_csv')) . '">' . esc_html__('Export planning (CSV)', 'conseil-classe') . '</a> ';
-        echo '<a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_councils_download_template'), 'cc_councils_download_template')) . '">' . esc_html__('Modèle import (CSV)', 'conseil-classe') . '</a>';
+        echo '<a class="button button-primary" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_councils_export_csv'), 'cc_councils_export_csv')) . '">' . esc_html__('Export planning (CSV)', 'conseil-de-classe') . '</a> ';
+        echo '<a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_councils_download_template'), 'cc_councils_download_template')) . '">' . esc_html__('Modèle import (CSV)', 'conseil-de-classe') . '</a>';
         echo '</p>';
         if ($this->get_scalar('imported') !== '' || $this->get_scalar('ignored') !== '' || $this->get_scalar('import_errors') !== '') {
             echo '<div class="notice notice-success"><p>' . esc_html(sprintf(
                 /* translators: 1: created councils, 2: ignored rows, 3: import errors */
-                __('Import conseils terminé: %1$d créé(s), %2$d ignoré(s), %3$d erreur(s).', 'conseil-classe'),
+                __('Import conseils terminé: %1$d créé(s), %2$d ignoré(s), %3$d erreur(s).', 'conseil-de-classe'),
                 (int) $this->get_scalar('imported', '0'),
                 (int) $this->get_scalar('ignored', '0'),
                 (int) $this->get_scalar('import_errors', '0')
@@ -2083,20 +2103,20 @@ final class CC_Admin {
         echo '<input type="hidden" name="action" value="cc_councils_import_csv" />';
         echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
         echo '<p><input type="file" name="csv_file" accept=".csv,text/csv" required /> ';
-        submit_button(__('Import planning', 'conseil-classe'), 'secondary', 'submit', false);
-        echo ' <a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_councils_download_template'), 'cc_councils_download_template')) . '">' . esc_html__('Télécharger le modèle', 'conseil-classe') . '</a>';
+        submit_button(__('Import planning', 'conseil-de-classe'), 'secondary', 'submit', false);
+        echo ' <a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_councils_download_template'), 'cc_councils_download_template')) . '">' . esc_html__('Télécharger le modèle', 'conseil-de-classe') . '</a>';
         echo '</p></form>';
 
         $classes = CC_Repo::list_classes_for_year((int) $year['id']);
         if (!$classes) {
-            echo '<div class="notice notice-warning"><p>' . esc_html__('Ajoutez d’abord des classes pour cette année.', 'conseil-classe') . '</p></div>';
+            echo '<div class="notice notice-warning"><p>' . esc_html__('Ajoutez d’abord des classes pour cette année.', 'conseil-de-classe') . '</p></div>';
         } else {
-            echo '<h2>' . esc_html__('Planifier un conseil', 'conseil-classe') . '</h2>';
+            echo '<h2>' . esc_html__('Planifier un conseil', 'conseil-de-classe') . '</h2>';
             echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
             echo '<input type="hidden" name="action" value="cc_council_create" />';
             echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
 
-            echo '<p><label>' . esc_html__('Classe', 'conseil-classe') . '</label><br />';
+            echo '<p><label>' . esc_html__('Classe', 'conseil-de-classe') . '</label><br />';
             echo '<select name="class_id" required>';
             foreach ($classes as $c) {
                 $label = $c['nom'] . ' (' . $c['niveau'] . ')';
@@ -2104,19 +2124,19 @@ final class CC_Admin {
             }
             echo '</select></p>';
 
-            echo '<p><label>' . esc_html__('Date', 'conseil-classe') . '</label><br />';
+            echo '<p><label>' . esc_html__('Date', 'conseil-de-classe') . '</label><br />';
             echo '<input type="date" name="date_conseil" required /></p>';
 
-            echo '<p><label>' . esc_html__('Heure début', 'conseil-classe') . '</label><br />';
+            echo '<p><label>' . esc_html__('Heure début', 'conseil-de-classe') . '</label><br />';
             echo '<input type="time" name="heure_debut" required /></p>';
 
-            echo '<p><label>' . esc_html__('Heure fin (optionnel)', 'conseil-classe') . '</label><br />';
+            echo '<p><label>' . esc_html__('Heure fin (optionnel)', 'conseil-de-classe') . '</label><br />';
             echo '<input type="time" name="heure_fin" /></p>';
 
-            $this->text('salle_conseil', __('Salle', 'conseil-classe'), '');
-            $this->text('president_conseil', __('Président du conseil', 'conseil-classe'), '');
+            $this->text('salle_conseil', __('Salle', 'conseil-de-classe'), '');
+            $this->text('president_conseil', __('Président du conseil', 'conseil-de-classe'), '');
 
-            submit_button(__('Créer', 'conseil-classe'), 'primary', 'submit', false);
+            submit_button(__('Créer', 'conseil-de-classe'), 'primary', 'submit', false);
             echo '</form>';
         }
 
@@ -2125,16 +2145,16 @@ final class CC_Admin {
         $maxParents = (int) ($settings['max_parents_per_conseil'] ?? 2);
 
         echo '<hr />';
-        echo '<h2>' . esc_html__('Liste', 'conseil-classe') . '</h2>';
+        echo '<h2>' . esc_html__('Liste', 'conseil-de-classe') . '</h2>';
         echo '<table class="widefat striped"><thead><tr>';
         echo '<th><input type="checkbox" data-cc-toggle-all="councils" /></th>';
-        echo '<th>' . esc_html__('Classe', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Date', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Heure', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Salle', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Président', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Inscrits', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Actions', 'conseil-classe') . '</th>';
+        echo '<th>' . esc_html__('Classe', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Date', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Heure', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Salle', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Président', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Inscrits', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Actions', 'conseil-de-classe') . '</th>';
         echo '</tr></thead><tbody>';
         foreach ($councils as $co) {
             $count = CC_Repo::count_registrations_for_council((int) $co['id']);
@@ -2151,25 +2171,25 @@ final class CC_Admin {
             echo '<td>' . esc_html($co['president_conseil']) . '</td>';
             echo '<td>' . esc_html($count . ' / ' . $maxParents) . '</td>';
             echo '<td>';
-            echo '<a class="button" href="' . esc_url(admin_url('admin.php?page=cc_registrations&council_id=' . (int) $co['id'])) . '">' . esc_html__('Inscriptions', 'conseil-classe') . '</a> ';
+            echo '<a class="button" href="' . esc_url(admin_url('admin.php?page=cc_registrations&council_id=' . (int) $co['id'])) . '">' . esc_html__('Inscriptions', 'conseil-de-classe') . '</a> ';
             echo '<form style="display:inline" method="post" action="' . esc_url(admin_url('admin-post.php')) . '" onsubmit="return confirm(\'Supprimer ce conseil ?\');">';
             echo '<input type="hidden" name="action" value="cc_council_delete" />';
             echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
             echo '<input type="hidden" name="id" value="' . esc_attr((string) $co['id']) . '" />';
-            submit_button(__('Supprimer', 'conseil-classe'), 'delete', 'submit', false);
+            submit_button(__('Supprimer', 'conseil-de-classe'), 'delete', 'submit', false);
             echo '</form>';
             echo '</td>';
             echo '</tr>';
         }
         if (!$councils) {
-            echo '<tr><td colspan="8">' . esc_html__('Aucun conseil planifié.', 'conseil-classe') . '</td></tr>';
+            echo '<tr><td colspan="8">' . esc_html__('Aucun conseil planifié.', 'conseil-de-classe') . '</td></tr>';
         }
         echo '</tbody></table>';
         echo '<form id="cc-councils-bulk-form" method="post" action="' . esc_url(admin_url('admin-post.php')) . '" onsubmit="return confirm(\'Supprimer les conseils sélectionnés ?\');">';
         echo '<input type="hidden" name="action" value="cc_councils_bulk_delete" />';
         echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
         echo '<p>';
-        submit_button(__('Supprimer la sélection', 'conseil-classe'), 'delete', 'submit', false);
+        submit_button(__('Supprimer la sélection', 'conseil-de-classe'), 'delete', 'submit', false);
         echo '</p></form>';
         $this->render_bulk_toggle_script('councils');
 
@@ -2185,7 +2205,7 @@ final class CC_Admin {
         $year = CC_Repo::get_active_year();
         $term = CC_Repo::get_active_term();
         if (!$year || !$term) {
-            wp_die(esc_html__('Année/trimestre actif manquant.', 'conseil-classe'));
+            wp_die(esc_html__('Année/trimestre actif manquant.', 'conseil-de-classe'));
         }
 
         $yearId = (int) $year['id'];
@@ -2297,7 +2317,9 @@ final class CC_Admin {
 
         $filename = 'trimestre_' . sanitize_file_name((string) $year['nom'] . '_' . (string) $term['nom']) . '_' . gmdate('Ymd') . '.xls';
         $this->excel_send_headers($filename);
+        // phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- Excel HTML workbook is generated by the dedicated renderer for file download.
         echo $this->excel_render_workbook($worksheets);
+        // phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
         exit;
     }
 
@@ -2596,7 +2618,7 @@ final class CC_Admin {
         check_admin_referer('cc_classes_export_csv');
         $year = CC_Repo::get_active_year();
         if (!$year) {
-            wp_die(esc_html__('Aucune année active.', 'conseil-classe'));
+            wp_die(esc_html__('Aucune année active.', 'conseil-de-classe'));
         }
         $classes = CC_Repo::list_classes_for_year((int) $year['id']);
         $filename = 'classes_' . sanitize_file_name($year['nom']) . '_' . gmdate('Ymd') . '.csv';
@@ -2680,7 +2702,7 @@ final class CC_Admin {
         $year = CC_Repo::get_active_year();
         $term = CC_Repo::get_active_term();
         if (!$year || !$term) {
-            wp_die(esc_html__('Année/trimestre actif manquant.', 'conseil-classe'));
+            wp_die(esc_html__('Année/trimestre actif manquant.', 'conseil-de-classe'));
         }
         $councils = CC_Repo::list_councils((int) $year['id'], (int) $term['id']);
         $filename = 'planning_conseils_' . sanitize_file_name($year['nom'] . '_' . $term['nom']) . '_' . gmdate('Ymd') . '.csv';
@@ -2871,37 +2893,37 @@ final class CC_Admin {
         );
 
         echo '<div class="wrap cc-admin-page">';
-        echo '<h1>' . esc_html__('Parents', 'conseil-classe') . '</h1>';
+        echo '<h1>' . esc_html__('Parents', 'conseil-de-classe') . '</h1>';
         if ($year) {
-            echo '<p><strong>' . esc_html__('Année active:', 'conseil-classe') . '</strong> ' . esc_html($year['nom']) . '</p>';
+            echo '<p><strong>' . esc_html__('Année active:', 'conseil-de-classe') . '</strong> ' . esc_html($year['nom']) . '</p>';
         }
         if ($this->get_scalar('bulk_deleted') !== '') {
             echo '<div class="notice notice-success"><p>' . esc_html(sprintf(
                 /* translators: %d: number of removed parents */
-                __('%d parent(s) retiré(s) de l’année active.', 'conseil-classe'),
+                __('%d parent(s) retiré(s) de l’année active.', 'conseil-de-classe'),
                 (int) $this->get_scalar('bulk_deleted', '0')
             )) . '</p></div>';
         }
 
         echo '<p>';
-        echo '<a class="button button-primary" href="' . esc_url($exportParentsUrl) . '">' . esc_html__('Export (CSV)', 'conseil-classe') . '</a> ';
-        echo '<a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_parents_download_template'), 'cc_parents_download_template')) . '">' . esc_html__('Modèle CSV parents', 'conseil-classe') . '</a> ';
-        echo '<a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_parents_download_template_admins'), 'cc_parents_download_template_admins')) . '">' . esc_html__('Modèle CSV admins conseil', 'conseil-classe') . '</a>';
+        echo '<a class="button button-primary" href="' . esc_url($exportParentsUrl) . '">' . esc_html__('Export (CSV)', 'conseil-de-classe') . '</a> ';
+        echo '<a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_parents_download_template'), 'cc_parents_download_template')) . '">' . esc_html__('Modèle CSV parents', 'conseil-de-classe') . '</a> ';
+        echo '<a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_parents_download_template_admins'), 'cc_parents_download_template_admins')) . '">' . esc_html__('Modèle CSV admins conseil', 'conseil-de-classe') . '</a>';
         echo '</p>';
 
-        echo '<h2>' . esc_html__('Importer des parents (CSV)', 'conseil-classe') . '</h2>';
-        echo '<p class="description">' . esc_html__('Colonnes : Nom, Prénom, Email, Téléphone, Mot de passe ou code. Les lignes existantes sont mises à jour (email identique).', 'conseil-classe') . '</p>';
+        echo '<h2>' . esc_html__('Importer des parents (CSV)', 'conseil-de-classe') . '</h2>';
+        echo '<p class="description">' . esc_html__('Colonnes : Nom, Prénom, Email, Téléphone, Mot de passe ou code. Les lignes existantes sont mises à jour (email identique).', 'conseil-de-classe') . '</p>';
         if ($this->get_scalar('imported') !== '' || $this->get_scalar('import_updated') !== '' || $this->get_scalar('import_errors') !== '') {
             $imported = (int) $this->get_scalar('imported', '0');
             $importUpdated = (int) $this->get_scalar('import_updated', '0');
             $errors = (int) $this->get_scalar('import_errors', '0');
             $suffix = ($this->get_scalar('import_mode') === 'admins')
-                ? ' ' . __('(import équipe conseil)', 'conseil-classe')
+                ? ' ' . __('(import équipe conseil)', 'conseil-de-classe')
                 : '';
             echo '<div class="notice notice-success"><p>' . esc_html(
                 sprintf(
                     /* translators: 1: optional suffix, 2: created parents, 3: updated parents, 4: import errors */
-                    __('Import terminé%1$s : %2$d créé(s), %3$d mis à jour, %4$d erreur(s).', 'conseil-classe'),
+                    __('Import terminé%1$s : %2$d créé(s), %3$d mis à jour, %4$d erreur(s).', 'conseil-de-classe'),
                     $suffix,
                     $imported,
                     $importUpdated,
@@ -2910,79 +2932,79 @@ final class CC_Admin {
             ) . '</p></div>';
         }
         if ($this->get_scalar('user_err') !== '') {
-            echo '<div class="notice notice-error"><p>' . esc_html__('Création ou liaison du compte utilisateur impossible. Aucune fiche parent n’a été enregistrée.', 'conseil-classe') . '</p></div>';
+            echo '<div class="notice notice-error"><p>' . esc_html__('Création ou liaison du compte utilisateur impossible. Aucune fiche parent n’a été enregistrée.', 'conseil-de-classe') . '</p></div>';
         }
         if ($this->get_scalar('pw_err') !== '') {
-            echo '<div class="notice notice-error"><p>' . esc_html__('Mot de passe / code invalide (minimum 6 caractères si vous le renseignez).', 'conseil-classe') . '</p></div>';
+            echo '<div class="notice notice-error"><p>' . esc_html__('Mot de passe / code invalide (minimum 6 caractères si vous le renseignez).', 'conseil-de-classe') . '</p></div>';
         }
         if ($this->get_scalar('code_dup') !== '') {
-            echo '<div class="notice notice-error"><p>' . esc_html__('Ce mot de passe / code est déjà utilisé par un autre parent.', 'conseil-classe') . '</p></div>';
+            echo '<div class="notice notice-error"><p>' . esc_html__('Ce mot de passe / code est déjà utilisé par un autre parent.', 'conseil-de-classe') . '</p></div>';
         }
         echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" enctype="multipart/form-data">';
         echo '<input type="hidden" name="action" value="cc_parents_import_csv" />';
         echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
         echo '<p><input type="file" name="csv_file" accept=".csv,text/csv" required /> ';
-        submit_button(__('Importer les parents', 'conseil-classe'), 'secondary', 'submit', false);
-        echo ' <a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_parents_download_template'), 'cc_parents_download_template')) . '">' . esc_html__('Télécharger le modèle parents', 'conseil-classe') . '</a></p>';
+        submit_button(__('Importer les parents', 'conseil-de-classe'), 'secondary', 'submit', false);
+        echo ' <a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_parents_download_template'), 'cc_parents_download_template')) . '">' . esc_html__('Télécharger le modèle parents', 'conseil-de-classe') . '</a></p>';
         echo '</form>';
 
-        echo '<h2>' . esc_html__('Importer des comptes admins conseil (CSV)', 'conseil-classe') . '</h2>';
-        echo '<p class="description">' . esc_html__('Un fichier distinct, avec une colonne « Rôle » en plus : admin ou super (super réservé aux super-admins du plugin). Les comptes sont créés ou mis à jour.', 'conseil-classe') . '</p>';
+        echo '<h2>' . esc_html__('Importer des comptes admins conseil (CSV)', 'conseil-de-classe') . '</h2>';
+        echo '<p class="description">' . esc_html__('Un fichier distinct, avec une colonne « Rôle » en plus : admin ou super (super réservé aux super-admins du plugin). Les comptes sont créés ou mis à jour.', 'conseil-de-classe') . '</p>';
         echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" enctype="multipart/form-data">';
         echo '<input type="hidden" name="action" value="cc_parents_import_admins_csv" />';
         echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
         echo '<p><input type="file" name="csv_file_admins" accept=".csv,text/csv" required /> ';
-        submit_button(__('Importer les admins', 'conseil-classe'), 'secondary', 'submit', false);
-        echo ' <a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_parents_download_template_admins'), 'cc_parents_download_template_admins')) . '">' . esc_html__('Télécharger le modèle admins conseil', 'conseil-classe') . '</a></p>';
+        submit_button(__('Importer les admins', 'conseil-de-classe'), 'secondary', 'submit', false);
+        echo ' <a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_parents_download_template_admins'), 'cc_parents_download_template_admins')) . '">' . esc_html__('Télécharger le modèle admins conseil', 'conseil-de-classe') . '</a></p>';
         echo '</form>';
 
-        echo '<h2>' . esc_html__('Ajouter un parent', 'conseil-classe') . '</h2>';
+        echo '<h2>' . esc_html__('Ajouter un parent', 'conseil-de-classe') . '</h2>';
         echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
         echo '<input type="hidden" name="action" value="cc_parent_create" />';
         echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
-        $this->text('nom', __('Nom', 'conseil-classe'), '');
-        $this->text('prenom', __('Prénom', 'conseil-classe'), '');
-        $this->text('email', __('Email', 'conseil-classe'), '');
-        $this->text('telephone', __('Téléphone', 'conseil-classe'), '');
-        $this->text('code_acces', __('Mot de passe / code connexion (= mot de passe du compte, laissé vide = généré)', 'conseil-classe'), '');
-        echo '<p class="description">' . esc_html__('Un compte utilisateur est toujours créé ou relié automatiquement (même adresse email).', 'conseil-classe') . '</p>';
-        echo '<p><label>' . esc_html__('Rôle du compte', 'conseil-classe') . '<br />';
+        $this->text('nom', __('Nom', 'conseil-de-classe'), '');
+        $this->text('prenom', __('Prénom', 'conseil-de-classe'), '');
+        $this->text('email', __('Email', 'conseil-de-classe'), '');
+        $this->text('telephone', __('Téléphone', 'conseil-de-classe'), '');
+        $this->text('code_acces', __('Mot de passe / code connexion (= mot de passe du compte, laissé vide = généré)', 'conseil-de-classe'), '');
+        echo '<p class="description">' . esc_html__('Un compte utilisateur est toujours créé ou relié automatiquement (même adresse email).', 'conseil-de-classe') . '</p>';
+        echo '<p><label>' . esc_html__('Rôle du compte', 'conseil-de-classe') . '<br />';
         echo '<select name="cc_new_wp_role">';
         foreach (CC_Roles::allowed_roles_for_parent_user_dropdown() as $roleSlug => $roleLabel) {
             echo '<option value="' . esc_attr($roleSlug) . '">' . esc_html($roleLabel) . '</option>';
         }
         echo '</select></label></p>';
-        submit_button(__('Créer', 'conseil-classe'), 'primary', 'submit', false);
+        submit_button(__('Créer', 'conseil-de-classe'), 'primary', 'submit', false);
         echo '</form>';
 
         echo '<hr />';
         echo '<form method="get" action="' . esc_url(admin_url('admin.php')) . '">';
         echo '<input type="hidden" name="page" value="cc_parents" />';
         echo '<p>';
-        echo '<label>' . esc_html__('Profil affiché', 'conseil-classe') . '<br />';
+        echo '<label>' . esc_html__('Profil affiché', 'conseil-de-classe') . '<br />';
         echo '<select name="cc_profile">';
         $profiles = [
-            'all' => __('Tous', 'conseil-classe'),
-            'parent' => __('Parents (sans gestion conseil)', 'conseil-classe'),
-            'admin' => __('Admins conseil', 'conseil-classe'),
+            'all' => __('Tous', 'conseil-de-classe'),
+            'parent' => __('Parents (sans gestion conseil)', 'conseil-de-classe'),
+            'admin' => __('Admins conseil', 'conseil-de-classe'),
         ];
         foreach ($profiles as $slug => $label) {
             echo '<option value="' . esc_attr($slug) . '"' . selected($profile, $slug, false) . '>' . esc_html($label) . '</option>';
         }
         echo '</select></label> ';
-        echo '<input type="search" name="s" value="' . esc_attr($search) . '" placeholder="' . esc_attr__('Recherche nom/email…', 'conseil-classe') . '" /> ';
-        submit_button(__('Filtrer', 'conseil-classe'), 'secondary', 'submit', false);
+        echo '<input type="search" name="s" value="' . esc_attr($search) . '" placeholder="' . esc_attr__('Recherche nom/email…', 'conseil-de-classe') . '" /> ';
+        submit_button(__('Filtrer', 'conseil-de-classe'), 'secondary', 'submit', false);
         echo '</p></form>';
 
         echo '<table class="widefat striped"><thead><tr>';
         echo '<th><input type="checkbox" data-cc-toggle-all="parents" /></th>';
-        echo '<th>' . esc_html__('Nom', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Email', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Téléphone', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Mot de passe / code', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Compte WP', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Rôle WP', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Actions', 'conseil-classe') . '</th>';
+        echo '<th>' . esc_html__('Nom', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Email', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Téléphone', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Mot de passe / code', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Compte WP', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Rôle WP', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Actions', 'conseil-de-classe') . '</th>';
         echo '</tr></thead><tbody>';
         foreach ($parents as $p) {
             echo '<tr>';
@@ -2992,7 +3014,7 @@ final class CC_Admin {
             echo '<td>' . esc_html($p['telephone'] ?? '') . '</td>';
             $wid = (int) ($p['wp_user_id'] ?? 0);
             if ($wid > 0 && $this->is_parent_wp_account_privileged($wid)) {
-                echo '<td><em>' . esc_html__('Masqué (admin / gestion conseil). Utilisez « Régénérer mot de passe / code » pour définir un nouveau mot de passe.', 'conseil-classe') . '</em></td>';
+                echo '<td><em>' . esc_html__('Masqué (admin / gestion conseil). Utilisez « Régénérer mot de passe / code » pour définir un nouveau mot de passe.', 'conseil-de-classe') . '</em></td>';
             } else {
                 echo '<td><code>' . esc_html($p['code_acces'] ?? '') . '</code></td>';
             }
@@ -3001,14 +3023,14 @@ final class CC_Admin {
                 $ulink = get_edit_user_link($wid);
                 echo $ulink ? '<a href="' . esc_url($ulink) . '">#' . esc_html((string) $wid) . '</a>' : '#' . esc_html((string) $wid);
             } else {
-                echo '<em>' . esc_html__('—', 'conseil-classe') . '</em>';
+                echo '<em>' . esc_html__('—', 'conseil-de-classe') . '</em>';
             }
             echo '</td>';
             echo '<td>';
             if ($wid > 0) {
                 echo esc_html($this->format_wp_user_roles($wid));
             } else {
-                echo '<em>' . esc_html__('—', 'conseil-classe') . '</em>';
+                echo '<em>' . esc_html__('—', 'conseil-de-classe') . '</em>';
             }
             echo '</td>';
             echo '<td>';
@@ -3017,27 +3039,27 @@ final class CC_Admin {
             echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
             echo '<input type="hidden" name="id" value="' . esc_attr((string) $p['id']) . '" />';
             echo '<input type="hidden" name="code_acces_custom" value="" />';
-            submit_button(__('Régénérer mot de passe / code', 'conseil-classe'), 'secondary', 'submit', false);
+            submit_button(__('Régénérer mot de passe / code', 'conseil-de-classe'), 'secondary', 'submit', false);
             echo '</form> ';
 
             echo '<form style="display:inline" method="post" action="' . esc_url(admin_url('admin-post.php')) . '" onsubmit="return confirm(\'Supprimer ce parent ?\');">';
             echo '<input type="hidden" name="action" value="cc_parent_delete" />';
             echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
             echo '<input type="hidden" name="id" value="' . esc_attr((string) $p['id']) . '" />';
-            submit_button(__('Supprimer', 'conseil-classe'), 'delete', 'submit', false);
+            submit_button(__('Supprimer', 'conseil-de-classe'), 'delete', 'submit', false);
             echo '</form>';
             echo '</td>';
             echo '</tr>';
         }
         if (!$parents) {
-            echo '<tr><td colspan="8">' . esc_html__('Aucun parent.', 'conseil-classe') . '</td></tr>';
+            echo '<tr><td colspan="8">' . esc_html__('Aucun parent.', 'conseil-de-classe') . '</td></tr>';
         }
         echo '</tbody></table>';
         echo '<form id="cc-parents-bulk-form" method="post" action="' . esc_url(admin_url('admin-post.php')) . '" onsubmit="return confirm(\'Retirer les parents sélectionnés de l\'année active ?\');">';
         echo '<input type="hidden" name="action" value="cc_parents_bulk_delete" />';
         echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
         echo '<p>';
-        submit_button(__('Retirer la sélection de l’année active', 'conseil-classe'), 'delete', 'submit', false);
+        submit_button(__('Retirer la sélection de l’année active', 'conseil-de-classe'), 'delete', 'submit', false);
         echo '</p></form>';
         $this->render_bulk_toggle_script('parents');
 
@@ -3324,28 +3346,28 @@ final class CC_Admin {
         $nonce = wp_create_nonce('cc_registrations');
 
         echo '<div class="wrap cc-admin-page">';
-        echo '<h1>' . esc_html__('Inscriptions', 'conseil-classe') . '</h1>';
+        echo '<h1>' . esc_html__('Inscriptions', 'conseil-de-classe') . '</h1>';
 
         if (!$year || !$term) {
-            echo '<div class="notice notice-warning"><p>' . esc_html__('Définissez une année active et un trimestre actif.', 'conseil-classe') . '</p></div>';
+            echo '<div class="notice notice-warning"><p>' . esc_html__('Définissez une année active et un trimestre actif.', 'conseil-de-classe') . '</p></div>';
             echo '</div>';
             return;
         }
 
         $councils = CC_Repo::list_councils((int) $year['id'], (int) $term['id']);
 
-    echo '<p><strong>' . esc_html__('Contexte:', 'conseil-classe') . '</strong> ' . esc_html($year['nom']) . ' — ' . esc_html($term['nom']) . '</p>';
+    echo '<p><strong>' . esc_html__('Contexte:', 'conseil-de-classe') . '</strong> ' . esc_html($year['nom']) . ' — ' . esc_html($term['nom']) . '</p>';
 
     echo '<section class="cc-admin-section">';
-    echo '<h2>' . esc_html__('Import / Export (CSV)', 'conseil-classe') . '</h2>';
+    echo '<h2>' . esc_html__('Import / Export (CSV)', 'conseil-de-classe') . '</h2>';
     echo '<p>';
-    echo '<a class="button button-primary" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_registrations_export_csv'), 'cc_registrations_export_csv')) . '">' . esc_html__('Export inscriptions (CSV)', 'conseil-classe') . '</a> ';
-    echo '<a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_registrations_download_template'), 'cc_registrations_download_template')) . '">' . esc_html__('Modèle import (CSV)', 'conseil-classe') . '</a>';
+    echo '<a class="button button-primary" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_registrations_export_csv'), 'cc_registrations_export_csv')) . '">' . esc_html__('Export inscriptions (CSV)', 'conseil-de-classe') . '</a> ';
+    echo '<a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_registrations_download_template'), 'cc_registrations_download_template')) . '">' . esc_html__('Modèle import (CSV)', 'conseil-de-classe') . '</a>';
     echo '</p>';
     if ($this->get_scalar('imported') !== '' || $this->get_scalar('import_errors') !== '') {
         echo '<div class="notice notice-success is-dismissible"><p>' . esc_html(sprintf(
             /* translators: 1: created/updated registrations, 2: ignored rows, 3: import errors */
-            __('Import inscriptions terminé : %1$d créée(s)/mise(s) à jour, %2$d ignorée(s), %3$d erreur(s).', 'conseil-classe'),
+            __('Import inscriptions terminé : %1$d créée(s)/mise(s) à jour, %2$d ignorée(s), %3$d erreur(s).', 'conseil-de-classe'),
             (int) $this->get_scalar('imported', '0'),
             (int) $this->get_scalar('ignored', '0'),
             (int) $this->get_scalar('import_errors', '0')
@@ -3355,23 +3377,23 @@ final class CC_Admin {
     echo '<input type="hidden" name="action" value="cc_registrations_import_csv" />';
     echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
     echo '<p><input type="file" name="csv_file" accept=".csv,text/csv" required /> ';
-    submit_button(__('Importer', 'conseil-classe'), 'secondary', 'submit', false);
+    submit_button(__('Importer', 'conseil-de-classe'), 'secondary', 'submit', false);
     echo '</p></form>';
     echo '</section>';
 
     echo '<section class="cc-admin-section">';
-    echo '<h2>' . esc_html__('Sélection du conseil', 'conseil-classe') . '</h2>';
+    echo '<h2>' . esc_html__('Sélection du conseil', 'conseil-de-classe') . '</h2>';
     echo '<form method="get" action="' . esc_url(admin_url('admin.php')) . '">';
         echo '<input type="hidden" name="page" value="cc_registrations" />';
-        echo '<p><label>' . esc_html__('Conseil', 'conseil-classe') . '</label><br />';
+        echo '<p><label>' . esc_html__('Conseil', 'conseil-de-classe') . '</label><br />';
         echo '<select name="council_id">';
-        echo '<option value="0">' . esc_html__('— Choisir —', 'conseil-classe') . '</option>';
+        echo '<option value="0">' . esc_html__('— Choisir —', 'conseil-de-classe') . '</option>';
         foreach ($councils as $co) {
             $label = $co['classe_nom'] . ' (' . $co['classe_niveau'] . ') - ' . mysql2date('d/m/Y', $co['date_conseil']) . ' ' . substr((string) $co['heure_debut'], 0, 5);
             echo '<option value="' . esc_attr((string) $co['id']) . '"' . selected($councilId, (int) $co['id'], false) . '>' . esc_html($label) . '</option>';
         }
         echo '</select> ';
-        submit_button(__('Afficher', 'conseil-classe'), 'secondary', 'submit', false);
+        submit_button(__('Afficher', 'conseil-de-classe'), 'secondary', 'submit', false);
         echo '</p></form>';
         echo '</section>';
 
@@ -3379,7 +3401,7 @@ final class CC_Admin {
             $council = CC_Repo::get_council($councilId);
             $regs = CC_Repo::list_registrations_for_council($councilId);
             echo '<section class="cc-admin-section">';
-            echo '<h2>' . esc_html__('Inscrits', 'conseil-classe') . '</h2>';
+            echo '<h2>' . esc_html__('Inscrits', 'conseil-de-classe') . '</h2>';
             if ($council) {
                 echo '<p><strong>' . esc_html($council['classe_nom'] . ' (' . $council['classe_niveau'] . ')') . '</strong> — ' . esc_html(mysql2date('d/m/Y', $council['date_conseil'])) . ' ' . esc_html(substr((string) $council['heure_debut'], 0, 5)) . '</p>';
             }
@@ -3387,20 +3409,20 @@ final class CC_Admin {
             if ($this->get_scalar('bulk_deleted') !== '') {
                 echo '<div class="notice notice-success"><p>' . esc_html(sprintf(
                     /* translators: %d: number of removed registrations */
-                    __('%d inscription(s) supprimée(s) pour ce conseil.', 'conseil-classe'),
+                    __('%d inscription(s) supprimée(s) pour ce conseil.', 'conseil-de-classe'),
                     (int) $this->get_scalar('bulk_deleted', '0')
                 )) . '</p></div>';
             }
 
             echo '<table class="widefat striped"><thead><tr>';
             echo '<th><input type="checkbox" data-cc-toggle-all="registrations" /></th>';
-            echo '<th>' . esc_html__('Parent', 'conseil-classe') . '</th>';
-            echo '<th>' . esc_html__('Email', 'conseil-classe') . '</th>';
-            echo '<th>' . esc_html__('Téléphone', 'conseil-classe') . '</th>';
-            echo '<th>' . esc_html__('Date inscription', 'conseil-classe') . '</th>';
-            echo '<th>' . esc_html__('Présent', 'conseil-classe') . '</th>';
-            echo '<th>' . esc_html__('Commentaire', 'conseil-classe') . '</th>';
-            echo '<th>' . esc_html__('Action', 'conseil-classe') . '</th>';
+            echo '<th>' . esc_html__('Parent', 'conseil-de-classe') . '</th>';
+            echo '<th>' . esc_html__('Email', 'conseil-de-classe') . '</th>';
+            echo '<th>' . esc_html__('Téléphone', 'conseil-de-classe') . '</th>';
+            echo '<th>' . esc_html__('Date inscription', 'conseil-de-classe') . '</th>';
+            echo '<th>' . esc_html__('Présent', 'conseil-de-classe') . '</th>';
+            echo '<th>' . esc_html__('Commentaire', 'conseil-de-classe') . '</th>';
+            echo '<th>' . esc_html__('Action', 'conseil-de-classe') . '</th>';
             echo '</tr></thead><tbody>';
 
             foreach ($regs as $r) {
@@ -3410,7 +3432,7 @@ final class CC_Admin {
                 echo '<td>' . esc_html($r['email']) . '</td>';
                 echo '<td>' . esc_html($r['telephone'] ?? '') . '</td>';
                 echo '<td>' . esc_html(mysql2date('d/m/Y H:i', $r['date_inscription'])) . '</td>';
-                echo '<td>' . ((int) $r['presente'] === 1 ? esc_html__('Oui', 'conseil-classe') : esc_html__('Non', 'conseil-classe')) . '</td>';
+                echo '<td>' . ((int) $r['presente'] === 1 ? esc_html__('Oui', 'conseil-de-classe') : esc_html__('Non', 'conseil-de-classe')) . '</td>';
                 echo '<td>' . esc_html($r['commentaire'] ?? '') . '</td>';
                 echo '<td>';
                 echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" onsubmit="return confirm(\'Désinscrire ce parent ?\');">';
@@ -3418,14 +3440,14 @@ final class CC_Admin {
                 echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
                 echo '<input type="hidden" name="council_id" value="' . esc_attr((string) $councilId) . '" />';
                 echo '<input type="hidden" name="parent_id" value="' . esc_attr((string) $r['parent_id']) . '" />';
-                submit_button(__('Désinscrire', 'conseil-classe'), 'delete', 'submit', false);
+                submit_button(__('Désinscrire', 'conseil-de-classe'), 'delete', 'submit', false);
                 echo '</form>';
                 echo '</td>';
                 echo '</tr>';
             }
 
             if (!$regs) {
-                echo '<tr><td colspan="8">' . esc_html__('Aucune inscription.', 'conseil-classe') . '</td></tr>';
+                echo '<tr><td colspan="8">' . esc_html__('Aucune inscription.', 'conseil-de-classe') . '</td></tr>';
             }
 
             echo '</tbody></table>';
@@ -3434,7 +3456,7 @@ final class CC_Admin {
             echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
             echo '<input type="hidden" name="council_id" value="' . esc_attr((string) $councilId) . '" />';
             echo '<p>';
-            submit_button(__('Désinscrire la sélection', 'conseil-classe'), 'delete', 'submit', false);
+            submit_button(__('Désinscrire la sélection', 'conseil-de-classe'), 'delete', 'submit', false);
             echo '</p></form>';
             $this->render_bulk_toggle_script('registrations');
             echo '</section>';
@@ -3471,7 +3493,7 @@ final class CC_Admin {
         $year = CC_Repo::get_active_year();
         $term = CC_Repo::get_active_term();
         if (!$year || !$term) {
-            wp_die(esc_html__('Année/trimestre actif manquant.', 'conseil-classe'));
+            wp_die(esc_html__('Année/trimestre actif manquant.', 'conseil-de-classe'));
         }
         $regs = CC_Repo::list_registrations_for_year_term((int) $year['id'], (int) $term['id']);
         $filename = 'inscriptions_' . sanitize_file_name($year['nom'] . '_' . $term['nom']) . '_' . gmdate('Ymd') . '.csv';
@@ -3570,24 +3592,24 @@ final class CC_Admin {
         $nonce = wp_create_nonce('cc_reports');
 
         echo '<div class="wrap cc-admin-page">';
-        echo '<h1>' . esc_html__('Comptes-rendus', 'conseil-classe') . '</h1>';
+        echo '<h1>' . esc_html__('Comptes-rendus', 'conseil-de-classe') . '</h1>';
 
         if (!$year || !$term) {
-            echo '<div class="notice notice-warning"><p>' . esc_html__('Définissez une année active et un trimestre actif.', 'conseil-classe') . '</p></div>';
+            echo '<div class="notice notice-warning"><p>' . esc_html__('Définissez une année active et un trimestre actif.', 'conseil-de-classe') . '</p></div>';
             echo '</div>';
             return;
         }
 
         echo '<section class="cc-admin-section">';
-        echo '<h2>' . esc_html__('Actions', 'conseil-classe') . '</h2>';
+        echo '<h2>' . esc_html__('Actions', 'conseil-de-classe') . '</h2>';
         echo '<p>';
-        echo '<a class="button button-primary" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_reports_export_csv'), 'cc_reports_export_csv')) . '">' . esc_html__('Export (CSV)', 'conseil-classe') . '</a> ';
-        echo '<a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_reports_download_template'), 'cc_reports_download_template')) . '">' . esc_html__('Modèle import (CSV)', 'conseil-classe') . '</a>';
+        echo '<a class="button button-primary" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_reports_export_csv'), 'cc_reports_export_csv')) . '">' . esc_html__('Export (CSV)', 'conseil-de-classe') . '</a> ';
+        echo '<a class="button" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=cc_reports_download_template'), 'cc_reports_download_template')) . '">' . esc_html__('Modèle import (CSV)', 'conseil-de-classe') . '</a>';
         echo '</p>';
         if ($this->get_scalar('rep_imported') !== '' || $this->get_scalar('rep_import_errors') !== '') {
             echo '<div class="notice notice-success is-dismissible"><p>' . esc_html(sprintf(
                 /* translators: 1: created/updated reports, 2: ignored rows, 3: import errors */
-                __('Import comptes-rendus terminé : %1$d créé(s)/mis à jour, %2$d ignoré(s), %3$d erreur(s).', 'conseil-classe'),
+                __('Import comptes-rendus terminé : %1$d créé(s)/mis à jour, %2$d ignoré(s), %3$d erreur(s).', 'conseil-de-classe'),
                 (int) $this->get_scalar('rep_imported', '0'),
                 (int) $this->get_scalar('rep_ignored', '0'),
                 (int) $this->get_scalar('rep_import_errors', '0')
@@ -3597,7 +3619,7 @@ final class CC_Admin {
         echo '<input type="hidden" name="action" value="cc_reports_import_csv" />';
         echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
         echo '<p><input type="file" name="csv_file" accept=".csv,text/csv" required /> ';
-        submit_button(__('Importer', 'conseil-classe'), 'secondary', 'submit', false);
+        submit_button(__('Importer', 'conseil-de-classe'), 'secondary', 'submit', false);
         echo '</p></form>';
         echo '</section>';
 
@@ -3605,26 +3627,26 @@ final class CC_Admin {
         $updateNonceToken = wp_create_nonce('cc_report_update');
 
         if ($this->get_scalar('updated') !== '') {
-            echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Compte-rendu enregistré.', 'conseil-classe') . '</p></div>';
+            echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Compte-rendu enregistré.', 'conseil-de-classe') . '</p></div>';
         }
         if ($this->get_scalar('bulk_deleted') !== '') {
             echo '<div class="notice notice-success is-dismissible"><p>' . esc_html(sprintf(
                 /* translators: %d: number of deleted reports */
-                __('%d compte-rendu(s) supprimé(s) pour le trimestre actif.', 'conseil-classe'),
+                __('%d compte-rendu(s) supprimé(s) pour le trimestre actif.', 'conseil-de-classe'),
                 (int) $this->get_scalar('bulk_deleted', '0')
             )) . '</p></div>';
         }
 
         echo '<section class="cc-admin-section">';
-        echo '<h2>' . esc_html__('Liste', 'conseil-classe') . '</h2>';
+        echo '<h2>' . esc_html__('Liste', 'conseil-de-classe') . '</h2>';
         echo '<table class="widefat striped"><thead><tr>';
         echo '<th><input type="checkbox" data-cc-toggle-all="reports" /></th>';
-        echo '<th>' . esc_html__('Classe', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Date conseil', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Président', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Rédigé par', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Validé', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Action', 'conseil-classe') . '</th>';
+        echo '<th>' . esc_html__('Classe', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Date conseil', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Président', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Rédigé par', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Validé', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Action', 'conseil-de-classe') . '</th>';
         echo '</tr></thead><tbody>';
 
         foreach ($reports as $r) {
@@ -3634,9 +3656,9 @@ final class CC_Admin {
             echo '<td>' . esc_html(mysql2date('d/m/Y', $r['date_conseil']) . ' ' . substr((string) $r['heure_debut'], 0, 5)) . '</td>';
             echo '<td>' . esc_html($r['president_conseil'] ?? '') . '</td>';
             echo '<td>' . esc_html(trim(($r['prenom_parent'] ?? '') . ' ' . ($r['nom_parent'] ?? '')) . ' (' . ($r['email_parent'] ?? '') . ')') . '</td>';
-            echo '<td>' . ((int) $r['valide'] === 1 ? '<strong>' . esc_html__('Oui', 'conseil-classe') . '</strong>' : esc_html__('Non', 'conseil-classe')) . '</td>';
+            echo '<td>' . ((int) $r['valide'] === 1 ? '<strong>' . esc_html__('Oui', 'conseil-de-classe') . '</strong>' : esc_html__('Non', 'conseil-de-classe')) . '</td>';
             echo '<td>';
-            echo '<a class="button" href="' . esc_url(admin_url('admin.php?page=cc_reports&report_id=' . (int) $r['id'])) . '">' . esc_html__('Voir / Modifier', 'conseil-classe') . '</a> ';
+            echo '<a class="button" href="' . esc_url(admin_url('admin.php?page=cc_reports&report_id=' . (int) $r['id'])) . '">' . esc_html__('Voir / Modifier', 'conseil-de-classe') . '</a> ';
 
             $exportUrl = wp_nonce_url(
                 admin_url('admin-post.php?action=cc_report_export&id=' . (int) $r['id'] . '&format=pdf'),
@@ -3646,22 +3668,22 @@ final class CC_Admin {
                 admin_url('admin-post.php?action=cc_report_export&id=' . (int) $r['id'] . '&format=html'),
                 'cc_report_export'
             );
-            echo '<a class="button" href="' . esc_url($exportUrl) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Export PDF', 'conseil-classe') . '</a> ';
-            echo '<a class="button" href="' . esc_url($exportHtmlUrl) . '">' . esc_html__('Export HTML', 'conseil-classe') . '</a> ';
+            echo '<a class="button" href="' . esc_url($exportUrl) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Export PDF', 'conseil-de-classe') . '</a> ';
+            echo '<a class="button" href="' . esc_url($exportHtmlUrl) . '">' . esc_html__('Export HTML', 'conseil-de-classe') . '</a> ';
 
             echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
             echo '<input type="hidden" name="action" value="cc_report_toggle_validation" />';
             echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
             echo '<input type="hidden" name="id" value="' . esc_attr((string) $r['id']) . '" />';
             echo '<input type="hidden" name="valide" value="' . esc_attr((string) ((int) $r['valide'] === 1 ? 0 : 1)) . '" />';
-            submit_button(((int) $r['valide'] === 1) ? __('Dévalider', 'conseil-classe') : __('Valider', 'conseil-classe'), 'secondary', 'submit', false);
+            submit_button(((int) $r['valide'] === 1) ? __('Dévalider', 'conseil-de-classe') : __('Valider', 'conseil-de-classe'), 'secondary', 'submit', false);
             echo '</form>';
             echo '</td>';
             echo '</tr>';
         }
 
         if (!$reports) {
-            echo '<tr><td colspan="7">' . esc_html__('Aucun compte-rendu.', 'conseil-classe') . '</td></tr>';
+            echo '<tr><td colspan="7">' . esc_html__('Aucun compte-rendu.', 'conseil-de-classe') . '</td></tr>';
         }
 
         echo '</tbody></table>';
@@ -3669,7 +3691,7 @@ final class CC_Admin {
         echo '<input type="hidden" name="action" value="cc_reports_bulk_delete" />';
         echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
         echo '<p>';
-        submit_button(__('Supprimer la sélection', 'conseil-classe'), 'delete', 'submit', false);
+        submit_button(__('Supprimer la sélection', 'conseil-de-classe'), 'delete', 'submit', false);
         echo '</p></form>';
         $this->render_bulk_toggle_script('reports');
         echo '</section>';
@@ -3680,19 +3702,19 @@ final class CC_Admin {
             $report = CC_Repo::get_report($reportId);
             if ($report) {
                 echo '<section class="cc-admin-section cc-admin-section--report-detail">';
-                echo '<h2>' . esc_html__('Modifier le compte-rendu', 'conseil-classe') . '</h2>';
-                echo '<p><a href="' . esc_url(admin_url('admin.php?page=cc_reports')) . '">' . esc_html__('← Retour à la liste', 'conseil-classe') . '</a></p>';
+                echo '<h2>' . esc_html__('Modifier le compte-rendu', 'conseil-de-classe') . '</h2>';
+                echo '<p><a href="' . esc_url(admin_url('admin.php?page=cc_reports')) . '">' . esc_html__('← Retour à la liste', 'conseil-de-classe') . '</a></p>';
                 echo '<div class="cc-admin-kv-grid cc-admin-kv-grid--report">';
-                echo '<div class="cc-admin-kv"><span class="cc-admin-kv-label">' . esc_html__('Classe', 'conseil-classe') . '</span><span class="cc-admin-kv-value">' . esc_html(($report['classe_nom'] ?? '') . ' (' . ($report['classe_niveau'] ?? '') . ')') . '</span></div>';
+                echo '<div class="cc-admin-kv"><span class="cc-admin-kv-label">' . esc_html__('Classe', 'conseil-de-classe') . '</span><span class="cc-admin-kv-value">' . esc_html(($report['classe_nom'] ?? '') . ' (' . ($report['classe_niveau'] ?? '') . ')') . '</span></div>';
                 $dateLabel = mysql2date('d/m/Y', $report['date_conseil']) . ' ' . substr((string) $report['heure_debut'], 0, 5);
                 if (!empty($report['heure_fin'])) {
                     $dateLabel .= ' — ' . substr((string) $report['heure_fin'], 0, 5);
                 }
-                echo '<div class="cc-admin-kv"><span class="cc-admin-kv-label">' . esc_html__('Date', 'conseil-classe') . '</span><span class="cc-admin-kv-value">' . esc_html($dateLabel) . '</span></div>';
-                echo '<div class="cc-admin-kv"><span class="cc-admin-kv-label">' . esc_html__('Salle', 'conseil-classe') . '</span><span class="cc-admin-kv-value">' . esc_html((string) ($report['salle_conseil'] ?? '')) . '</span></div>';
-                echo '<div class="cc-admin-kv"><span class="cc-admin-kv-label">' . esc_html__('Président', 'conseil-classe') . '</span><span class="cc-admin-kv-value">' . esc_html((string) ($report['president_conseil'] ?? '')) . '</span></div>';
-                echo '<div class="cc-admin-kv"><span class="cc-admin-kv-label">' . esc_html__('Année / trimestre', 'conseil-classe') . '</span><span class="cc-admin-kv-value">' . esc_html(($report['annee_nom'] ?? '') . ' - ' . ($report['trimestre_nom'] ?? '')) . '</span></div>';
-                echo '<div class="cc-admin-kv"><span class="cc-admin-kv-label">' . esc_html__('Validé', 'conseil-classe') . '</span><span class="cc-admin-kv-value">' . esc_html(((int) ($report['valide'] ?? 0) === 1) ? __('Oui', 'conseil-classe') : __('Non', 'conseil-classe')) . '</span></div>';
+                echo '<div class="cc-admin-kv"><span class="cc-admin-kv-label">' . esc_html__('Date', 'conseil-de-classe') . '</span><span class="cc-admin-kv-value">' . esc_html($dateLabel) . '</span></div>';
+                echo '<div class="cc-admin-kv"><span class="cc-admin-kv-label">' . esc_html__('Salle', 'conseil-de-classe') . '</span><span class="cc-admin-kv-value">' . esc_html((string) ($report['salle_conseil'] ?? '')) . '</span></div>';
+                echo '<div class="cc-admin-kv"><span class="cc-admin-kv-label">' . esc_html__('Président', 'conseil-de-classe') . '</span><span class="cc-admin-kv-value">' . esc_html((string) ($report['president_conseil'] ?? '')) . '</span></div>';
+                echo '<div class="cc-admin-kv"><span class="cc-admin-kv-label">' . esc_html__('Année / trimestre', 'conseil-de-classe') . '</span><span class="cc-admin-kv-value">' . esc_html(($report['annee_nom'] ?? '') . ' - ' . ($report['trimestre_nom'] ?? '')) . '</span></div>';
+                echo '<div class="cc-admin-kv"><span class="cc-admin-kv-label">' . esc_html__('Validé', 'conseil-de-classe') . '</span><span class="cc-admin-kv-value">' . esc_html(((int) ($report['valide'] ?? 0) === 1) ? __('Oui', 'conseil-de-classe') : __('Non', 'conseil-de-classe')) . '</span></div>';
                 echo '</div>';
 
                 echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" class="cc-admin-report-edit">';
@@ -3700,52 +3722,52 @@ final class CC_Admin {
                 echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($updateNonceToken) . '" />';
                 echo '<input type="hidden" name="id" value="' . esc_attr((string) $report['id']) . '" />';
 
-                echo '<h3>' . esc_html__('Auteur (fiche parent)', 'conseil-classe') . '</h3>';
+                echo '<h3>' . esc_html__('Auteur (fiche parent)', 'conseil-de-classe') . '</h3>';
                 echo '<table class="form-table"><tbody>';
-                $this->admin_text_row('nom_parent', __('Nom', 'conseil-classe'), (string) ($report['nom_parent'] ?? ''));
-                $this->admin_text_row('prenom_parent', __('Prénom', 'conseil-classe'), (string) ($report['prenom_parent'] ?? ''));
-                $this->admin_text_row('email_parent', __('Email', 'conseil-classe'), (string) ($report['email_parent'] ?? ''), 'email');
+                $this->admin_text_row('nom_parent', __('Nom', 'conseil-de-classe'), (string) ($report['nom_parent'] ?? ''));
+                $this->admin_text_row('prenom_parent', __('Prénom', 'conseil-de-classe'), (string) ($report['prenom_parent'] ?? ''));
+                $this->admin_text_row('email_parent', __('Email', 'conseil-de-classe'), (string) ($report['email_parent'] ?? ''), 'email');
                 echo '</tbody></table>';
 
-                echo '<h3>' . esc_html__('Participants', 'conseil-classe') . '</h3>';
-                echo '<p><label for="cc_profs_participants"><strong>' . esc_html__('Professeurs participants', 'conseil-classe') . '</strong></label></p>';
+                echo '<h3>' . esc_html__('Participants', 'conseil-de-classe') . '</h3>';
+                echo '<p><label for="cc_profs_participants"><strong>' . esc_html__('Professeurs participants', 'conseil-de-classe') . '</strong></label></p>';
                 echo '<textarea class="large-text" rows="4" id="cc_profs_participants" name="profs_participants">' . esc_textarea((string) ($report['profs_participants'] ?? '')) . '</textarea>';
 
-                echo '<h3>' . esc_html__('Délégués', 'conseil-classe') . '</h3>';
+                echo '<h3>' . esc_html__('Délégués', 'conseil-de-classe') . '</h3>';
                 echo '<table class="form-table"><tbody>';
-                $this->admin_text_row('delegue_eleve_1_prenom', __('Élève 1 — prénom', 'conseil-classe'), (string) ($report['delegue_eleve_1_prenom'] ?? ''));
-                $this->admin_text_row('delegue_eleve_1_nom', __('Élève 1 — nom', 'conseil-classe'), (string) ($report['delegue_eleve_1_nom'] ?? ''));
-                $this->admin_text_row('delegue_eleve_2_prenom', __('Élève 2 — prénom', 'conseil-classe'), (string) ($report['delegue_eleve_2_prenom'] ?? ''));
-                $this->admin_text_row('delegue_eleve_2_nom', __('Élève 2 — nom', 'conseil-classe'), (string) ($report['delegue_eleve_2_nom'] ?? ''));
-                $this->admin_text_row('delegue_parent_1_prenom', __('Parent 1 — prénom', 'conseil-classe'), (string) ($report['delegue_parent_1_prenom'] ?? ''));
-                $this->admin_text_row('delegue_parent_1_nom', __('Parent 1 — nom', 'conseil-classe'), (string) ($report['delegue_parent_1_nom'] ?? ''));
-                $this->admin_text_row('delegue_parent_2_prenom', __('Parent 2 — prénom', 'conseil-classe'), (string) ($report['delegue_parent_2_prenom'] ?? ''));
-                $this->admin_text_row('delegue_parent_2_nom', __('Parent 2 — nom', 'conseil-classe'), (string) ($report['delegue_parent_2_nom'] ?? ''));
+                $this->admin_text_row('delegue_eleve_1_prenom', __('Élève 1 — prénom', 'conseil-de-classe'), (string) ($report['delegue_eleve_1_prenom'] ?? ''));
+                $this->admin_text_row('delegue_eleve_1_nom', __('Élève 1 — nom', 'conseil-de-classe'), (string) ($report['delegue_eleve_1_nom'] ?? ''));
+                $this->admin_text_row('delegue_eleve_2_prenom', __('Élève 2 — prénom', 'conseil-de-classe'), (string) ($report['delegue_eleve_2_prenom'] ?? ''));
+                $this->admin_text_row('delegue_eleve_2_nom', __('Élève 2 — nom', 'conseil-de-classe'), (string) ($report['delegue_eleve_2_nom'] ?? ''));
+                $this->admin_text_row('delegue_parent_1_prenom', __('Parent 1 — prénom', 'conseil-de-classe'), (string) ($report['delegue_parent_1_prenom'] ?? ''));
+                $this->admin_text_row('delegue_parent_1_nom', __('Parent 1 — nom', 'conseil-de-classe'), (string) ($report['delegue_parent_1_nom'] ?? ''));
+                $this->admin_text_row('delegue_parent_2_prenom', __('Parent 2 — prénom', 'conseil-de-classe'), (string) ($report['delegue_parent_2_prenom'] ?? ''));
+                $this->admin_text_row('delegue_parent_2_nom', __('Parent 2 — nom', 'conseil-de-classe'), (string) ($report['delegue_parent_2_nom'] ?? ''));
                 echo '</tbody></table>';
 
-                echo '<h3>' . esc_html__('Décisions et récompenses', 'conseil-classe') . '</h3>';
+                echo '<h3>' . esc_html__('Décisions et récompenses', 'conseil-de-classe') . '</h3>';
                 echo '<table class="form-table"><tbody>';
-                $this->admin_number_row('nb_felicitations', __('Félicitations', 'conseil-classe'), (int) ($report['nb_felicitations'] ?? 0));
-                $this->admin_number_row('nb_encouragements', __('Encouragements', 'conseil-classe'), (int) ($report['nb_encouragements'] ?? 0));
-                $this->admin_number_row('nb_compliments', __('Compliments', 'conseil-classe'), (int) ($report['nb_compliments'] ?? 0));
-                $this->admin_number_row('nb_mise_en_garde_travail', __('Mise en garde travail', 'conseil-classe'), (int) ($report['nb_mise_en_garde_travail'] ?? 0));
-                $this->admin_number_row('nb_mise_en_garde_comportement', __('Mise en garde comportement', 'conseil-classe'), (int) ($report['nb_mise_en_garde_comportement'] ?? 0));
+                $this->admin_number_row('nb_felicitations', __('Félicitations', 'conseil-de-classe'), (int) ($report['nb_felicitations'] ?? 0));
+                $this->admin_number_row('nb_encouragements', __('Encouragements', 'conseil-de-classe'), (int) ($report['nb_encouragements'] ?? 0));
+                $this->admin_number_row('nb_compliments', __('Compliments', 'conseil-de-classe'), (int) ($report['nb_compliments'] ?? 0));
+                $this->admin_number_row('nb_mise_en_garde_travail', __('Mise en garde travail', 'conseil-de-classe'), (int) ($report['nb_mise_en_garde_travail'] ?? 0));
+                $this->admin_number_row('nb_mise_en_garde_comportement', __('Mise en garde comportement', 'conseil-de-classe'), (int) ($report['nb_mise_en_garde_comportement'] ?? 0));
                 echo '</tbody></table>';
 
-                echo '<h3>' . esc_html__('Remarques', 'conseil-classe') . '</h3>';
+                echo '<h3>' . esc_html__('Remarques', 'conseil-de-classe') . '</h3>';
                 $remarkFields = [
-                    'remarque_principal' => __('Remarque principal', 'conseil-classe'),
-                    'remarque_prof_principal' => __('Remarque prof principal', 'conseil-classe'),
-                    'remarques_autres_profs' => __('Remarques autres profs', 'conseil-classe'),
-                    'remarques_eleves_delegues' => __('Remarques délégués élèves', 'conseil-classe'),
-                    'remarques_parents' => __('Remarques parents', 'conseil-classe'),
+                    'remarque_principal' => __('Remarque principal', 'conseil-de-classe'),
+                    'remarque_prof_principal' => __('Remarque prof principal', 'conseil-de-classe'),
+                    'remarques_autres_profs' => __('Remarques autres profs', 'conseil-de-classe'),
+                    'remarques_eleves_delegues' => __('Remarques délégués élèves', 'conseil-de-classe'),
+                    'remarques_parents' => __('Remarques parents', 'conseil-de-classe'),
                 ];
                 foreach ($remarkFields as $field => $label) {
                     echo '<p><label for="cc_rep_' . esc_attr($field) . '"><strong>' . esc_html($label) . '</strong></label></p>';
                     echo '<textarea class="large-text" rows="4" id="cc_rep_' . esc_attr($field) . '" name="' . esc_attr($field) . '">' . esc_textarea((string) ($report[$field] ?? '')) . '</textarea>';
                 }
 
-                submit_button(__('Enregistrer les modifications', 'conseil-classe'));
+                submit_button(__('Enregistrer les modifications', 'conseil-de-classe'));
                 echo '</form>';
                 echo '</section>';
             }
@@ -3930,7 +3952,7 @@ final class CC_Admin {
         $year = CC_Repo::get_active_year();
         $term = CC_Repo::get_active_term();
         if (!$year || !$term) {
-            wp_die(esc_html__('Année/trimestre actif manquant.', 'conseil-classe'));
+            wp_die(esc_html__('Année/trimestre actif manquant.', 'conseil-de-classe'));
         }
 
         $reports = CC_Repo::list_reports((int) $year['id'], (int) $term['id']);
@@ -4001,7 +4023,7 @@ final class CC_Admin {
         $format = sanitize_text_field($this->get_scalar('format', 'pdf'));
         $report = $id > 0 ? CC_Repo::get_report($id) : null;
         if (!$report) {
-            wp_die(esc_html__('Compte-rendu introuvable.', 'conseil-classe'));
+            wp_die(esc_html__('Compte-rendu introuvable.', 'conseil-de-classe'));
         }
 
         $settings = CC_Repo::get_settings();
@@ -4022,7 +4044,9 @@ final class CC_Admin {
             nocache_headers();
             header('Content-Type: text/html; charset=utf-8');
             header('Content-Disposition: attachment; filename=' . $filenameBase . '.html');
-            echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            // phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML export is generated by the plugin template renderer for direct download.
+            echo $html;
+            // phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
             exit;
         }
 
@@ -4035,7 +4059,9 @@ final class CC_Admin {
             nocache_headers();
             header('Content-Type: application/pdf');
             header('Content-Disposition: attachment; filename=' . $filenameBase . '.pdf');
-            echo $dompdf->output(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            // phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- Dompdf returns the final PDF binary stream for download.
+            echo $dompdf->output();
+            // phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
             exit;
         }
 
@@ -4052,21 +4078,23 @@ final class CC_Admin {
         $pdfFile = CC_PLUGIN_DIR . 'assets/html2pdf.bundle.min.js';
         if (!is_readable($pdfFile)) {
             wp_die(wp_kses_post(
-                __('Le générateur PDF intégré est manquant. Réinstallez le plugin ou utilisez « Export HTML ».', 'conseil-classe')
+                __('Le générateur PDF intégré est manquant. Réinstallez le plugin ou utilisez « Export HTML ».', 'conseil-de-classe')
             ));
         }
 
         $scriptUrl = CC_PLUGIN_URL . 'assets/html2pdf.bundle.min.js';
         $fn = sanitize_file_name($filenameBase . '.pdf');
-        $msgWait = __('Génération du PDF… votre navigateur doit proposer un téléchargement.', 'conseil-classe');
-        $msgErr = __('Impossible de générer le PDF (script bloqué). Utilisez l’export HTML.', 'conseil-classe');
+        $msgWait = __('Génération du PDF… votre navigateur doit proposer un téléchargement.', 'conseil-de-classe');
+        $msgErr = __('Impossible de générer le PDF (script bloqué). Utilisez l’export HTML.', 'conseil-de-classe');
 
         echo '<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8" />';
         echo '<title>' . esc_html($title) . '</title>';
         echo '<style>html,body{margin:0;padding:14px;background:#eef0f4;font-family:system-ui,sans-serif;font-size:14px;}</style>';
         echo '</head><body>';
         echo '<p class="cc-pdf-wait-msg">' . esc_html($msgWait) . '</p>';
-        echo $fragment; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        // phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- Fragment contains the rendered export markup inserted before client-side PDF conversion.
+        echo $fragment;
+        // phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
         $scriptHref = add_query_arg('ver', CC_PLUGIN_VERSION, $scriptUrl);
         $pdfObjectHref = esc_url(add_query_arg('ver', CC_PLUGIN_VERSION, CC_PLUGIN_URL . 'assets/pdfobject.min.js'));
         echo '<script>window.ccPdfObjectUrl=' . wp_json_encode($pdfObjectHref) . ';</script>'; // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript
@@ -4096,11 +4124,11 @@ final class CC_Admin {
 
         $decisions = [];
         $mapDec = [
-            'nb_felicitations' => __('Félicitations', 'conseil-classe'),
-            'nb_encouragements' => __('Encouragements', 'conseil-classe'),
-            'nb_compliments' => __('Compliments', 'conseil-classe'),
-            'nb_mise_en_garde_travail' => __('Mise en garde travail', 'conseil-classe'),
-            'nb_mise_en_garde_comportement' => __('Mise en garde comportement', 'conseil-classe'),
+            'nb_felicitations' => __('Félicitations', 'conseil-de-classe'),
+            'nb_encouragements' => __('Encouragements', 'conseil-de-classe'),
+            'nb_compliments' => __('Compliments', 'conseil-de-classe'),
+            'nb_mise_en_garde_travail' => __('Mise en garde travail', 'conseil-de-classe'),
+            'nb_mise_en_garde_comportement' => __('Mise en garde comportement', 'conseil-de-classe'),
         ];
         foreach ($mapDec as $k => $label) {
             $v = (int) ($r[$k] ?? 0);
@@ -4108,7 +4136,7 @@ final class CC_Admin {
                 $decisions[] = esc_html($label) . ' : <strong>' . esc_html((string) $v) . '</strong>';
             }
         }
-        $decisionsHtml = $decisions ? implode('<br />', $decisions) : esc_html__('Aucune', 'conseil-classe');
+        $decisionsHtml = $decisions ? implode('<br />', $decisions) : esc_html__('Aucune', 'conseil-de-classe');
 
         $deleguesEleves = trim(($r['delegue_eleve_1_prenom'] ?? '') . ' ' . ($r['delegue_eleve_1_nom'] ?? ''));
         $deleguesEleves2 = trim(($r['delegue_eleve_2_prenom'] ?? '') . ' ' . ($r['delegue_eleve_2_nom'] ?? ''));
@@ -4168,59 +4196,59 @@ final class CC_Admin {
         $isEdit = (bool) $template;
 
         echo '<div class="wrap cc-admin-page">';
-        echo '<h1>' . esc_html__('Templates PDF', 'conseil-classe') . '</h1>';
+        echo '<h1>' . esc_html__('Templates PDF', 'conseil-de-classe') . '</h1>';
 
-        echo '<h2>' . esc_html($isEdit ? __('Modifier un template', 'conseil-classe') : __('Nouveau template', 'conseil-classe')) . '</h2>';
+        echo '<h2>' . esc_html($isEdit ? __('Modifier un template', 'conseil-de-classe') : __('Nouveau template', 'conseil-de-classe')) . '</h2>';
         echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
         echo '<input type="hidden" name="action" value="cc_pdf_template_save" />';
         echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
         echo '<input type="hidden" name="id" value="' . esc_attr((string) ($template['id'] ?? 0)) . '" />';
 
-        $this->text('nom', __('Nom', 'conseil-classe'), (string) ($template['nom'] ?? ''));
-        $this->textarea('description', __('Description', 'conseil-classe'), (string) ($template['description'] ?? ''));
+        $this->text('nom', __('Nom', 'conseil-de-classe'), (string) ($template['nom'] ?? ''));
+        $this->textarea('description', __('Description', 'conseil-de-classe'), (string) ($template['description'] ?? ''));
 
-        echo '<p><label for="html_template">' . esc_html__('HTML (avec tokens {{...}})', 'conseil-classe') . '</label><br />';
+        echo '<p><label for="html_template">' . esc_html__('HTML (avec tokens {{...}})', 'conseil-de-classe') . '</label><br />';
         echo '<textarea class="large-text code" rows="16" id="html_template" name="html_template">' . esc_textarea((string) ($template['html_template'] ?? CC_Defaults::default_pdf_html_template())) . '</textarea></p>';
 
-        echo '<p><label for="css_style">' . esc_html__('CSS', 'conseil-classe') . '</label><br />';
+        echo '<p><label for="css_style">' . esc_html__('CSS', 'conseil-de-classe') . '</label><br />';
         echo '<textarea class="large-text code" rows="12" id="css_style" name="css_style">' . esc_textarea((string) ($template['css_style'] ?? CC_Defaults::default_pdf_css())) . '</textarea></p>';
 
-        echo '<p><label><input type="checkbox" name="actif" value="1"' . checked((int) ($template['actif'] ?? 0), 1, false) . ' /> ' . esc_html__('Définir actif', 'conseil-classe') . '</label></p>';
+        echo '<p><label><input type="checkbox" name="actif" value="1"' . checked((int) ($template['actif'] ?? 0), 1, false) . ' /> ' . esc_html__('Définir actif', 'conseil-de-classe') . '</label></p>';
 
-        submit_button($isEdit ? __('Enregistrer', 'conseil-classe') : __('Créer', 'conseil-classe'));
+        submit_button($isEdit ? __('Enregistrer', 'conseil-de-classe') : __('Créer', 'conseil-de-classe'));
         echo '</form>';
 
         echo '<hr />';
-        echo '<h2>' . esc_html__('Liste', 'conseil-classe') . '</h2>';
+        echo '<h2>' . esc_html__('Liste', 'conseil-de-classe') . '</h2>';
 
         $templates = CC_Repo::list_pdf_templates();
         echo '<table class="widefat striped"><thead><tr>';
-        echo '<th>' . esc_html__('Nom', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Actif', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Mis à jour', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Actions', 'conseil-classe') . '</th>';
+        echo '<th>' . esc_html__('Nom', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Actif', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Mis à jour', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Actions', 'conseil-de-classe') . '</th>';
         echo '</tr></thead><tbody>';
 
         foreach ($templates as $t) {
             echo '<tr>';
             echo '<td>' . esc_html($t['nom']) . '</td>';
-            echo '<td>' . (((int) $t['actif'] === 1) ? '<strong>' . esc_html__('Oui', 'conseil-classe') . '</strong>' : esc_html__('Non', 'conseil-classe')) . '</td>';
+            echo '<td>' . (((int) $t['actif'] === 1) ? '<strong>' . esc_html__('Oui', 'conseil-de-classe') . '</strong>' : esc_html__('Non', 'conseil-de-classe')) . '</td>';
             echo '<td>' . esc_html(!empty($t['updated_at']) ? mysql2date('d/m/Y H:i', $t['updated_at']) : '') . '</td>';
             echo '<td>';
-            echo '<a class="button" href="' . esc_url(admin_url('admin.php?page=cc_pdf_templates&edit_id=' . (int) $t['id'])) . '">' . esc_html__('Éditer', 'conseil-classe') . '</a> ';
+            echo '<a class="button" href="' . esc_url(admin_url('admin.php?page=cc_pdf_templates&edit_id=' . (int) $t['id'])) . '">' . esc_html__('Éditer', 'conseil-de-classe') . '</a> ';
 
             echo '<form style="display:inline" method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
             echo '<input type="hidden" name="action" value="cc_pdf_template_activate" />';
             echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
             echo '<input type="hidden" name="id" value="' . esc_attr((string) $t['id']) . '" />';
-            submit_button(__('Activer', 'conseil-classe'), 'secondary', 'submit', false);
+            submit_button(__('Activer', 'conseil-de-classe'), 'secondary', 'submit', false);
             echo '</form> ';
 
             echo '<form style="display:inline" method="post" action="' . esc_url(admin_url('admin-post.php')) . '" onsubmit="return confirm(\'Supprimer ce template ?\');">';
             echo '<input type="hidden" name="action" value="cc_pdf_template_delete" />';
             echo '<input type="hidden" name="_wpnonce" value="' . esc_attr($nonce) . '" />';
             echo '<input type="hidden" name="id" value="' . esc_attr((string) $t['id']) . '" />';
-            submit_button(__('Supprimer', 'conseil-classe'), 'delete', 'submit', false);
+            submit_button(__('Supprimer', 'conseil-de-classe'), 'delete', 'submit', false);
             echo '</form>';
 
             echo '</td>';
@@ -4228,11 +4256,11 @@ final class CC_Admin {
         }
 
         if (!$templates) {
-            echo '<tr><td colspan="4">' . esc_html__('Aucun template.', 'conseil-classe') . '</td></tr>';
+            echo '<tr><td colspan="4">' . esc_html__('Aucun template.', 'conseil-de-classe') . '</td></tr>';
         }
         echo '</tbody></table>';
 
-        echo '<p style="margin-top:14px;"><strong>' . esc_html__('Tokens disponibles:', 'conseil-classe') . '</strong><br />';
+        echo '<p style="margin-top:14px;"><strong>' . esc_html__('Tokens disponibles:', 'conseil-de-classe') . '</strong><br />';
         echo '<code>{{association_nom}}</code> <code>{{association_adresse}}</code> <code>{{association_telephone}}</code> <code>{{association_email}}</code> ';
         echo '<code>{{etablissement_nom}}</code> <code>{{annee}}</code> <code>{{trimestre}}</code> <code>{{classe}}</code> <code>{{classe_niveau}}</code> ';
         echo '<code>{{date_conseil}}</code> <code>{{heure_conseil}}</code> <code>{{salle}}</code> <code>{{president}}</code> ';
@@ -4296,18 +4324,18 @@ final class CC_Admin {
         $rows = (array) $wpdb->get_results("SELECT * FROM " . esc_sql($logs) . " ORDER BY timestamp DESC LIMIT 100", ARRAY_A);
 
         echo '<div class="wrap cc-admin-page">';
-        echo '<h1>' . esc_html__('Logs', 'conseil-classe') . '</h1>';
+        echo '<h1>' . esc_html__('Logs', 'conseil-de-classe') . '</h1>';
         echo '<section class="cc-admin-section">';
-        echo '<h2>' . esc_html__('Historique récent', 'conseil-classe') . '</h2>';
-        echo '<p>' . esc_html__('Dernières 100 modifications (paramètres).', 'conseil-classe') . '</p>';
+        echo '<h2>' . esc_html__('Historique récent', 'conseil-de-classe') . '</h2>';
+        echo '<p>' . esc_html__('Dernières 100 modifications (paramètres).', 'conseil-de-classe') . '</p>';
 
         echo '<table class="widefat striped"><thead><tr>';
-        echo '<th>' . esc_html__('Date', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Action', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Section', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Champ', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Utilisateur', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('IP', 'conseil-classe') . '</th>';
+        echo '<th>' . esc_html__('Date', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Action', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Section', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Champ', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Utilisateur', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('IP', 'conseil-de-classe') . '</th>';
         echo '</tr></thead><tbody>';
 
         foreach ($rows as $r) {
@@ -4321,7 +4349,7 @@ final class CC_Admin {
             echo '</tr>';
         }
         if (!$rows) {
-            echo '<tr><td colspan="6">' . esc_html__('Aucun log.', 'conseil-classe') . '</td></tr>';
+            echo '<tr><td colspan="6">' . esc_html__('Aucun log.', 'conseil-de-classe') . '</td></tr>';
         }
         echo '</tbody></table>';
         echo '</section>';
@@ -4365,11 +4393,11 @@ final class CC_Admin {
         $maxParentsPerCouncil = max(1, (int) ($settings['max_parents_per_conseil'] ?? 2));
 
         echo '<div class="wrap cc-admin-page">';
-        echo '<h1>' . esc_html__('Statistiques', 'conseil-classe') . '</h1>';
+        echo '<h1>' . esc_html__('Statistiques', 'conseil-de-classe') . '</h1>';
 
         if (!$year || !$term || !$activeYearId || !$activeTermId) {
             echo '<div class="notice notice-warning inline"><p>';
-            echo esc_html__('Définissez une année scolaire et un trimestre actifs pour afficher les statistiques.', 'conseil-classe');
+            echo esc_html__('Définissez une année scolaire et un trimestre actifs pour afficher les statistiques.', 'conseil-de-classe');
             echo '</p></div></div>';
             return;
         }
@@ -4462,11 +4490,11 @@ final class CC_Admin {
 
         $statsJson = [
             'labels' => [
-                'fel'  => __('Félicitations', 'conseil-classe'),
-                'enc'  => __('Encouragements', 'conseil-classe'),
-                'comp' => __('Compliments', 'conseil-classe'),
-                'mgt'  => __('M.G. Travail', 'conseil-classe'),
-                'mgc'  => __('M.G. Comportement', 'conseil-classe'),
+                'fel'  => __('Félicitations', 'conseil-de-classe'),
+                'enc'  => __('Encouragements', 'conseil-de-classe'),
+                'comp' => __('Compliments', 'conseil-de-classe'),
+                'mgt'  => __('M.G. Travail', 'conseil-de-classe'),
+                'mgc'  => __('M.G. Comportement', 'conseil-de-classe'),
             ],
             'colors' => [
                 'fel'  => ['bg' => 'rgba(34,169,92,0.75)',  'border' => '#17883e'],
@@ -4505,16 +4533,16 @@ final class CC_Admin {
 
         // ══ SECTION APPRÉCIATIONS ════════════════════════════════════════════
         echo '<section class="cc-admin-section cc-admin-section--dashboard">';
-        echo '<h2>' . esc_html__('Appréciations', 'conseil-classe') . '</h2>';
+        echo '<h2>' . esc_html__('Appréciations', 'conseil-de-classe') . '</h2>';
 
         // Graphique 1 : barres verticales empilées par classe
         echo '<div class="cc-admin-canvas-card" style="margin-bottom:14px">';
         echo '<h3>' . esc_html(
             /* translators: %s: term name */
-            sprintf(__('Appréciations par classe — %s', 'conseil-classe'), $termNom)
+            sprintf(__('Appréciations par classe — %s', 'conseil-de-classe'), $termNom)
         ) . '</h3>';
         echo '<div class="cc-admin-canvas-wrap" style="height:340px">';
-        echo '<canvas id="cc-stat-apprec-class" role="img" aria-label="' . esc_attr__('Appréciations par classe', 'conseil-classe') . '"></canvas>';
+        echo '<canvas id="cc-stat-apprec-class" role="img" aria-label="' . esc_attr__('Appréciations par classe', 'conseil-de-classe') . '"></canvas>';
         echo '</div></div>';
 
         // Graphiques 2 + 3 côte à côte
@@ -4524,27 +4552,27 @@ final class CC_Admin {
         echo '<div class="cc-admin-canvas-card">';
         echo '<h3>' . esc_html(
             /* translators: %s: term name */
-            sprintf(__('Répartition moyenne — %s', 'conseil-classe'), $termNom)
+            sprintf(__('Répartition moyenne — %s', 'conseil-de-classe'), $termNom)
         ) . '</h3>';
         echo '<div class="cc-admin-canvas-wrap cc-admin-canvas-wrap--donut">';
-        echo '<canvas id="cc-stat-apprec-avg" role="img" aria-label="' . esc_attr__('Répartition des appréciations', 'conseil-classe') . '"></canvas>';
+        echo '<canvas id="cc-stat-apprec-avg" role="img" aria-label="' . esc_attr__('Répartition des appréciations', 'conseil-de-classe') . '"></canvas>';
         echo '</div></div>';
 
         // Graphique 3 : évolution par trimestre (courbe) + filtre classe
         echo '<div class="cc-admin-canvas-card">';
         echo '<h3>' . esc_html(
             /* translators: %s: year name */
-            sprintf(__('Évolution des appréciations — %s', 'conseil-classe'), $yearNom)
+            sprintf(__('Évolution des appréciations — %s', 'conseil-de-classe'), $yearNom)
         ) . '</h3>';
         echo '<div class="cc-stat-class-filter">';
         echo '<select id="cc-stat-class-select" class="cc-stat-select">';
-        echo '<option value="global">' . esc_html__('Toutes les classes (total)', 'conseil-classe') . '</option>';
+        echo '<option value="global">' . esc_html__('Toutes les classes (total)', 'conseil-de-classe') . '</option>';
         foreach (array_keys($evolutionByClass) as $cn) {
             echo '<option value="' . esc_attr((string) $cn) . '">' . esc_html((string) $cn) . '</option>';
         }
         echo '</select></div>';
         echo '<div class="cc-admin-canvas-wrap" style="height:260px">';
-        echo '<canvas id="cc-stat-apprec-evolution" role="img" aria-label="' . esc_attr__('Évolution des appréciations', 'conseil-classe') . '"></canvas>';
+        echo '<canvas id="cc-stat-apprec-evolution" role="img" aria-label="' . esc_attr__('Évolution des appréciations', 'conseil-de-classe') . '"></canvas>';
         echo '</div></div>';
 
         echo '</div>'; // grid
@@ -4552,7 +4580,7 @@ final class CC_Admin {
 
         // ══ SECTION IMPLICATION DES PARENTS ══════════════════════════════════
         echo '<section class="cc-admin-section cc-admin-section--dashboard">';
-        echo '<h2>' . esc_html__('Implication des parents', 'conseil-classe') . '</h2>';
+        echo '<h2>' . esc_html__('Implication des parents', 'conseil-de-classe') . '</h2>';
 
         // Graphiques 4 + 5
         echo '<div class="cc-admin-canvas-grid" style="margin-bottom:14px">';
@@ -4561,20 +4589,20 @@ final class CC_Admin {
         echo '<div class="cc-admin-canvas-card">';
         echo '<h3>' . esc_html(
             /* translators: %s: year name */
-            sprintf(__('Couverture & comptes-rendus — %s', 'conseil-classe'), $yearNom)
+            sprintf(__('Couverture & comptes-rendus — %s', 'conseil-de-classe'), $yearNom)
         ) . '</h3>';
         echo '<div class="cc-admin-canvas-wrap" style="height:260px">';
-        echo '<canvas id="cc-stat-parents-engagement" role="img" aria-label="' . esc_attr__('Implication des parents par trimestre', 'conseil-classe') . '"></canvas>';
+        echo '<canvas id="cc-stat-parents-engagement" role="img" aria-label="' . esc_attr__('Implication des parents par trimestre', 'conseil-de-classe') . '"></canvas>';
         echo '</div></div>';
 
         // Graphique 5 : courbe des taux (%)
         echo '<div class="cc-admin-canvas-card">';
         echo '<h3>' . esc_html(
             /* translators: %s: year name */
-            sprintf(__('Taux de couverture & CR — %s', 'conseil-classe'), $yearNom)
+            sprintf(__('Taux de couverture & CR — %s', 'conseil-de-classe'), $yearNom)
         ) . '</h3>';
         echo '<div class="cc-admin-canvas-wrap" style="height:260px">';
-        echo '<canvas id="cc-stat-parents-rate" role="img" aria-label="' . esc_attr__('Taux de couverture et CR', 'conseil-classe') . '"></canvas>';
+        echo '<canvas id="cc-stat-parents-rate" role="img" aria-label="' . esc_attr__('Taux de couverture et CR', 'conseil-de-classe') . '"></canvas>';
         echo '</div></div>';
 
         echo '</div>'; // grid
@@ -4586,7 +4614,7 @@ final class CC_Admin {
         echo '<div class="cc-admin-canvas-card">';
         echo '<h3>' . esc_html(
             /* translators: %s: term name */
-            sprintf(__('Top 5 parents engagés — %s', 'conseil-classe'), $termNom)
+            sprintf(__('Top 5 parents engagés — %s', 'conseil-de-classe'), $termNom)
         ) . '</h3>';
         if ($topParents) {
             echo '<ol class="cc-stat-top-list">';
@@ -4595,12 +4623,12 @@ final class CC_Admin {
                 echo '<span class="cc-stat-top-rank">' . esc_html((string) ($i + 1)) . '</span>';
                 echo '<span class="cc-stat-top-name">' . esc_html(trim((string) $p['prenom'] . ' ' . (string) $p['nom'])) . '</span>';
                 echo '<span class="cc-stat-top-count">' . esc_html((string) $p['nb_inscriptions']) . ' ';
-                echo esc_html(_n('conseil', 'conseils', (int) $p['nb_inscriptions'], 'conseil-classe')) . '</span>';
+                echo esc_html(_n('conseil', 'conseils', (int) $p['nb_inscriptions'], 'conseil-de-classe')) . '</span>';
                 echo '</li>';
             }
             echo '</ol>';
         } else {
-            echo '<p class="cc-admin-dash-empty">' . esc_html__('Aucune inscription pour ce trimestre.', 'conseil-classe') . '</p>';
+            echo '<p class="cc-admin-dash-empty">' . esc_html__('Aucune inscription pour ce trimestre.', 'conseil-de-classe') . '</p>';
         }
         echo '</div>';
 
@@ -4608,13 +4636,13 @@ final class CC_Admin {
         echo '<div class="cc-admin-canvas-card">';
         echo '<h3>' . esc_html(
             /* translators: %s: term name */
-            sprintf(__('Conseils sans CR (date passée) — %s', 'conseil-classe'), $termNom)
+            sprintf(__('Conseils sans CR (date passée) — %s', 'conseil-de-classe'), $termNom)
         ) . '</h3>';
         if ($pendingCouncils) {
             echo '<table class="widefat striped cc-stat-pending-table"><thead><tr>';
-            echo '<th>' . esc_html__('Classe', 'conseil-classe') . '</th>';
-            echo '<th>' . esc_html__('Date', 'conseil-classe') . '</th>';
-            echo '<th>' . esc_html__('Salle', 'conseil-classe') . '</th>';
+            echo '<th>' . esc_html__('Classe', 'conseil-de-classe') . '</th>';
+            echo '<th>' . esc_html__('Date', 'conseil-de-classe') . '</th>';
+            echo '<th>' . esc_html__('Salle', 'conseil-de-classe') . '</th>';
             echo '</tr></thead><tbody>';
             foreach ($pendingCouncils as $pc) {
                 echo '<tr>';
@@ -4625,7 +4653,7 @@ final class CC_Admin {
             }
             echo '</tbody></table>';
         } else {
-            echo '<p class="cc-admin-dash-empty cc-admin-dash-empty--ok">' . esc_html__('Aucun conseil en attente. Tout est à jour.', 'conseil-classe') . '</p>';
+            echo '<p class="cc-admin-dash-empty cc-admin-dash-empty--ok">' . esc_html__('Aucun conseil en attente. Tout est à jour.', 'conseil-de-classe') . '</p>';
         }
         echo '</div>';
 

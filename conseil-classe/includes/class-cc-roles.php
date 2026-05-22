@@ -36,16 +36,16 @@ final class CC_Roles {
     }
 
     public static function register(): void {
-        self::ensure_role(self::ROLE_SUPER, __('Super admin (conseil de classe)', 'conseil-classe'), [
+        self::ensure_role(self::ROLE_SUPER, __('Super admin (conseil de classe)', 'conseil-de-classe'), [
             self::CAP_SUPER => true,
             self::CAP_MANAGE => true,
             self::CAP_PARENT => true,
         ]);
-        self::ensure_role(self::ROLE_ADMIN, __('Admin (conseil de classe)', 'conseil-classe'), [
+        self::ensure_role(self::ROLE_ADMIN, __('Admin (conseil de classe)', 'conseil-de-classe'), [
             self::CAP_MANAGE => true,
             self::CAP_PARENT => true,
         ]);
-        self::ensure_role(self::ROLE_PARENT, __('Parent (conseil de classe)', 'conseil-classe'), [
+        self::ensure_role(self::ROLE_PARENT, __('Parent (conseil de classe)', 'conseil-de-classe'), [
             self::CAP_PARENT => true,
         ]);
 
@@ -95,14 +95,14 @@ final class CC_Roles {
     /** Rôle attribuable lors de la création d’un compte WP depuis la fiche parent. */
     public static function allowed_roles_for_parent_user_dropdown(): array {
         $choices = [];
-        $choices[self::ROLE_PARENT] = __('Parent uniquement', 'conseil-classe');
+        $choices[self::ROLE_PARENT] = __('Parent uniquement', 'conseil-de-classe');
 
         $uid = get_current_user_id();
         if ($uid > 0 && self::user_can_manage_plugin($uid)) {
-            $choices[self::ROLE_ADMIN] = __('Admin conseil (+ parent)', 'conseil-classe');
+            $choices[self::ROLE_ADMIN] = __('Admin conseil (+ parent)', 'conseil-de-classe');
         }
         if ($uid > 0 && self::user_can_super($uid)) {
-            $choices[self::ROLE_SUPER] = __('Super admin conseil (+ admin + parent)', 'conseil-classe');
+            $choices[self::ROLE_SUPER] = __('Super admin conseil (+ admin + parent)', 'conseil-de-classe');
         }
 
         return $choices;

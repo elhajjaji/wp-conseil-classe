@@ -217,7 +217,7 @@ final class CC_DB {
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- intentional insert.
             $wpdb->insert($settingsTable, [
                 'year_id' => null,
-                'nom_etablissement' => __('Mon établissement', 'conseil-classe'),
+                'nom_etablissement' => __('Mon établissement', 'conseil-de-classe'),
                 'max_parents_per_conseil' => 2,
                 'created_at' => $now,
                 'updated_at' => $now,
@@ -246,7 +246,7 @@ final class CC_DB {
                 // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name from safe source.
                 $legacySettingsId = (int) $wpdb->get_var('SELECT id FROM ' . esc_sql($settingsTable) . ' WHERE year_id IS NULL ORDER BY id ASC LIMIT 1');
                 if ($legacySettingsId > 0) {
-                    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- intentional update.
+                    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- intentional update on activation/migration path.
                     $wpdb->update($settingsTable, ['year_id' => $activeYearId], ['id' => $legacySettingsId], ['%d'], ['%d']);
                 }
             }
@@ -284,8 +284,8 @@ final class CC_DB {
             $now = current_time('mysql');
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- intentional insert.
             $wpdb->insert($tplTable, [
-                'nom' => __('Template par défaut', 'conseil-classe'),
-                'description' => __('Template de base pour l’export PDF des comptes-rendus', 'conseil-classe'),
+                'nom' => __('Template par défaut', 'conseil-de-classe'),
+                'description' => __('Template de base pour l’export PDF des comptes-rendus', 'conseil-de-classe'),
                 'html_template' => CC_Defaults::default_pdf_html_template(),
                 'css_style' => CC_Defaults::default_pdf_css(),
                 'actif' => 1,

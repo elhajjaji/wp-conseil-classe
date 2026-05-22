@@ -34,10 +34,10 @@ Le code du plugin se trouve dans le dossier **`conseil-classe/`** à la racine d
 
 Un **`docker-compose.yml`** lance WordPress + MySQL. **Aucun dossier du plugin n’est monté dans le conteneur** : l’installation se fait comme sur un site classique en **téléversant le ZIP** (`Extensions → Ajouter une extension → Téléverser`).
 
-À la racine du dépôt : **`conseil-classe.zip`** (et une copie versionnée `conseil-classe-VERSION.zip`). À l’intérieur du ZIP, la **première** entrée doit être **`conseil-classe/`** — pas un dossier du type `conseil-classe-0.4.0/` par-dessus.
+À la racine du dépôt : **`conseil-classe.zip`** (et une copie versionnée `conseil-classe-VERSION.zip`). À l’intérieur du ZIP, la **première** entrée doit être **`conseil-classe/`** — pas un dossier du type `conseil-classe-1.0.0/` par-dessus.
 
-**Piège fréquent (chemin inexistant)** : si vous décompressez `conseil-classe-0.4.0.zip` dans un dossier du même nom, puis vous **recompressez** ce dossier pour le téléverser dans WordPress, vous obtenez :  
-`conseil-classe-0.4.0/conseil-classe/conseil-classe.php` → erreurs du type `file_get_contents(...) No such file or directory`.  
+**Piège fréquent (chemin inexistant)** : si vous décompressez `conseil-classe-1.0.0.zip` dans un dossier du même nom, puis vous **recompressez** ce dossier pour le téléverser dans WordPress, vous obtenez :  
+`conseil-classe-1.0.0/conseil-classe/conseil-classe.php` → erreurs du type `file_get_contents(...) No such file or directory`.  
 **Correctif :** téléversez **directement** l’archive fournie par le dépôt (sans repasser par une extraction ou un re-zippage), ou régénérez avec `python scripts/build-plugin-zip.py`.
 
 Prérequis : [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows / macOS) ou Docker Engine + Compose v2.
@@ -48,7 +48,7 @@ docker compose up -d
 ```
 
 1. Ouvrir **http://localhost:8890** et terminer l’assistant WordPress.
-2. **Extensions → Ajouter une extension → Téléverser une extension** et choisir **`conseil-classe.zip`** (ou la copie `conseil-classe-0.4.0.zip` au besoin).
+2. **Extensions → Ajouter une extension → Téléverser une extension** et choisir **`conseil-classe.zip`** (ou la copie `conseil-classe-1.0.0.zip` au besoin).
 3. **Activer** « Conseil de classe ».
 
 Si le port publié est déjà pris sur ta machine, change la ligne `8890:80` dans `docker-compose.yml` (ex. `8081:80`).

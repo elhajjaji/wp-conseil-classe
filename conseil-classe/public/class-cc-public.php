@@ -62,8 +62,8 @@ final class CC_Public {
         }
         if (!CC_Roles::user_can_parent_portal()) {
             wp_die(
-                wp_kses_post(__('Ce compte n’a pas le profil conseil de classe nécessaire (parent, admin conseil ou super admin conseil).', 'conseil-classe')),
-                esc_html__('Accès refusé', 'conseil-classe'),
+                wp_kses_post(__('Ce compte n’a pas le profil conseil de classe nécessaire (parent, admin conseil ou super admin conseil).', 'conseil-de-classe')),
+                esc_html__('Accès refusé', 'conseil-de-classe'),
                 ['response' => 403]
             );
         }
@@ -188,28 +188,28 @@ final class CC_Public {
 
         $loginId = (int) get_option('cc_parent_login_page_id', 0);
         if ($loginId > 0 && ($u = get_permalink($loginId))) {
-            $items[] = ['key' => 'login', 'label' => __('Espace compte', 'conseil-classe'), 'url' => $u];
+            $items[] = ['key' => 'login', 'label' => __('Espace compte', 'conseil-de-classe'), 'url' => $u];
         }
         $planId = (int) get_option('cc_plannings_page_id', 0);
         if ($planId > 0 && ($u = get_permalink($planId))) {
-            $items[] = ['key' => 'planning', 'label' => __('Planning', 'conseil-classe'), 'url' => $u];
+            $items[] = ['key' => 'planning', 'label' => __('Planning', 'conseil-de-classe'), 'url' => $u];
         }
         $mcId = (int) get_option('cc_my_councils_page_id', 0);
         if ($mcId > 0 && ($u = get_permalink($mcId))) {
-            $items[] = ['key' => 'my_councils', 'label' => __('Mes conseils', 'conseil-classe'), 'url' => $u];
+            $items[] = ['key' => 'my_councils', 'label' => __('Mes conseils', 'conseil-de-classe'), 'url' => $u];
         }
         $rpId = (int) get_option('cc_report_form_page_id', 0);
         if ($rpId > 0 && ($u = get_permalink($rpId))) {
-            $items[] = ['key' => 'report', 'label' => __('Compte rendu', 'conseil-classe'), 'url' => $u];
+            $items[] = ['key' => 'report', 'label' => __('Compte rendu', 'conseil-de-classe'), 'url' => $u];
         }
 
         if (!$items) {
-            return '<div class="cc-notice cc-notice-warning">' . esc_html__('Aucune page parent n’est configurée. Allez dans Conseil de classe → Paramètres → Pages (front).', 'conseil-classe') . '</div>';
+            return '<div class="cc-notice cc-notice-warning">' . esc_html__('Aucune page parent n’est configurée. Allez dans Conseil de classe → Paramètres → Pages (front).', 'conseil-de-classe') . '</div>';
         }
 
         ob_start();
-        echo '<nav class="cc-parent-nav" aria-label="' . esc_attr__('Espace parents — conseils de classe', 'conseil-classe') . '">';
-        echo '<p class="cc-parent-nav-title">' . esc_html__('Conseils de classe — Parents', 'conseil-classe') . '</p>';
+        echo '<nav class="cc-parent-nav" aria-label="' . esc_attr__('Espace parents — conseils de classe', 'conseil-de-classe') . '">';
+        echo '<p class="cc-parent-nav-title">' . esc_html__('Conseils de classe — Parents', 'conseil-de-classe') . '</p>';
         echo '<ul class="cc-parent-nav-list">';
         foreach ($items as $it) {
             $cls = ['cc-parent-nav-link'];
@@ -232,26 +232,26 @@ final class CC_Public {
     public function shortcode_parent_login($atts): string {
         ob_start();
         echo '<div class="cc-parent-login">';
-        echo '<h3>' . esc_html__('Espace parents (compte du site)', 'conseil-classe') . '</h3>';
+        echo '<h3>' . esc_html__('Espace parents (compte du site)', 'conseil-de-classe') . '</h3>';
 
         if (is_user_logged_in()) {
             if (!CC_Roles::user_can_parent_portal()) {
-                echo '<div class="cc-notice cc-notice-warning">' . esc_html__('Vous êtes connecté, mais ce compte n’a pas le rôle « parent conseil » demandé. Contactez l’administration.', 'conseil-classe') . '</div>';
+                echo '<div class="cc-notice cc-notice-warning">' . esc_html__('Vous êtes connecté, mais ce compte n’a pas le rôle « parent conseil » demandé. Contactez l’administration.', 'conseil-de-classe') . '</div>';
             } else {
                 $row = $this->get_frontend_parent_record();
                 $u = wp_get_current_user();
-                echo '<div class="cc-notice cc-notice-info">' . esc_html__('Vous êtes connecté.', 'conseil-classe') . '</div>';
+                echo '<div class="cc-notice cc-notice-info">' . esc_html__('Vous êtes connecté.', 'conseil-de-classe') . '</div>';
                 echo '<p><strong>' . esc_html($u->display_name) . '</strong> — ' . esc_html((string) $u->user_email) . '</p>';
                 if ($row) {
-                    echo '<p>' . esc_html__('Fiche parent :', 'conseil-classe') . ' <strong>' . esc_html($row['prenom'] . ' ' . $row['nom']) . '</strong></p>';
+                    echo '<p>' . esc_html__('Fiche parent :', 'conseil-de-classe') . ' <strong>' . esc_html($row['prenom'] . ' ' . $row['nom']) . '</strong></p>';
                 } else {
-                    echo '<div class="cc-notice cc-notice-warning">' . esc_html__('Aucune fiche parent n’est liée à ce compte (identifiant ou email). Un administrateur doit associer cet utilisateur à la liste des parents.', 'conseil-classe') . '</div>';
+                    echo '<div class="cc-notice cc-notice-warning">' . esc_html__('Aucune fiche parent n’est liée à ce compte (identifiant ou email). Un administrateur doit associer cet utilisateur à la liste des parents.', 'conseil-de-classe') . '</div>';
                 }
-                echo '<p><a class="cc-btn cc-btn-secondary" href="' . esc_url(wp_logout_url((string) wp_validate_redirect(self::current_page_url_or_home(), home_url('/')))) . '">' . esc_html__('Se déconnecter', 'conseil-classe') . '</a></p>';
+                echo '<p><a class="cc-btn cc-btn-secondary" href="' . esc_url(wp_logout_url((string) wp_validate_redirect(self::current_page_url_or_home(), home_url('/')))) . '">' . esc_html__('Se déconnecter', 'conseil-de-classe') . '</a></p>';
             }
         } else {
-            echo '<p class="cc-muted">' . esc_html__('Accédez au planning, à vos inscriptions et aux comptes rendus avec votre compte fourni par l’établissement ou l’association.', 'conseil-classe') . '</p>';
-            echo '<p><a class="cc-btn cc-btn-primary" href="' . esc_url($this->wp_login_url_for_conseil()) . '">' . esc_html__('Se connecter', 'conseil-classe') . '</a></p>';
+            echo '<p class="cc-muted">' . esc_html__('Accédez au planning, à vos inscriptions et aux comptes rendus avec votre compte fourni par l’établissement ou l’association.', 'conseil-de-classe') . '</p>';
+            echo '<p><a class="cc-btn cc-btn-primary" href="' . esc_url($this->wp_login_url_for_conseil()) . '">' . esc_html__('Se connecter', 'conseil-de-classe') . '</a></p>';
         }
 
         echo '</div>';
@@ -274,7 +274,7 @@ final class CC_Public {
     public function shortcode_plannings($atts): string {
         if (!is_user_logged_in() || !CC_Roles::user_can_parent_portal()) {
             return $this->wrap_parent_shortcode_output(
-                '<div class="cc-plannings"><div class="cc-notice cc-notice-warning">' . esc_html__('Connectez-vous avec un compte autorisé pour voir le planning.', 'conseil-classe') . '</div></div>',
+                '<div class="cc-plannings"><div class="cc-notice cc-notice-warning">' . esc_html__('Connectez-vous avec un compte autorisé pour voir le planning.', 'conseil-de-classe') . '</div></div>',
                 'planning'
             );
         }
@@ -282,7 +282,7 @@ final class CC_Public {
         $parentRow = $this->get_frontend_parent_record();
         if (!$parentRow) {
             return $this->wrap_parent_shortcode_output(
-                '<div class="cc-plannings"><div class="cc-notice cc-notice-warning">' . esc_html__('Votre compte n’est pas encore lié à une fiche parent. Contactez l’administration.', 'conseil-classe') . '</div></div>',
+                '<div class="cc-plannings"><div class="cc-notice cc-notice-warning">' . esc_html__('Votre compte n’est pas encore lié à une fiche parent. Contactez l’administration.', 'conseil-de-classe') . '</div></div>',
                 'planning'
             );
         }
@@ -291,7 +291,7 @@ final class CC_Public {
         $term = CC_Repo::get_active_term();
         if (!$year || !$term) {
             return $this->wrap_parent_shortcode_output(
-                '<div class="cc-plannings"><div class="cc-notice cc-notice-warning">' . esc_html__('Aucune année/trimestre actif configuré.', 'conseil-classe') . '</div></div>',
+                '<div class="cc-plannings"><div class="cc-notice cc-notice-warning">' . esc_html__('Aucune année/trimestre actif configuré.', 'conseil-de-classe') . '</div></div>',
                 'planning'
             );
         }
@@ -305,23 +305,23 @@ final class CC_Public {
         ob_start();
         echo '<div class="cc-plannings">';
         /* translators: 1: school year name, 2: term name */
-        echo '<h3>' . esc_html(sprintf(__('Planning des conseils (%1$s - %2$s)', 'conseil-classe'), $year['nom'], $term['nom'])) . '</h3>';
+        echo '<h3>' . esc_html(sprintf(__('Planning des conseils (%1$s - %2$s)', 'conseil-de-classe'), $year['nom'], $term['nom'])) . '</h3>';
 
         if (!$councils) {
-            echo '<p>' . esc_html__('Aucun conseil planifié.', 'conseil-classe') . '</p>';
+            echo '<p>' . esc_html__('Aucun conseil planifié.', 'conseil-de-classe') . '</p>';
             echo '</div>';
 
             return $this->wrap_parent_shortcode_output((string) ob_get_clean(), 'planning');
         }
 
-        echo '<div class="cc-table-scroll" role="region" aria-label="' . esc_attr__('Planning des conseils', 'conseil-classe') . '">';
+        echo '<div class="cc-table-scroll" role="region" aria-label="' . esc_attr__('Planning des conseils', 'conseil-de-classe') . '">';
         echo '<table class="cc-table"><thead><tr>';
-        echo '<th>' . esc_html__('Classe', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Date', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Heure', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Salle', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Places', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Action', 'conseil-classe') . '</th>';
+        echo '<th>' . esc_html__('Classe', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Date', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Heure', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Salle', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Places', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Action', 'conseil-de-classe') . '</th>';
         echo '</tr></thead><tbody>';
 
         foreach ($councils as $co) {
@@ -347,16 +347,16 @@ final class CC_Public {
                 echo '<input type="hidden" name="action" value="cc_parent_unregister" />';
                 wp_nonce_field('cc_parent_unregister');
                 echo '<input type="hidden" name="council_id" value="' . esc_attr((string) $co['id']) . '" />';
-                echo '<button class="cc-btn cc-btn-secondary" type="submit">' . esc_html__('Se désinscrire', 'conseil-classe') . '</button>';
+                echo '<button class="cc-btn cc-btn-secondary" type="submit">' . esc_html__('Se désinscrire', 'conseil-de-classe') . '</button>';
                 echo '</form>';
             } elseif ($remaining <= 0) {
-                echo '<span class="cc-badge cc-badge-full">' . esc_html__('Complet', 'conseil-classe') . '</span>';
+                echo '<span class="cc-badge cc-badge-full">' . esc_html__('Complet', 'conseil-de-classe') . '</span>';
             } else {
                 echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
                 echo '<input type="hidden" name="action" value="cc_parent_register" />';
                 wp_nonce_field('cc_parent_register');
                 echo '<input type="hidden" name="council_id" value="' . esc_attr((string) $co['id']) . '" />';
-                echo '<button class="cc-btn cc-btn-primary" type="submit">' . esc_html__('S’inscrire', 'conseil-classe') . '</button>';
+                echo '<button class="cc-btn cc-btn-primary" type="submit">' . esc_html__('S’inscrire', 'conseil-de-classe') . '</button>';
                 echo '</form>';
             }
 
@@ -376,7 +376,7 @@ final class CC_Public {
         check_admin_referer('cc_parent_register');
         $councilId = (int) $this->post_scalar('council_id', '0');
         if ($councilId <= 0) {
-            wp_die(esc_html__('Conseil invalide.', 'conseil-classe'));
+            wp_die(esc_html__('Conseil invalide.', 'conseil-de-classe'));
         }
 
         $settings = CC_Repo::get_settings();
@@ -389,7 +389,7 @@ final class CC_Public {
         $count = CC_Repo::count_registrations_for_council($councilId);
         if ($count >= $maxParents) {
             /* translators: %d: max number of parents allowed */
-            wp_die(esc_html(sprintf(__('Limite atteinte : maximum %d parent(s) autorisé(s) par conseil.', 'conseil-classe'), $maxParents)));
+            wp_die(esc_html(sprintf(__('Limite atteinte : maximum %d parent(s) autorisé(s) par conseil.', 'conseil-de-classe'), $maxParents)));
         }
 
         CC_Repo::register_parent($councilId, (int) $parent['id']);
@@ -409,7 +409,7 @@ final class CC_Public {
     public function shortcode_my_councils($atts): string {
         if (!is_user_logged_in() || !CC_Roles::user_can_parent_portal()) {
             return $this->wrap_parent_shortcode_output(
-                '<div class="cc-my-councils"><div class="cc-notice cc-notice-warning">' . esc_html__('Connectez-vous pour accéder à vos conseils.', 'conseil-classe') . '</div></div>',
+                '<div class="cc-my-councils"><div class="cc-notice cc-notice-warning">' . esc_html__('Connectez-vous pour accéder à vos conseils.', 'conseil-de-classe') . '</div></div>',
                 'my_councils'
             );
         }
@@ -417,7 +417,7 @@ final class CC_Public {
         $parent = $this->get_frontend_parent_record();
         if (!$parent) {
             return $this->wrap_parent_shortcode_output(
-                '<div class="cc-my-councils"><div class="cc-notice cc-notice-warning">' . esc_html__('Votre compte n’est pas lié à une fiche parent.', 'conseil-classe') . '</div></div>',
+                '<div class="cc-my-councils"><div class="cc-notice cc-notice-warning">' . esc_html__('Votre compte n’est pas lié à une fiche parent.', 'conseil-de-classe') . '</div></div>',
                 'my_councils'
             );
         }
@@ -426,7 +426,7 @@ final class CC_Public {
         $term = CC_Repo::get_active_term();
         if (!$year || !$term) {
             return $this->wrap_parent_shortcode_output(
-                '<div class="cc-my-councils"><div class="cc-notice cc-notice-warning">' . esc_html__('Aucune année/trimestre actif configuré.', 'conseil-classe') . '</div></div>',
+                '<div class="cc-my-councils"><div class="cc-notice cc-notice-warning">' . esc_html__('Aucune année/trimestre actif configuré.', 'conseil-de-classe') . '</div></div>',
                 'my_councils'
             );
         }
@@ -443,10 +443,10 @@ final class CC_Public {
 
         ob_start();
         echo '<div class="cc-my-councils">';
-        echo '<h3>' . esc_html__('Mes conseils (actifs)', 'conseil-classe') . '</h3>';
+        echo '<h3>' . esc_html__('Mes conseils (actifs)', 'conseil-de-classe') . '</h3>';
         echo $this->render_parent_councils_table($actifs, $reportFormUrl); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
-        echo '<h3 style="margin-top:24px">' . esc_html__('Historique', 'conseil-classe') . '</h3>';
+        echo '<h3 style="margin-top:24px">' . esc_html__('Historique', 'conseil-de-classe') . '</h3>';
         echo $this->render_parent_councils_table($hist, $reportFormUrl); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
         echo '</div>';
 
@@ -455,16 +455,16 @@ final class CC_Public {
 
     private function render_parent_councils_table(array $councils, string $reportFormUrl): string {
         if (!$councils) {
-            return '<p>' . esc_html__('Aucun conseil.', 'conseil-classe') . '</p>';
+            return '<p>' . esc_html__('Aucun conseil.', 'conseil-de-classe') . '</p>';
         }
 
         ob_start();
-        echo '<div class="cc-table-scroll" role="region" aria-label="' . esc_attr__('Liste des conseils', 'conseil-classe') . '">';
+        echo '<div class="cc-table-scroll" role="region" aria-label="' . esc_attr__('Liste des conseils', 'conseil-de-classe') . '">';
         echo '<table class="cc-table"><thead><tr>';
-        echo '<th>' . esc_html__('Classe', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Date', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Heure', 'conseil-classe') . '</th>';
-        echo '<th>' . esc_html__('Compte-rendu', 'conseil-classe') . '</th>';
+        echo '<th>' . esc_html__('Classe', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Date', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Heure', 'conseil-de-classe') . '</th>';
+        echo '<th>' . esc_html__('Compte-rendu', 'conseil-de-classe') . '</th>';
         echo '</tr></thead><tbody>';
 
         foreach ($councils as $co) {
@@ -481,12 +481,12 @@ final class CC_Public {
             echo '<td>' . esc_html($heure) . '</td>';
             echo '<td>';
             if ($existing) {
-                echo '<span class="cc-badge cc-badge-done">' . esc_html__('Déjà rédigé', 'conseil-classe') . '</span>';
+                echo '<span class="cc-badge cc-badge-done">' . esc_html__('Déjà rédigé', 'conseil-de-classe') . '</span>';
             } elseif ($reportFormUrl) {
                 $url = add_query_arg(['council_id' => (int) $co['id']], $reportFormUrl);
-                echo '<a class="cc-btn cc-btn-primary" href="' . esc_url($url) . '">' . esc_html__('Rédiger', 'conseil-classe') . '</a>';
+                echo '<a class="cc-btn cc-btn-primary" href="' . esc_url($url) . '">' . esc_html__('Rédiger', 'conseil-de-classe') . '</a>';
             } else {
-                echo '<em>' . esc_html__('Configurez la page du formulaire de compte-rendu.', 'conseil-classe') . '</em>';
+                echo '<em>' . esc_html__('Configurez la page du formulaire de compte-rendu.', 'conseil-de-classe') . '</em>';
             }
             echo '</td>';
             echo '</tr>';
@@ -501,7 +501,7 @@ final class CC_Public {
     public function shortcode_report_form($atts): string {
         if (!is_user_logged_in() || !CC_Roles::user_can_parent_portal()) {
             return $this->wrap_parent_shortcode_output(
-                '<div class="cc-report-form"><div class="cc-notice cc-notice-warning">' . esc_html__('Connexion obligatoire pour rédiger un compte rendu.', 'conseil-classe') . '</div></div>',
+                '<div class="cc-report-form"><div class="cc-notice cc-notice-warning">' . esc_html__('Connexion obligatoire pour rédiger un compte rendu.', 'conseil-de-classe') . '</div></div>',
                 'report'
             );
         }
@@ -509,7 +509,7 @@ final class CC_Public {
         $parent = $this->get_frontend_parent_record();
         if (!$parent) {
             return $this->wrap_parent_shortcode_output(
-                '<div class="cc-report-form"><div class="cc-notice cc-notice-warning">' . esc_html__('Fiche parent introuvable pour ce compte.', 'conseil-classe') . '</div></div>',
+                '<div class="cc-report-form"><div class="cc-notice cc-notice-warning">' . esc_html__('Fiche parent introuvable pour ce compte.', 'conseil-de-classe') . '</div></div>',
                 'report'
             );
         }
@@ -517,14 +517,14 @@ final class CC_Public {
         $councilId = (int) $this->get_scalar('council_id', '0');
         if ($councilId <= 0) {
             return $this->wrap_parent_shortcode_output(
-                '<div class="cc-report-form"><div class="cc-notice cc-notice-warning">' . esc_html__('Conseil manquant : utilisez « Rédiger » depuis « Mes conseils ».', 'conseil-classe') . '</div></div>',
+                '<div class="cc-report-form"><div class="cc-notice cc-notice-warning">' . esc_html__('Conseil manquant : utilisez « Rédiger » depuis « Mes conseils ».', 'conseil-de-classe') . '</div></div>',
                 'report'
             );
         }
 
         if (!CC_Repo::is_parent_registered($councilId, (int) $parent['id'])) {
             return $this->wrap_parent_shortcode_output(
-                '<div class="cc-report-form"><div class="cc-notice cc-notice-error">' . esc_html__('Vous n’êtes pas inscrit(e) à ce conseil.', 'conseil-classe') . '</div></div>',
+                '<div class="cc-report-form"><div class="cc-notice cc-notice-error">' . esc_html__('Vous n’êtes pas inscrit(e) à ce conseil.', 'conseil-de-classe') . '</div></div>',
                 'report'
             );
         }
@@ -532,7 +532,7 @@ final class CC_Public {
         $council = CC_Repo::get_council($councilId);
         if (!$council) {
             return $this->wrap_parent_shortcode_output(
-                '<div class="cc-report-form"><div class="cc-notice cc-notice-warning">' . esc_html__('Conseil introuvable.', 'conseil-classe') . '</div></div>',
+                '<div class="cc-report-form"><div class="cc-notice cc-notice-warning">' . esc_html__('Conseil introuvable.', 'conseil-de-classe') . '</div></div>',
                 'report'
             );
         }
@@ -540,7 +540,7 @@ final class CC_Public {
         $existing = CC_Repo::get_report_for_council($councilId);
         if ($existing) {
             return $this->wrap_parent_shortcode_output(
-                '<div class="cc-report-form"><div class="cc-notice cc-notice-info">' . esc_html__('Un compte-rendu existe déjà pour ce conseil.', 'conseil-classe') . '</div></div>',
+                '<div class="cc-report-form"><div class="cc-notice cc-notice-info">' . esc_html__('Un compte-rendu existe déjà pour ce conseil.', 'conseil-de-classe') . '</div></div>',
                 'report'
             );
         }
@@ -552,11 +552,11 @@ final class CC_Public {
 
         ob_start();
         echo '<div class="cc-report-form">';
-        echo '<h3>' . esc_html__('Nouveau compte-rendu', 'conseil-classe') . '</h3>';
+        echo '<h3>' . esc_html__('Nouveau compte-rendu', 'conseil-de-classe') . '</h3>';
         echo '<p><strong>' . esc_html($council['classe_nom'] . ' (' . $council['classe_niveau'] . ')') . '</strong> — ' . esc_html(mysql2date('d/m/Y', $council['date_conseil'])) . ' ' . esc_html($heure) . '</p>';
 
         echo '<div class="cc-notice cc-notice-info">';
-        echo esc_html__('Une fois créé, vous ne pouvez plus modifier ce compte-rendu depuis cet espace ; l’équipe conseil peut le corriger depuis l’administration du site si besoin.', 'conseil-classe');
+        echo esc_html__('Une fois créé, vous ne pouvez plus modifier ce compte-rendu depuis cet espace ; l’équipe conseil peut le corriger depuis l’administration du site si besoin.', 'conseil-de-classe');
         echo '</div>';
 
         echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
@@ -564,44 +564,44 @@ final class CC_Public {
         wp_nonce_field('cc_report_create');
         echo '<input type="hidden" name="council_id" value="' . esc_attr((string) $councilId) . '" />';
 
-        echo '<fieldset class="cc-fieldset"><legend>' . esc_html__('Participants', 'conseil-classe') . '</legend>';
-        echo '<label>' . esc_html__('Professeurs participants', 'conseil-classe') . '<br />';
+        echo '<fieldset class="cc-fieldset"><legend>' . esc_html__('Participants', 'conseil-de-classe') . '</legend>';
+        echo '<label>' . esc_html__('Professeurs participants', 'conseil-de-classe') . '<br />';
         echo '<textarea name="profs_participants" rows="3" class="cc-textarea"></textarea></label>';
 
         echo '<div class="cc-grid">';
-        echo '<div><h4>' . esc_html__('Délégués élèves', 'conseil-classe') . '</h4>';
-        $this->two_name_fields('delegue_eleve_1_prenom', 'delegue_eleve_1_nom', __('Prénom', 'conseil-classe'), __('Nom', 'conseil-classe'));
-        $this->two_name_fields('delegue_eleve_2_prenom', 'delegue_eleve_2_nom', __('Prénom', 'conseil-classe'), __('Nom', 'conseil-classe'));
+        echo '<div><h4>' . esc_html__('Délégués élèves', 'conseil-de-classe') . '</h4>';
+        $this->two_name_fields('delegue_eleve_1_prenom', 'delegue_eleve_1_nom', __('Prénom', 'conseil-de-classe'), __('Nom', 'conseil-de-classe'));
+        $this->two_name_fields('delegue_eleve_2_prenom', 'delegue_eleve_2_nom', __('Prénom', 'conseil-de-classe'), __('Nom', 'conseil-de-classe'));
         echo '</div>';
 
-        echo '<div><h4>' . esc_html__('Délégués parents', 'conseil-classe') . '</h4>';
-        $this->two_name_fields('delegue_parent_1_prenom', 'delegue_parent_1_nom', __('Prénom', 'conseil-classe'), __('Nom', 'conseil-classe'));
-        $this->two_name_fields('delegue_parent_2_prenom', 'delegue_parent_2_nom', __('Prénom', 'conseil-classe'), __('Nom', 'conseil-classe'));
+        echo '<div><h4>' . esc_html__('Délégués parents', 'conseil-de-classe') . '</h4>';
+        $this->two_name_fields('delegue_parent_1_prenom', 'delegue_parent_1_nom', __('Prénom', 'conseil-de-classe'), __('Nom', 'conseil-de-classe'));
+        $this->two_name_fields('delegue_parent_2_prenom', 'delegue_parent_2_nom', __('Prénom', 'conseil-de-classe'), __('Nom', 'conseil-de-classe'));
         echo '</div>';
         echo '</div>';
         echo '</fieldset>';
 
-        echo '<fieldset class="cc-fieldset"><legend>' . esc_html__('Décisions et récompenses', 'conseil-classe') . '</legend>';
-        $this->number_field('nb_felicitations', __('Félicitations', 'conseil-classe'));
-        $this->number_field('nb_encouragements', __('Encouragements', 'conseil-classe'));
-        $this->number_field('nb_compliments', __('Compliments', 'conseil-classe'));
-        $this->number_field('nb_mise_en_garde_travail', __('Mise en garde travail', 'conseil-classe'));
-        $this->number_field('nb_mise_en_garde_comportement', __('Mise en garde comportement', 'conseil-classe'));
+        echo '<fieldset class="cc-fieldset"><legend>' . esc_html__('Décisions et récompenses', 'conseil-de-classe') . '</legend>';
+        $this->number_field('nb_felicitations', __('Félicitations', 'conseil-de-classe'));
+        $this->number_field('nb_encouragements', __('Encouragements', 'conseil-de-classe'));
+        $this->number_field('nb_compliments', __('Compliments', 'conseil-de-classe'));
+        $this->number_field('nb_mise_en_garde_travail', __('Mise en garde travail', 'conseil-de-classe'));
+        $this->number_field('nb_mise_en_garde_comportement', __('Mise en garde comportement', 'conseil-de-classe'));
         echo '</fieldset>';
 
-        echo '<fieldset class="cc-fieldset"><legend>' . esc_html__('Remarques', 'conseil-classe') . '</legend>';
-        $this->textarea_field('remarque_principal', __('Remarque principal', 'conseil-classe'));
-        $this->textarea_field('remarque_prof_principal', __('Remarque prof principal', 'conseil-classe'));
-        $this->textarea_field('remarques_autres_profs', __('Remarques autres profs', 'conseil-classe'));
-        $this->textarea_field('remarques_eleves_delegues', __('Remarques délégués élèves', 'conseil-classe'));
-        $this->textarea_field('remarques_parents', __('Remarques parents', 'conseil-classe'));
+        echo '<fieldset class="cc-fieldset"><legend>' . esc_html__('Remarques', 'conseil-de-classe') . '</legend>';
+        $this->textarea_field('remarque_principal', __('Remarque principal', 'conseil-de-classe'));
+        $this->textarea_field('remarque_prof_principal', __('Remarque prof principal', 'conseil-de-classe'));
+        $this->textarea_field('remarques_autres_profs', __('Remarques autres profs', 'conseil-de-classe'));
+        $this->textarea_field('remarques_eleves_delegues', __('Remarques délégués élèves', 'conseil-de-classe'));
+        $this->textarea_field('remarques_parents', __('Remarques parents', 'conseil-de-classe'));
         echo '</fieldset>';
 
         echo '<input type="hidden" name="nom_parent" value="' . esc_attr((string) ($parent['nom'] ?? '')) . '" />';
         echo '<input type="hidden" name="prenom_parent" value="' . esc_attr((string) ($parent['prenom'] ?? '')) . '" />';
         echo '<input type="hidden" name="email_parent" value="' . esc_attr((string) ($parent['email'] ?? '')) . '" />';
 
-        echo '<button class="cc-btn cc-btn-primary" type="submit">' . esc_html__('Créer le compte-rendu', 'conseil-classe') . '</button>';
+        echo '<button class="cc-btn cc-btn-primary" type="submit">' . esc_html__('Créer le compte-rendu', 'conseil-de-classe') . '</button>';
         echo '</form>';
         echo '</div>';
 
@@ -613,15 +613,15 @@ final class CC_Public {
         check_admin_referer('cc_report_create');
         $councilId = (int) $this->post_scalar('council_id', '0');
         if ($councilId <= 0) {
-            wp_die(esc_html__('Conseil invalide.', 'conseil-classe'));
+            wp_die(esc_html__('Conseil invalide.', 'conseil-de-classe'));
         }
 
         if (!CC_Repo::is_parent_registered($councilId, (int) $parent['id'])) {
-            wp_die(esc_html__('Vous n’êtes pas inscrit(e) à ce conseil.', 'conseil-classe'));
+            wp_die(esc_html__('Vous n’êtes pas inscrit(e) à ce conseil.', 'conseil-de-classe'));
         }
 
         if (CC_Repo::get_report_for_council($councilId)) {
-            wp_die(esc_html__('Un compte-rendu existe déjà.', 'conseil-classe'));
+            wp_die(esc_html__('Un compte-rendu existe déjà.', 'conseil-de-classe'));
         }
 
         $data = [

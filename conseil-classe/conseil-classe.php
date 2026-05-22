@@ -2,23 +2,23 @@
 /**
  * Plugin Name:       Gestion Conseils de Classe
  * Plugin URI:        https://github.com/elhajjaji/wp-conseil-classe
- * Description:       Class council management: school settings, school years/terms, classes, planning, parent registrations, reports, CSV and PDF exports.
- * Version:           0.4.33
+ * Description:       Class council management with statistics dashboards, planning, parent registrations, reports, CSV and PDF exports.
+ * Version:           1.0.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
- * Tested up to:       6.9
- * Author:            aelhajjaji
+ * Tested up to:      7.0
+ * Author:            AbdERRAHMAN EL HAJJAJI
  * Author URI:        https://profiles.wordpress.org/aelhajjaji/
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       conseil-classe
+ * Text Domain:       conseil-de-classe
  */
 
 if (!defined('ABSPATH')) {
     exit;
 }
 
-define('CC_PLUGIN_VERSION', '0.4.33');
+define('CC_PLUGIN_VERSION', '1.0.0');
 define('CC_PLUGIN_FILE', __FILE__);
 define('CC_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('CC_PLUGIN_URL', plugin_dir_url(__FILE__));

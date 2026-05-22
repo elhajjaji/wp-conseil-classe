@@ -2,39 +2,46 @@
 Contributors: aelhajjaji
 Tags: school, education, parents, csv, pdf
 Requires at least: 6.0
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.4.33
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Manage class councils: school settings, school years/terms, classes, planning, parent registrations, reports, CSV and PDF exports.
+Manage class councils in WordPress with dashboards, planning, parent participation, reports, and CSV/PDF exports.
 
 == Description ==
 
-**Conseil de classe** helps schools and parent associations manage class council workflows directly in WordPress.
+Gestion Conseils de Classe helps schools and parent associations run class councils directly in WordPress, from setup and planning to parent participation, report writing, and follow-up.
 
-Main features:
+It combines day-to-day management screens with a statistics dashboard that gives a quick view of assessments by class, parent involvement, coverage, and pending actions for the active period.
+
+Core features:
 
 * School and parent-association settings
 * School years and terms (active period)
+* Statistics dashboard for assessments, parent involvement, coverage, and operational follow-up
 * Classes and council planning (dates, rooms, chairperson)
-* Parent records, linked WordPress accounts, and slot registrations
-* Council reports with admin validation and CSV/HTML/PDF exports (customizable templates)
+* Parent records, linked WordPress accounts, and registration management
+* Council reports with admin validation and CSV/HTML/PDF exports
 
-The parent area is based on WordPress pages that contain shortcodes. These pages are mapped in the plugin settings.
+The public area uses WordPress pages with shortcodes. These pages are selected in the plugin settings.
+
+The plugin is intended for schools, PTAs, and teams that want one WordPress site for preparation, participation, reporting, and follow-up.
 
 == Installation ==
 
 1. Upload the plugin folder to `wp-content/plugins/` (or install it from the Plugins screen in your WordPress admin).
 2. Activate **Gestion Conseils de Classe** from the Plugins menu.
-3. Open the **Conseil de classe** menu and follow the setup order: settings, active school year, active term, classes, councils, parents.
+3. Open the **Conseil de classe** menu and configure school settings, the active school year, and the active term.
+4. Create the required WordPress pages with the plugin shortcodes, then select those pages in the plugin settings.
+5. Add classes, councils, parents, and administrators, then start using the dashboard and exports.
 
 == Frequently Asked Questions ==
 
 = Do I need to create pages on the site? =
 
-Yes. Create WordPress pages containing the shortcodes listed under **Conseil de classe → Settings → Pages (front)**, then select those pages in the dropdown menus.
+Yes. Create WordPress pages containing the shortcodes listed under **Conseil de classe → Settings → Pages (front)**, then assign those pages in the plugin settings.
 
 = What WordPress roles does the plugin add? =
 
@@ -42,55 +49,24 @@ The plugin adds dedicated roles (parent, council administrator, council super-ad
 
 = Does PDF generation work without extra plugins? =
 
-The plugin can generate a PDF via the browser (bundled script). If the **Dompdf** library is available on the server, server-side PDF generation is also supported.
+Yes. The plugin can generate a PDF in the browser with the bundled script. If the **Dompdf** library is available on the server, server-side PDF generation is also supported.
 
 == Screenshots ==
 
-1. Dashboard: shortcuts and active context (school, year, term).
-2. Settings: school, association, rules and public pages (shortcodes).
+1. Statistics dashboard: assessments by class, parent involvement, coverage rate, and operational follow-up for the active period.
+2. Main dashboard: shortcuts and active context for the school year and term.
 3. Council schedule in the admin area.
 4. Parent portal: schedule and registration or deregistration.
-5. Dashboard with the year-scoped statistics strip (key figures: parents, classes, councils, reports).
-6. Statistics page: assessments by class, parent involvement, coverage rate and term-over-term trends.
+5. Settings: school, parent association, and public pages linked to shortcodes.
+6. Admin overview dashboard: key figures, setup status, quick actions, and summary charts.
 
 == Changelog ==
 
-= 0.4.32 =
-* WordPress.org review fixes: plugin renamed to Gestion Conseils de Classe, readme translated to English, inline scripts replaced with wp_print_inline_script_tag(), pdfobject.min.js hosted locally (no CDN calls).
-
-= 0.4.31 =
-* Dashboard hero strip scoped to the active year: key stats (parents, classes, councils, reports) for the current year displayed prominently; other years shown in a compact secondary line.
-* Added screenshots 5 and 6 (dashboard stats strip and Statistics page).
-
-= 0.4.1 =
-* WordPress.org compliance fixes (Plugin Check): input validation/escaping, SQL query hardening and readme adjustments.
-
-= 0.4.0 =
-* WordPress-compliant structure: plugin folder `conseil-classe/` with main file `conseil-classe/conseil-classe.php` (old paths removed after uninstall).
-
-= 0.3.2 =
-* Repository: removed duplicated `conseil-classe-plugin/` subfolder inside the plugin folder. WordPress sometimes detected two plugin paths ("file not found" after update when the old entry pointed to the duplicate).
-
-= 0.3.1 =
-* Main file header: compliant format per the Plugin Handbook (spaced fields, LF line endings, licence "GPL v2 or later") to avoid false positives from Plugin Check.
-
-= 0.3.0 =
-* WordPress.org directory preparation: readme.txt and main file headers (URI, licence, PHP and WordPress requirements).
-* Artwork (banners, icons, screenshots) organised in the Git repository under `wordpress-org/assets/` with the names expected by Subversion — not included in the plugin ZIP.
-
-= 0.2.9 =
-* Previous version (see Git history for details).
+= 1.0.0 =
+* First public package prepared for WordPress.org review.
+* Readme, screenshots, metadata, and release assets aligned for the initial directory release.
 
 == Upgrade Notice ==
 
-= 0.4.32 =
-Recommended update: WordPress.org review fixes (plugin name, English readme, inline scripts, no CDN calls).
-
-= 0.4.31 =
-Recommended update: dashboard statistics scoped to active year, new screenshots.
-
-= 0.4.1 =
-Recommended update for WordPress.org compliance fixes (Plugin Check) and general robustness.
-
-= 0.4.0 =
-IMPORTANT: uninstall/remove any old folder (`conseil-classe-plugin` or duplicates) before installing this ZIP. Expected path after install: `wp-content/plugins/conseil-classe/conseil-classe.php`.
+= 1.0.0 =
+First public version for WordPress.org review.
